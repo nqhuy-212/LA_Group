@@ -1,0 +1,24 @@
+# Rác trình duyệt sinh ra khi chụp screenshot, không phải nội dung dự án
+screenshots/edge-profile/
+screenshots/edge-profile2/
+
+# Node / Next.js (frontend/ sẽ tạo sau)
+node_modules/
+.next/
+out/
+frontend/.env*
+
+# Python / FastAPI (backend/ sẽ tạo sau)
+__pycache__/
+*.pyc
+.venv/
+venv/
+backend/.env*
+
+# Secrets chung
+.env
+.env.local
+
+# OS junk
+Thumbs.db
+.DS_Store

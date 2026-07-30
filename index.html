@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LA Group (LAHR) – Cung ứng nhân lực &amp; kết nối việc làm tại Hải Dương</title>
+<meta name="description" content="LA Group (Công ty CP Dịch vụ Cung ứng Nhân lực LA - LAHR) - Cung ứng, cho thuê lại lao động cho các khu công nghiệp tại Hải Dương và miền Bắc. Tìm việc làm, tư vấn AI, chính sách công ty." />
+<style>
+  :root{
+    --primary-950:#061c38;
+    --primary-900:#0a3d7a;
+    --primary-800:#0d4f9c;
+    --primary-700:#0f60bd;
+    --primary-600:#1471d9;
+    --primary-500:#2f8bf0;
+    --primary-100:#e8f2fd;
+    --accent:#e5372e;
+    --accent-dark:#c22a22;
+    --bg:#f4f6f9;
+    --surface:#ffffff;
+    --text:#1f2733;
+    --text-muted:#5b6672;
+    --border:#e2e7ee;
+    --radius:12px;
+    --shadow:0 2px 10px rgba(15,40,80,.08);
+    --shadow-lg:0 12px 32px rgba(10,40,90,.14);
+    --container:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  button{font:inherit;cursor:pointer;}
+  ul{margin:0;padding:0;list-style:none;}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 16px;}
+  section{padding:40px 0;}
+  h1,h2,h3{margin:0;line-height:1.25;}
+  .eyebrow{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;
+    color:var(--primary-700);background:var(--primary-100);padding:4px 10px;border-radius:999px;
+    text-transform:uppercase;margin-bottom:8px;
+  }
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .section-head h2{font-size:20px;font-weight:800;}
+  .section-head .desc{color:var(--text-muted);font-size:14px;margin-top:4px;}
+  .link-more{font-size:13px;font-weight:700;color:var(--primary-700);white-space:nowrap;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:none;border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px;
+    min-height:44px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--primary-600);color:#fff;box-shadow:0 6px 16px rgba(20,113,217,.28);}
+  .btn-primary:hover{background:var(--primary-700);}
+  .btn-accent{background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(229,55,46,.28);}
+  .btn-accent:hover{background:var(--accent-dark);}
+  .btn-ghost{background:#fff;color:var(--primary-700);border:1px solid var(--border);}
+  .btn-outline-light{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6);}
+  .btn-block{width:100%;}
+  .badge-hot{
+    display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:#fff;
+    font-size:11px;font-weight:800;padding:2px 8px;border-radius:5px;letter-spacing:.02em;
+  }
+  .icon{width:20px;height:20px;flex-shrink:0;}
+  .icon-sm{width:16px;height:16px;}
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease;}
+  .reveal.is-visible{opacity:1;transform:translateY(0);}
+  .reveal-stagger > *{transition-delay:calc(var(--i,0) * 80ms);}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .reveal{transition:none;opacity:1;transform:none;}
+  }
+
+  /* ---------- top utility bar ---------- */
+  .topbar{background:var(--primary-900);color:#cfe1f7;font-size:12.5px;}
+  .topbar .wrap{display:flex;justify-content:space-between;align-items:center;height:34px;}
+  .topbar .contact-line{display:flex;gap:18px;}
+  .topbar .contact-line span{display:inline-flex;align-items:center;gap:5px;}
+  .topbar .top-links{display:flex;gap:14px;}
+  .topbar a:hover{color:#fff;}
+
+  /* ---------- main header ---------- */
+  header.site{position:sticky;top:0;z-index:50;}
+  .navbar{background:var(--primary-700);background:linear-gradient(180deg,var(--primary-800),var(--primary-700));box-shadow:var(--shadow);}
+  .navbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px;}
+  .logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:18px;flex-shrink:0;}
+  .logo .mark{
+    width:40px;height:40px;object-fit:contain;flex-shrink:0;display:block;
+  }
+  .logo .sub{display:block;font-size:10px;font-weight:600;color:#bcd6f5;letter-spacing:.05em;}
+  nav.main-nav{display:none;}
+  nav.main-nav ul{display:flex;gap:4px;}
+  nav.main-nav a{
+    display:block;padding:10px 14px;border-radius:8px;color:#e8f1fc;font-weight:600;font-size:14px;
+    transition:background .15s ease;
+  }
+  nav.main-nav a:hover,nav.main-nav a.active{background:rgba(255,255,255,.14);color:#fff;}
+  .nav-actions{display:none;align-items:center;gap:10px;}
+  .hamburger{
+    display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;background:transparent;
+    color:#fff;flex-shrink:0;
+  }
+  .mobile-nav{
+    display:none;background:var(--primary-800);border-top:1px solid rgba(255,255,255,.12);
+  }
+  .mobile-nav.open{display:block;}
+  .mobile-nav ul{padding:8px;}
+  .mobile-nav a{display:block;padding:13px 12px;color:#eaf2fc;font-weight:600;font-size:15px;border-radius:8px;}
+  .mobile-nav a:active{background:rgba(255,255,255,.12);}
+  .mobile-nav .divider{height:1px;background:rgba(255,255,255,.12);margin:6px 4px;}
+  .mobile-nav .mobile-cta{padding:10px 12px;display:flex;gap:8px;}
+
+  /* ---------- search bar strip ---------- */
+  .search-strip{background:#fff;border-bottom:1px solid var(--border);}
+  .search-form{
+    display:flex;flex-direction:column;gap:10px;padding:14px 0;
+  }
+  .search-field{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9px;
+    padding:11px 12px;background:var(--bg);min-height:44px;
+  }
+  .search-field input,.search-field select{
+    border:none;background:transparent;outline:none;font-size:14px;color:var(--text);width:100%;font-family:inherit;
+  }
+  .search-field svg{color:var(--primary-600);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    background:radial-gradient(circle at 15% 20%,var(--primary-600),var(--primary-900) 70%);
+    color:#fff;padding:36px 0 48px;position:relative;overflow:hidden;
+  }
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:24px;position:relative;z-index:2;}
+  .hero-copy h1{font-size:26px;font-weight:800;letter-spacing:-.01em;}
+  .hero-copy p{color:#d3e6fb;font-size:14.5px;margin-top:10px;max-width:520px;}
+  .hero-stats{display:flex;gap:22px;margin-top:18px;flex-wrap:wrap;}
+  .hero-stats div strong{display:block;font-size:20px;font-weight:800;}
+  .hero-stats div span{font-size:12px;color:#bcd6f5;}
+  .hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+
+  .quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;position:relative;z-index:2;}
+  .quick-card{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--radius);
+    padding:16px 14px;backdrop-filter:blur(2px);
+  }
+  .quick-card .qi{
+    width:38px;height:38px;border-radius:9px;background:#fff;color:var(--primary-700);
+    display:flex;align-items:center;justify-content:center;margin-bottom:10px;
+  }
+  .quick-card h3{color:#fff;font-size:13.5px;font-weight:700;}
+  .quick-card p{color:#c9def7;font-size:11.5px;margin:4px 0 0;}
+
+  /* ---------- generic card ---------- */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+
+  /* ---------- event carousel ---------- */
+  .event-section{background:linear-gradient(135deg,var(--primary-700),var(--primary-800));padding:28px 0 20px;}
+  .event-track{
+    display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 6px;
+    -ms-overflow-style:none;scrollbar-width:none;
+  }
+  .event-track::-webkit-scrollbar{display:none;}
+  .event-card{
+    flex:0 0 78%;scroll-snap-align:start;background:#fff;border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow-lg);display:flex;flex-direction:column;
+  }
+  .event-thumb{
+    height:120px;background:linear-gradient(135deg,var(--primary-100),#dcebfb);color:var(--primary-700);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .event-body{padding:12px 14px 4px;flex:1;}
+  .event-body h3{font-size:13.5px;font-weight:700;line-height:1.35;}
+  .event-date{display:block;margin-top:8px;font-size:11.5px;color:var(--text-muted);}
+  .event-card .btn{margin:10px 14px 14px;width:calc(100% - 28px);}
+  .event-dots{display:flex;justify-content:center;gap:6px;margin-top:14px;}
+  .event-dots .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);}
+  .event-dots .dot.active{background:#fff;width:18px;border-radius:4px;transition:width .2s ease;}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;-ms-overflow-style:none;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{
+    flex-shrink:0;border:1px solid var(--border);background:#fff;color:var(--text-muted);
+    padding:9px 16px;border-radius:999px;font-weight:700;font-size:13px;min-height:40px;
+  }
+  .tab-btn.active{background:var(--primary-600);border-color:var(--primary-600);color:#fff;}
+
+  /* ---------- job list ---------- */
+  .job-list{display:flex;flex-direction:column;gap:12px;}
+  .job-card{
+    display:flex;gap:12px;padding:14px;align-items:flex-start;
+  }
+  .job-logo{
+    width:46px;height:46px;border-radius:9px;background:var(--primary-100);color:var(--primary-700);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;
+  }
+  .job-main{flex:1;min-width:0;}
+  .job-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .job-title-row a{font-size:15px;font-weight:700;}
+  .job-company{color:var(--text-muted);font-size:13px;margin-top:2px;}
+  .job-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;}
+  .job-meta span{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text-muted);}
+  .job-meta .salary{color:var(--accent-dark);font-weight:700;}
+  .job-apply{display:none;flex-shrink:0;}
+  .job-card:hover{border-color:var(--primary-600);}
+
+  /* ---------- categories ---------- */
+  .cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .cat-card{padding:16px 14px;text-align:left;}
+  .cat-card .ci{
+    width:40px;height:40px;border-radius:9px;background:var(--primary-100);color:var(--primary-700);
+    display:flex;align-items:center;justify-content:center;margin-bottom:10px;
+  }
+  .cat-card h3{font-size:14px;font-weight:700;}
+  .cat-card span{font-size:12px;color:var(--text-muted);}
+
+  /* ---------- AI banner ---------- */
+  .ai-banner{
+    background:linear-gradient(120deg,var(--primary-800),var(--primary-600));
+    border-radius:16px;padding:28px 20px;color:#fff;display:flex;flex-direction:column;gap:16px;align-items:flex-start;
+    position:relative;overflow:hidden;
+  }
+  .ai-banner::after{
+    content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.08);
+  }
+  .ai-banner .ai-chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;}
+  .ai-banner h2{font-size:21px;font-weight:800;max-width:480px;position:relative;z-index:1;}
+  .ai-banner p{color:#d3e6fb;font-size:13.5px;max-width:460px;position:relative;z-index:1;}
+
+  /* ---------- news ---------- */
+  .news-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+  .news-card{overflow:hidden;}
+  .news-thumb{
+    height:150px;background:linear-gradient(135deg,var(--primary-600),var(--primary-900));
+    display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.85);
+  }
+  .news-body{padding:14px 16px 16px;}
+  .news-tag{font-size:11px;font-weight:800;color:var(--primary-700);text-transform:uppercase;letter-spacing:.04em;}
+  .news-body h3{font-size:15px;font-weight:700;margin-top:6px;}
+  .news-body p{font-size:13px;color:var(--text-muted);margin-top:6px;}
+  .news-date{font-size:11.5px;color:var(--text-muted);margin-top:10px;display:block;}
+
+  /* ---------- feed list (Doanh nghiệp mới / Cảnh báo) ---------- */
+  .feed-list{display:flex;flex-direction:column;}
+  .feed-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+  .feed-row:last-child{border-bottom:none;}
+  .feed-thumb{
+    width:60px;height:60px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--primary-100),#dcebfb);color:var(--primary-700);
+  }
+  .feed-thumb.alert{background:linear-gradient(135deg,#fde3e1,#fbd0cc);color:var(--accent-dark);}
+  .feed-body h4{font-size:13.5px;font-weight:700;line-height:1.4;}
+  .feed-date{display:block;font-size:11.5px;color:var(--text-muted);margin-top:6px;}
+
+  /* ---------- warning box ---------- */
+  .warn-box{
+    border:1.5px solid #f3b9b5;background:#fdf1f0;border-radius:var(--radius);padding:16px;display:flex;gap:12px;
+  }
+  .warn-box .wi{
+    width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .warn-box h3{font-size:14.5px;font-weight:800;color:var(--accent-dark);}
+  .warn-box ul{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+  .warn-box li{font-size:13px;color:#7a2b26;padding-left:14px;position:relative;}
+  .warn-box li::before{content:"•";position:absolute;left:0;color:var(--accent);font-weight:900;}
+
+  /* ---------- biz CTA ---------- */
+  .biz-cta{
+    background:var(--surface);border:1px dashed var(--primary-600);border-radius:var(--radius);
+    padding:20px;display:flex;flex-direction:column;gap:12px;text-align:center;
+  }
+  .biz-cta h3{font-size:16px;font-weight:800;}
+  .biz-cta p{font-size:13px;color:var(--text-muted);}
+
+  /* ---------- about section ---------- */
+  .about-section{background:linear-gradient(160deg,var(--primary-900),var(--primary-700));color:#fff;}
+  .about-section .eyebrow{background:rgba(255,255,255,.14);color:#fff;}
+  .about-section h2{font-size:21px;font-weight:800;margin-top:6px;color:#fff;}
+  .about-list{margin-top:16px;display:flex;flex-direction:column;gap:12px;}
+  .about-list li{display:flex;gap:10px;font-size:13.5px;color:#dcebfb;line-height:1.5;}
+  .about-list li svg{flex-shrink:0;margin-top:2px;color:#8fc4f7;}
+  .about-media{
+    margin-top:22px;border-radius:var(--radius);overflow:hidden;height:170px;
+    background:linear-gradient(135deg,var(--primary-600),var(--primary-900));
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ---------- footer ---------- */
+  footer.site{background:var(--primary-950);color:#c7dcf5;margin-top:0;}
+  .footer-map{
+    border-radius:var(--radius);overflow:hidden;height:140px;margin:0 0 8px;position:relative;
+    background:
+      repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 28px),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 28px),
+      linear-gradient(135deg,#0d2e57,#0a2246);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;
+    border:1px solid rgba(255,255,255,.1);
+  }
+  .footer-map span{font-size:12px;color:#9fbde3;}
+  .footer-map svg{color:var(--accent);}
+  .footer-grid{display:grid;grid-template-columns:1fr;gap:28px;padding:40px 0 24px;}
+  .footer-col h4{color:#fff;font-size:14px;font-weight:800;margin-bottom:14px;}
+  .footer-col ul{display:flex;flex-direction:column;gap:9px;}
+  .footer-col a{font-size:13.5px;color:#c7dcf5;}
+  .footer-col a:hover{color:#fff;}
+  .footer-about p{font-size:13px;color:#a9c4e6;margin-top:10px;}
+  .footer-contact li{display:flex;gap:8px;font-size:13.5px;align-items:flex-start;}
+  .footer-contact svg{flex-shrink:0;margin-top:2px;color:#7fb2ec;}
+  .social-row{display:flex;gap:10px;margin-top:14px;}
+  .social-row a{
+    width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .social-row a:hover{background:var(--primary-600);}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,.12);padding:16px 0;font-size:12px;color:#9fbde3;
+    display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;}
+
+  /* ---------- chatbot widget ---------- */
+  .chat-fab{
+    position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:50%;
+    background:var(--primary-600);color:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 26px rgba(15,60,120,.35);border:none;z-index:80;
+  }
+  .chat-fab:active{transform:scale(.94);}
+  .chat-panel{
+    position:fixed;right:0;left:0;bottom:0;top:auto;z-index:90;background:#fff;
+    border-radius:16px 16px 0 0;box-shadow:0 -10px 40px rgba(10,30,60,.25);
+    display:flex;flex-direction:column;height:78vh;transform:translateY(100%);transition:transform .28s ease;
+  }
+  .chat-panel.open{transform:translateY(0);}
+  .chat-head{
+    background:linear-gradient(135deg,var(--primary-700),var(--primary-600));color:#fff;
+    padding:14px 16px;display:flex;align-items:center;gap:10px;border-radius:16px 16px 0 0;flex-shrink:0;
+  }
+  .chat-head .avatar{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--primary-700);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+  .chat-head strong{display:block;font-size:14px;}
+  .chat-head small{color:#d3e6fb;font-size:11px;display:flex;align-items:center;gap:4px;}
+  .chat-close{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg);}
+  .msg{max-width:80%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;}
+  .msg.bot{background:#fff;border:1px solid var(--border);border-bottom-left-radius:4px;align-self:flex-start;}
+  .msg.user{background:var(--primary-600);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+  .msg-suggestions{display:flex;flex-wrap:wrap;gap:8px;}
+  .msg-suggestions button{
+    border:1px solid var(--primary-600);color:var(--primary-700);background:#fff;border-radius:999px;
+    padding:8px 13px;font-size:12.5px;font-weight:700;
+  }
+  .chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);background:#fff;flex-shrink:0;}
+  .chat-input-row input{
+    flex:1;border:1px solid var(--border);border-radius:999px;padding:11px 16px;font-size:13.5px;outline:none;font-family:inherit;
+  }
+  .chat-send{width:44px;height:44px;border-radius:50%;background:var(--primary-600);color:#fff;border:none;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+  .backdrop{position:fixed;inset:0;background:rgba(10,20,40,.4);z-index:85;opacity:0;pointer-events:none;transition:opacity .25s ease;}
+  .backdrop.show{opacity:1;pointer-events:auto;}
+
+  /* ================= tablet / desktop ================= */
+  @media(min-width:768px){
+    section{padding:56px 0;}
+    .topbar .wrap{height:38px;}
+    .hamburger{display:none;}
+    nav.main-nav{display:block;}
+    .nav-actions{display:flex;}
+    .search-form{flex-direction:row;align-items:center;}
+    .search-field{flex:1;}
+    .search-field.select-field{flex:0 0 170px;}
+    .search-field.select-field.sf-industry{flex:0 0 210px;}
+    .search-submit{flex:0 0 auto;}
+    .sf-keyword{order:1;}
+    .sf-industry{order:2;}
+    .sf-location{order:3;}
+    .sf-type{order:4;}
+    .sf-submit{order:5;}
+    .hero{padding:52px 0 64px;}
+    .hero-grid{grid-template-columns:1.5fr 1fr;align-items:center;}
+    .hero-copy h1{font-size:34px;}
+    .hero-copy p{font-size:15.5px;}
+    .cat-grid{grid-template-columns:repeat(4,1fr);}
+    .event-track{padding:4px 0 6px;}
+    .event-card{flex:0 0 calc(33.333% - 8px);}
+    .news-grid{grid-template-columns:repeat(3,1fr);}
+    .job-apply{display:inline-flex;}
+    .job-card{align-items:center;}
+    .ai-banner{flex-direction:row;align-items:center;justify-content:space-between;padding:36px 40px;}
+    .ai-banner .ai-copy{flex:1;}
+    .biz-cta{flex-direction:row;justify-content:space-between;text-align:left;padding:28px 36px;}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
+    .about-media{margin-top:0;height:100%;min-height:280px;}
+    .footer-grid{grid-template-columns:2fr 1fr 1fr 1.2fr;padding:52px 0 28px;}
+    .footer-bottom{flex-direction:row;justify-content:space-between;}
+    .chat-panel{
+      right:24px;bottom:88px;left:auto;top:auto;width:380px;height:560px;border-radius:16px;
+      transform:translateY(24px) scale(.97);opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease;
+    }
+    .chat-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto;}
+    .chat-head{border-radius:16px 16px 0 0;}
+    .backdrop{display:none;}
+  }
+  @media(min-width:1024px){
+    .hero-copy h1{font-size:38px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP UTILITY BAR ============ -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="contact-line">
+      <span>
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+0922.86.99.66
+      </span>
+      <span>
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><path d="M2 6h20v12H2z"/></svg>
+        lahrservice2023@gmail.com
+      </span>
+    </div>
+    <div class="top-links">
+      <a href="#">Dành cho doanh nghiệp</a>
+      <a href="#">Đăng nhập</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HEADER / NAV ============ -->
+<header class="site">
+  <div class="navbar">
+    <div class="wrap">
+      <a href="#top" class="logo">
+        <img src="logo-icon.png" alt="LA Group" class="mark">
+        <span>
+          LA Group
+          <span class="sub">Human Resources</span>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="#top" class="active">Trang chủ</a></li>
+          <li><a href="#viec-lam">Việc làm</a></li>
+          <li><a href="#chatbot-ai">Tư vấn AI</a></li>
+          <li><a href="#tin-tuc">Chính sách &amp; Tin tức</a></li>
+          <li><a href="#lien-he">Liên hệ</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="#viec-lam" class="btn btn-outline-light" style="color:#fff;border-color:rgba(255,255,255,.5);">Nộp CV</a>
+        <a href="#viec-lam" class="btn btn-accent">Đăng tuyển dụng</a>
+      </div>
+
+      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" aria-expanded="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="#top">Trang chủ</a></li>
+      <li><a href="#viec-lam">Việc làm</a></li>
+      <li><a href="#chatbot-ai">Tư vấn AI</a></li>
+      <li><a href="#tin-tuc">Chính sách &amp; Tin tức</a></li>
+      <li><a href="#lien-he">Liên hệ</a></li>
+    </ul>
+    <div class="divider"></div>
+    <div class="mobile-cta">
+      <a href="#viec-lam" class="btn btn-ghost btn-block">Nộp CV</a>
+      <a href="#viec-lam" class="btn btn-accent btn-block">Đăng tuyển</a>
+    </div>
+  </nav>
+
+  <!-- ============ SEARCH STRIP ============ -->
+  <div class="search-strip">
+    <div class="wrap">
+      <form class="search-form" id="searchForm">
+        <div class="search-field sf-keyword">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" placeholder="Tìm theo vị trí, công ty, kỹ năng..." />
+        </div>
+        <button type="submit" class="btn btn-primary search-submit sf-submit">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Tìm việc làm
+        </button>
+        <div class="search-field select-field sf-industry">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M14 9h1M14 13h1"/></svg>
+          <select>
+            <option>Tất cả ngành nghề</option>
+            <option>Sản xuất – Lắp ráp</option>
+            <option>Cơ khí – Kỹ thuật</option>
+            <option>Dịch vụ – Bán hàng</option>
+            <option>Kho vận – Logistics</option>
+          </select>
+        </div>
+        <div class="search-field select-field sf-location">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <select>
+            <option>Tất cả khu vực</option>
+            <option>Hải Dương</option>
+            <option>Hải Phòng</option>
+            <option>Hà Nội</option>
+            <option>Hưng Yên</option>
+          </select>
+        </div>
+        <div class="search-field select-field sf-type">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <select>
+            <option>Tất cả loại hình</option>
+            <option>Toàn thời gian</option>
+            <option>Bán thời gian</option>
+            <option>Thời vụ</option>
+            <option>Theo ca</option>
+          </select>
+        </div>
+      </form>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy reveal">
+      <span class="eyebrow" style="background:rgba(255,255,255,.15);color:#fff;">Cung ứng nhân lực LA Group (LAHR)</span>
+      <h1>Đồng hành cùng người lao động<br/>tìm việc làm phù hợp tại Hải Dương</h1>
+      <p>LA Group (LAHR) trực tiếp cung ứng và cho thuê lại lao động cho các nhà máy tại khu công nghiệp Hải Dương và khu vực miền Bắc, cùng trợ lý AI tư vấn miễn phí giúp bạn chọn đúng công việc phù hợp với kỹ năng và mong muốn của mình.</p>
+      <div class="hero-stats">
+        <div><strong>500+</strong><span>Lao động đang được cung ứng</span></div>
+        <div><strong>5</strong><span>Khu công nghiệp tại Hải Dương</span></div>
+        <div><strong>24/7</strong><span>Trợ lý AI tư vấn</span></div>
+      </div>
+      <div class="hero-actions">
+        <a href="#viec-lam" class="btn btn-accent">Xem việc làm mới</a>
+        <a href="#chatbot-ai" class="btn btn-outline-light" style="color:#fff;">Hỏi trợ lý AI</a>
+      </div>
+    </div>
+
+    <div class="quick-actions reveal">
+      <div class="quick-card">
+        <div class="qi"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <h3>Tìm việc làm</h3>
+        <p>Duyệt tin tuyển dụng mới nhất</p>
+      </div>
+      <div class="quick-card">
+        <div class="qi"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h2"/></svg></div>
+        <h3>Nộp hồ sơ / CV</h3>
+        <p>Ứng tuyển nhanh chỉ 2 phút</p>
+      </div>
+      <div class="quick-card">
+        <div class="qi"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Tư vấn AI</h3>
+        <p>Gợi ý việc làm phù hợp</p>
+      </div>
+      <div class="quick-card">
+        <div class="qi"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <h3>Chính sách công ty</h3>
+        <p>Quyền lợi &amp; chế độ lao động</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TIN TỨC - SỰ KIỆN MỚI (carousel) ============ -->
+<section class="event-section">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin-bottom:14px;">
+      <h2 style="color:#fff;">Tin tức – Sự kiện mới</h2>
+      <a href="#" class="link-more" style="color:#fff;">Xem tất cả →</a>
+    </div>
+  </div>
+  <div class="event-track reveal" id="eventTrack">
+    <a href="#" class="event-card">
+      <div class="event-thumb">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+      </div>
+      <div class="event-body">
+        <h3>Lễ ký kết hợp tác cung ứng lao động đầu năm 2026</h3>
+        <span class="event-date">28/07/2026</span>
+      </div>
+      <span class="btn btn-ghost btn-block">Xem thêm</span>
+    </a>
+    <a href="#" class="event-card">
+      <div class="event-thumb">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5"/></svg>
+      </div>
+      <div class="event-body">
+        <h3>Chương trình đào tạo kỹ năng nghề miễn phí cho người lao động</h3>
+        <span class="event-date">22/07/2026</span>
+      </div>
+      <span class="btn btn-ghost btn-block">Xem thêm</span>
+    </a>
+    <a href="#" class="event-card">
+      <div class="event-thumb">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="event-body">
+        <h3>LA Group mở rộng cung ứng lao động cho 5 khu công nghiệp tại Hải Dương</h3>
+        <span class="event-date">15/07/2026</span>
+      </div>
+      <span class="btn btn-ghost btn-block">Xem thêm</span>
+    </a>
+  </div>
+  <div class="event-dots reveal" id="eventDots">
+    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+</section>
+
+<!-- ============ JOB LISTINGS ============ -->
+<section id="viec-lam">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Việc làm mới nhất</h2>
+        <p class="desc">Cập nhật liên tục từ các doanh nghiệp đối tác của LA Group</p>
+      </div>
+      <a href="#" class="link-more">Xem tất cả việc làm →</a>
+    </div>
+
+    <div class="tabs reveal">
+      <button class="tab-btn active" data-cat="all">Tất cả</button>
+      <button class="tab-btn" data-cat="sx">Sản xuất – Lắp ráp</button>
+      <button class="tab-btn" data-cat="kt">Cơ khí – Kỹ thuật</button>
+      <button class="tab-btn" data-cat="dv">Dịch vụ – Bán hàng</button>
+      <button class="tab-btn" data-cat="kv">Kho vận – Logistics</button>
+    </div>
+
+    <div class="job-list reveal-stagger" id="jobList">
+
+      <a href="#" class="card job-card reveal" data-cat="sx" style="--i:0">
+        <div class="job-logo">CTY</div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <span>Công nhân lắp ráp điện tử</span>
+            <span class="badge-hot">HOT</span>
+          </div>
+          <div class="job-company">Công ty TNHH Điện tử Việt Phát</div>
+          <div class="job-meta">
+            <span class="salary"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>9 – 12 triệu</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>KCN Kỹ thuật cao An Phát, Hải Dương</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hạn nộp: 15/08/2026</span>
+          </div>
+        </div>
+        <span class="btn btn-primary job-apply">Ứng tuyển</span>
+      </a>
+
+      <a href="#" class="card job-card reveal" data-cat="kt" style="--i:1">
+        <div class="job-logo">KT</div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <span>Kỹ thuật viên bảo trì máy CNC</span>
+          </div>
+          <div class="job-company">Công ty Cơ khí Chính xác An Phát</div>
+          <div class="job-meta">
+            <span class="salary"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>12 – 16 triệu</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>KCN Đại An, Hải Dương</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hạn nộp: 20/08/2026</span>
+          </div>
+        </div>
+        <span class="btn btn-primary job-apply">Ứng tuyển</span>
+      </a>
+
+      <a href="#" class="card job-card reveal" data-cat="dv" style="--i:2">
+        <div class="job-logo">SV</div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <span>Nhân viên bán hàng siêu thị</span>
+            <span class="badge-hot">HOT</span>
+          </div>
+          <div class="job-company">Chuỗi Siêu thị Bình Minh Mart</div>
+          <div class="job-meta">
+            <span class="salary"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>7 – 9 triệu</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>P. Hải Tân, TP. Hải Dương</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hạn nộp: 10/08/2026</span>
+          </div>
+        </div>
+        <span class="btn btn-primary job-apply">Ứng tuyển</span>
+      </a>
+
+      <a href="#" class="card job-card reveal" data-cat="kv" style="--i:3">
+        <div class="job-logo">LG</div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <span>Nhân viên kho – bốc xếp hàng hóa</span>
+          </div>
+          <div class="job-company">Công ty Logistics Đại Dương</div>
+          <div class="job-meta">
+            <span class="salary"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>8 – 10 triệu</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>KCN Phúc Điền, Hải Dương</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hạn nộp: 25/08/2026</span>
+          </div>
+        </div>
+        <span class="btn btn-primary job-apply">Ứng tuyển</span>
+      </a>
+
+      <a href="#" class="card job-card reveal" data-cat="sx" style="--i:4">
+        <div class="job-logo">MM</div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <span>Công nhân may công nghiệp</span>
+          </div>
+          <div class="job-company">Công ty May mặc Thành Đạt</div>
+          <div class="job-meta">
+            <span class="salary"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>8 – 11 triệu</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>KCN Cẩm Điền – Lương Điền (Vsip Hải Dương)</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hạn nộp: 18/08/2026</span>
+          </div>
+        </div>
+        <span class="btn btn-primary job-apply">Ứng tuyển</span>
+      </a>
+
+      <a href="#" class="card job-card reveal" data-cat="kt" style="--i:5">
+        <div class="job-logo">DT</div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <span>Thợ điện công nghiệp</span>
+            <span class="badge-hot">HOT</span>
+          </div>
+          <div class="job-company">Công ty TNHH Cơ điện Phú Thành</div>
+          <div class="job-meta">
+            <span class="salary"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>11 – 15 triệu</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>KCN Tân Trường, Hải Dương</span>
+            <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hạn nộp: 30/08/2026</span>
+          </div>
+        </div>
+        <span class="btn btn-primary job-apply">Ứng tuyển</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<section style="background:#fff;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Ngành nghề nổi bật</h2>
+        <p class="desc">Chọn lĩnh vực bạn quan tâm để xem việc làm phù hợp</p>
+      </div>
+    </div>
+    <div class="cat-grid reveal-stagger">
+      <div class="card cat-card reveal" style="--i:0">
+        <div class="ci"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M4 20V10l8-6 8 6v10M9 20v-6h6v6"/></svg></div>
+        <h3>Sản xuất – Lắp ráp</h3>
+        <span>320 việc làm</span>
+      </div>
+      <div class="card cat-card reveal" style="--i:1">
+        <div class="ci"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <h3>Cơ khí – Kỹ thuật</h3>
+        <span>180 việc làm</span>
+      </div>
+      <div class="card cat-card reveal" style="--i:2">
+        <div class="ci"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <h3>Dịch vụ – Bán hàng</h3>
+        <span>240 việc làm</span>
+      </div>
+      <div class="card cat-card reveal" style="--i:3">
+        <div class="ci"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="7" width="15" height="13" rx="2"/><path d="M16 11h4l3 3v6h-7z"/><circle cx="5.5" cy="20.5" r="1.5"/><circle cx="18.5" cy="20.5" r="1.5"/></svg></div>
+        <h3>Kho vận – Logistics</h3>
+        <span>150 việc làm</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AI CHATBOT BANNER ============ -->
+<section id="chatbot-ai">
+  <div class="wrap">
+    <div class="ai-banner reveal">
+      <div class="ai-copy">
+        <span class="ai-chip"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg> Trợ lý AI LA Group</span>
+        <h2>Chưa biết chọn việc gì phù hợp? Hỏi ngay trợ lý AI</h2>
+        <p>Chỉ cần cho chúng tôi biết kỹ năng, kinh nghiệm và khu vực bạn muốn làm việc — trợ lý AI sẽ gợi ý những công việc phù hợp nhất từ danh sách tuyển dụng thực tế.</p>
+      </div>
+      <button class="btn btn-accent" id="openChatFromBanner">Chat với trợ lý AI</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEWS / POLICY ============ -->
+<section id="tin-tuc" style="background:#fff;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Chính sách &amp; Tin tức</h2>
+        <p class="desc">Thông tin chính sách lao động và hoạt động của LA Group</p>
+      </div>
+      <a href="#" class="link-more">Xem tất cả →</a>
+    </div>
+    <div class="news-grid reveal-stagger">
+      <a href="#" class="card news-card reveal" style="--i:0">
+        <div class="news-thumb">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+        </div>
+        <div class="news-body">
+          <span class="news-tag">Chính sách</span>
+          <h3>Chính sách bảo hiểm và phúc lợi cho người lao động 2026</h3>
+          <p>Tổng hợp các chế độ bảo hiểm xã hội, y tế và phúc lợi áp dụng cho người lao động tại LA Group.</p>
+          <span class="news-date">20/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="card news-card reveal" style="--i:1">
+        <div class="news-thumb">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="news-body">
+          <span class="news-tag">Hướng dẫn</span>
+          <h3>5 bước chuẩn bị hồ sơ ứng tuyển gây ấn tượng</h3>
+          <p>Hướng dẫn chi tiết cách chuẩn bị CV và hồ sơ để tăng cơ hội trúng tuyển tại các doanh nghiệp đối tác.</p>
+          <span class="news-date">15/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="card news-card reveal" style="--i:2">
+        <div class="news-thumb">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M14 9h1M14 13h1"/></svg>
+        </div>
+        <div class="news-body">
+          <span class="news-tag">Tin tức</span>
+          <h3>LA Group (LAHR) ký kết cung ứng lao động cùng 20 doanh nghiệp mới</h3>
+          <p>Mở rộng mạng lưới nhà máy đối tác nhận lao động do LAHR cung ứng tại các KCN Hải Dương, mang đến thêm hàng trăm cơ hội việc làm mới cho người lao động.</p>
+          <span class="news-date">08/07/2026</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOANH NGHIỆP MỚI (feed list) ============ -->
+<section style="background:#fff;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Doanh nghiệp mới</h2>
+        <p class="desc">Đối tác tuyển dụng vừa gia nhập mạng lưới LA Group</p>
+      </div>
+      <a href="#" class="link-more">Xem tất cả →</a>
+    </div>
+    <div class="feed-list reveal-stagger">
+      <a href="#" class="feed-row reveal" style="--i:0">
+        <div class="feed-thumb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <div class="feed-body">
+          <h4>Công ty TNHH Điện tử Việt Phát chính thức hợp tác tuyển dụng cùng LA Group</h4>
+          <span class="feed-date">26/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="feed-row reveal" style="--i:1">
+        <div class="feed-thumb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M4 20V10l8-6 8 6v10M9 20v-6h6v6"/></svg></div>
+        <div class="feed-body">
+          <h4>Công ty Cơ khí Chính xác An Phát mở rộng tuyển dụng 50 vị trí kỹ thuật</h4>
+          <span class="feed-date">24/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="feed-row reveal" style="--i:2">
+        <div class="feed-thumb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M14 9h1M14 13h1"/></svg></div>
+        <div class="feed-body">
+          <h4>Chuỗi Siêu thị Bình Minh Mart tham gia mạng lưới đối tác tuyển dụng</h4>
+          <span class="feed-date">20/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="feed-row reveal" style="--i:3">
+        <div class="feed-thumb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="7" width="15" height="13" rx="2"/><path d="M16 11h4l3 3v6h-7z"/><circle cx="5.5" cy="20.5" r="1.5"/><circle cx="18.5" cy="20.5" r="1.5"/></svg></div>
+        <div class="feed-body">
+          <h4>Công ty Logistics Đại Dương tuyển dụng nhân sự cho kho hàng mới</h4>
+          <span class="feed-date">16/07/2026</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CẢNH BÁO LỪA ĐẢO (feed list + checklist) ============ -->
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Cảnh báo lừa đảo tuyển dụng</h2>
+        <p class="desc">Thông tin cảnh báo mới nhất để bảo vệ người lao động</p>
+      </div>
+      <a href="#" class="link-more">Xem tất cả →</a>
+    </div>
+    <div class="feed-list reveal-stagger">
+      <a href="#" class="feed-row reveal" style="--i:0">
+        <div class="feed-thumb alert"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+        <div class="feed-body">
+          <h4>Cảnh giác chiêu trò mạo danh LA Group để thu phí giới thiệu việc làm</h4>
+          <span class="feed-date">27/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="feed-row reveal" style="--i:1">
+        <div class="feed-thumb alert"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <div class="feed-body">
+          <h4>Không có chuyện "việc nhẹ lương cao" không yêu cầu kinh nghiệm</h4>
+          <span class="feed-date">19/07/2026</span>
+        </div>
+      </a>
+      <a href="#" class="feed-row reveal" style="--i:2">
+        <div class="feed-thumb alert"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg></div>
+        <div class="feed-body">
+          <h4>Hướng dẫn nhận biết tin tuyển dụng giả mạo trên mạng xã hội</h4>
+          <span class="feed-date">10/07/2026</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="warn-box reveal" style="margin-top:18px;">
+      <div class="wi">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+      </div>
+      <div>
+        <h3>Ghi nhớ để tránh bị lừa</h3>
+        <ul>
+          <li>LA Group và các doanh nghiệp đối tác không bao giờ yêu cầu ứng viên nộp tiền, đặt cọc để được nhận việc.</li>
+          <li>Không cung cấp thông tin CMND/CCCD, tài khoản ngân hàng cho người lạ tự xưng là nhà tuyển dụng.</li>
+          <li>Chỉ tin tưởng thông tin tuyển dụng đăng trên website chính thức hoặc do trợ lý AI của LA Group cung cấp.</li>
+          <li>Liên hệ hotline <strong>0922.86.99.66</strong> ngay nếu phát hiện dấu hiệu lừa đảo liên quan đến tên LA Group.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BUSINESS CTA ============ -->
+<section>
+  <div class="wrap">
+    <div class="biz-cta reveal">
+      <div>
+        <h3>Doanh nghiệp cần tuyển dụng nhân sự?</h3>
+        <p>Đăng tin tuyển dụng cùng LA Group để tiếp cận hàng nghìn lao động tiềm năng mỗi ngày.</p>
+      </div>
+      <a href="#lien-he" class="btn btn-primary">Liên hệ hợp tác</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VỀ CHÚNG TÔI ============ -->
+<section class="about-section">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="reveal">
+        <span class="eyebrow">Về chúng tôi</span>
+        <h2>LA Group (LAHR) — Đồng hành cùng người lao động, cung ứng nhân lực bền vững tại Hải Dương</h2>
+        <ul class="about-list">
+          <li>
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Là thương hiệu của Công ty Cổ phần Dịch vụ Cung ứng Nhân lực LA, được UBND tỉnh Hải Dương cấp phép hoạt động dịch vụ việc làm và cho thuê lại lao động.</span>
+          </li>
+          <li>
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Đang cung ứng và quản lý gần 500 lao động tại các khu công nghiệp lớn của Hải Dương: An Phát, Đại An, Tân Trường, Phúc Điền, Cẩm Điền – Lương Điền (Vsip Hải Dương).</span>
+          </li>
+          <li>
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Cam kết minh bạch — không thu phí người lao động, đồng hành cùng chính sách lao động công bằng.</span>
+          </li>
+          <li>
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Ứng dụng trợ lý AI để tư vấn việc làm nhanh chóng, chính xác, phù hợp với từng cá nhân.</span>
+          </li>
+        </ul>
+        <a href="#" class="btn btn-outline-light" style="color:#fff;margin-top:20px;">Tìm hiểu thêm về LA Group</a>
+      </div>
+      <div class="about-media reveal">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".7"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h1M9 15h1M14 11h1M14 15h1"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site" id="lien-he">
+  <div class="wrap footer-grid">
+    <div class="footer-col footer-about">
+      <div class="logo" style="color:#fff;">
+        <img src="logo-icon.png" alt="LA Group" class="mark">
+        <span>LA Group<span class="sub">Human Resources</span></span>
+      </div>
+      <p>Công ty Cổ phần Dịch vụ Cung ứng Nhân lực LA (LAHR) — cung ứng, cho thuê lại lao động cho các doanh nghiệp, nhà máy tại Hải Dương và miền Bắc, đồng hành cùng chính sách lao động minh bạch, công bằng.</p>
+      <div class="social-row">
+        <a href="#" aria-label="Facebook"><svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9H16l-.4 2.9h-2.1v7A10 10 0 0 0 22 12Z"/></svg></a>
+        <a href="#" aria-label="Zalo"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 9h5M8 13h8M8 17h4"/></svg></a>
+        <a href="#" aria-label="Youtube"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="m10 9 5 3-5 3Z"/></svg></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Liên kết nhanh</h4>
+      <ul>
+        <li><a href="#top">Trang chủ</a></li>
+        <li><a href="#viec-lam">Việc làm</a></li>
+        <li><a href="#chatbot-ai">Tư vấn AI</a></li>
+        <li><a href="#tin-tuc">Chính sách &amp; Tin tức</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Hỗ trợ ứng viên</h4>
+      <ul>
+        <li><a href="#">Hướng dẫn ứng tuyển</a></li>
+        <li><a href="#">Câu hỏi thường gặp</a></li>
+        <li><a href="#">Cảnh báo lừa đảo</a></li>
+        <li><a href="#">Liên hệ hỗ trợ</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Liên hệ</h4>
+      <ul class="footer-contact">
+        <li>
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Số 72, phố Hải Hưng, KĐT Ecorivers, P. Hải Tân, TP. Hải Dương, T. Hải Dương</span>
+        </li>
+        <li>
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>Hotline: 0922.86.99.66</span>
+        </li>
+        <li>
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 6-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          <span>lahrservice2023@gmail.com</span>
+        </li>
+        <li>
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>
+          <span>MST: 0801411964</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="footer-map">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Bản đồ văn phòng LA Group — Số 72 phố Hải Hưng, KĐT Ecorivers, P. Hải Tân, TP. Hải Dương</span>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Công ty Cổ phần Dịch vụ Cung ứng Nhân lực LA (LAHR). Bảo lưu mọi quyền.</span>
+    <span>Cung ứng nhân lực minh bạch – Đồng hành cùng người lao động</span>
+  </div>
+</footer>
+
+<!-- ============ CHATBOT WIDGET ============ -->
+<div class="backdrop" id="chatBackdrop"></div>
+<button class="chat-fab" id="chatFab" aria-label="Mở trợ lý AI">
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="avatar">AI</div>
+    <div>
+      <strong>Trợ lý AI LA Group</strong>
+      <small>● Sẵn sàng tư vấn</small>
+    </div>
+    <button class="chat-close" id="chatCloseBtn" aria-label="Đóng">
+      <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="msg bot">Xin chào! Mình là trợ lý AI của LA Group 👋 Bạn đang tìm công việc như thế nào?</div>
+    <div class="msg-suggestions">
+      <button type="button" data-msg="Tôi muốn tìm việc sản xuất, lắp ráp">Việc sản xuất, lắp ráp</button>
+      <button type="button" data-msg="Tôi muốn tìm việc gần khu vực Hải Dương">Việc gần Hải Dương</button>
+      <button type="button" data-msg="Mức lương mong muốn 8-10 triệu">Lương 8–10 triệu</button>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Nhập câu hỏi của bạn..." />
+    <button class="chat-send" id="chatSendBtn" aria-label="Gửi">
+      <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // ---------- mobile nav ----------
+  var hamburgerBtn = document.getElementById('hamburgerBtn');
+  var mobileNav = document.getElementById('mobileNav');
+  hamburgerBtn.addEventListener('click', function () {
+    var isOpen = mobileNav.classList.toggle('open');
+    hamburgerBtn.setAttribute('aria-expanded', isOpen);
+  });
+  mobileNav.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () { mobileNav.classList.remove('open'); });
+  });
+
+  // ---------- event carousel dots ----------
+  var eventTrack = document.getElementById('eventTrack');
+  var eventDots = document.querySelectorAll('#eventDots .dot');
+  if (eventTrack && eventDots.length) {
+    eventTrack.addEventListener('scroll', function () {
+      var cards = eventTrack.querySelectorAll('.event-card');
+      var trackCenter = eventTrack.scrollLeft + eventTrack.clientWidth / 2;
+      var closest = 0, minDist = Infinity;
+      cards.forEach(function (card, i) {
+        var dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - trackCenter);
+        if (dist < minDist) { minDist = dist; closest = i; }
+      });
+      eventDots.forEach(function (d, i) { d.classList.toggle('active', i === closest); });
+    }, { passive: true });
+  }
+
+  // ---------- job tabs ----------
+  var tabButtons = document.querySelectorAll('.tab-btn');
+  var jobCards = document.querySelectorAll('.job-card');
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabButtons.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var cat = btn.getAttribute('data-cat');
+      jobCards.forEach(function (card) {
+        card.style.display = (cat === 'all' || card.getAttribute('data-cat') === cat) ? '' : 'none';
+      });
+    });
+  });
+
+  // ---------- scroll reveal ----------
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var revealEls = document.querySelectorAll('.reveal, .reveal-stagger > .reveal');
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function (el) { io.observe(el); });
+  }
+
+  // ---------- chatbot widget ----------
+  var chatFab = document.getElementById('chatFab');
+  var chatPanel = document.getElementById('chatPanel');
+  var chatCloseBtn = document.getElementById('chatCloseBtn');
+  var chatBackdrop = document.getElementById('chatBackdrop');
+  var openChatFromBanner = document.getElementById('openChatFromBanner');
+  var chatBody = document.getElementById('chatBody');
+  var chatInput = document.getElementById('chatInput');
+  var chatSendBtn = document.getElementById('chatSendBtn');
+
+  function openChat() {
+    chatPanel.classList.add('open');
+    chatBackdrop.classList.add('show');
+  }
+  function closeChat() {
+    chatPanel.classList.remove('open');
+    chatBackdrop.classList.remove('show');
+  }
+  chatFab.addEventListener('click', openChat);
+  if (openChatFromBanner) openChatFromBanner.addEventListener('click', openChat);
+  chatCloseBtn.addEventListener('click', closeChat);
+  chatBackdrop.addEventListener('click', closeChat);
+
+  function addUserMessage(text) {
+    if (!text) return;
+    var div = document.createElement('div');
+    div.className = 'msg user';
+    div.textContent = text;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    chatInput.value = '';
+    setTimeout(function () {
+      var bot = document.createElement('div');
+      bot.className = 'msg bot';
+      bot.textContent = 'Cảm ơn bạn! Đây là bản demo giao diện — trợ lý AI thực tế sẽ gợi ý việc làm phù hợp dựa trên dữ liệu tuyển dụng của LA Group.';
+      chatBody.appendChild(bot);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 500);
+  }
+
+  chatSendBtn.addEventListener('click', function () { addUserMessage(chatInput.value.trim()); });
+  chatInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { addUserMessage(chatInput.value.trim()); }
+  });
+  document.querySelectorAll('.msg-suggestions button').forEach(function (btn) {
+    btn.addEventListener('click', function () { addUserMessage(btn.getAttribute('data-msg')); });
+  });
+
+  // ---------- search form (demo, no backend yet) ----------
+  document.getElementById('searchForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    document.getElementById('viec-lam').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+</script>
+</body>
+</html>
