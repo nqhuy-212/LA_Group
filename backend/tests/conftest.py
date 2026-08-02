@@ -23,10 +23,14 @@ os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 
 import pytest  # noqa: E402
 from alembic.config import Config  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import create_engine, text  # noqa: E402
 from sqlalchemy.orm import Session  # noqa: E402
 
 from alembic import command  # noqa: E402
+from app.core.rate_limit import limiter  # noqa: E402
+from app.db.session import get_db  # noqa: E402
+from app.main import app  # noqa: E402
 
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -66,3 +70,31 @@ def db_session():
         trans.rollback()
         connection.close()
         engine.dispose()
+
+
+@pytest.fixture
+def client(db_session):
+    """TestClient dùng chung transaction/rollback với `db_session` — mọi query bên
+    trong request đi qua đúng savepoint đang mở, không escape ra ngoài rollback.
+    """
+
+    def _override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _override_get_db
+    try:
+        # base_url phải là https:// — cookie Set-Cookie có flag Secure (bắt buộc theo
+        # security.md/D4) sẽ bị chính cookie jar của httpx âm thầm bỏ qua khi request
+        # qua http://, làm cookie "biến mất" giữa các request dù server trả đúng.
+        with TestClient(app, base_url="https://testserver") as test_client:
+            yield test_client
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    # slowapi Limiter là singleton module-level, state cộng dồn xuyên suốt cả phiên
+    # pytest nếu không reset — test rate limit ở file này có thể làm hỏng test khác.
+    limiter.reset()
+    yield

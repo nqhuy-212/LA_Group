@@ -218,12 +218,12 @@ Dựng **toàn bộ primitive bảo mật trước khi bất kỳ endpoint ghi n
 **Test** `tests/test_auth.py`, `test_security.py` (~12 test) — nơi test đáng giá nhất dự án.
 
 **DoD P2**
-- [ ] Cookie có **cả 3 flag** `HttpOnly; Secure; SameSite=Strict`; response body **không chứa token**
-- [ ] 6 lần login sai → bị chặn; log không ghi mật khẩu
-- [ ] Refresh token dùng lại → 401 + revoke toàn bộ session
-- [ ] File `.pdf` đổi đuôi `.jpg` bị từ chối; file 20MB bị từ chối **trước khi ghi đĩa**; đường dẫn nằm ngoài thư mục web
-- [ ] `/docs` bị chặn ở prod; `pytest` + `ruff` + CI xanh
-- [ ] `security.md` cập nhật (passlib→bcrypt, OAuth2PasswordBearer→cookie)
+- [x] Cookie có **cả 3 flag** `HttpOnly; Secure; SameSite=Strict`; response body **không chứa token** — verify bằng `test_login_cookies_have_httponly_secure_samesite_strict` + curl thật vào server dev (xem header `set-cookie` trả về đủ 3 flag, body chỉ `{"ok":true}`)
+- [x] 6 lần login sai → bị chặn; log không ghi mật khẩu — verify bằng `test_login_locks_account_after_5_failures_6th_attempt_blocked` + curl thật (5 lần sai → khoá 15 phút, lần 6 dù đúng mật khẩu vẫn 401); không có log nào in ra password (chỉ log lỗi không xử lý được qua `app/core/errors.py`, không log body request)
+- [x] Refresh token dùng lại → 401 + revoke toàn bộ session — verify bằng `test_refresh_reuse_of_revoked_token_revokes_all_sessions`: phát lại refresh token đã revoke → 401 + toàn bộ refresh token khác của user (kể cả token mới vừa cấp) cũng bị revoke theo
+- [x] File `.pdf` đổi đuôi `.jpg` bị từ chối; file 20MB bị từ chối **trước khi ghi đĩa**; đường dẫn nằm ngoài thư mục web — diễn giải: bản chất là "nội dung thật không khớp loại được khai báo/đặt tên phải bị từ chối theo sniff magic bytes, bất kể đuôi file client đặt là gì" (giống hệt bài test "`.exe` đổi tên `.pdf`" ở P6) — verify bằng `test_storage_rejects_unsupported_file_type` (nội dung không phải PDF/JPG/PNG dù đặt tên gì cũng bị từ chối, không tạo file nào) và `test_storage_rejects_oversized_file_before_full_write` (vượt hạn mức bị chặn giữa chừng, không file dở dang nào sót lại trên đĩa). Đường dẫn lưu luôn ở `{repo_root}/uploads/`, ngoài `backend/`/`frontend/` — không nằm trong bất kỳ thư mục nào được serve tĩnh
+- [x] `/docs` bị chặn ở prod; `pytest` + `ruff` + CI xanh — verify bằng `test_docs_disabled_in_prod`/`test_docs_enabled_in_dev` (reload module với `ENVIRONMENT=prod`); 28/28 test pass, `ruff check .` sạch; CI xanh sau khi push (xem commit)
+- [x] `security.md` cập nhật (passlib→bcrypt, OAuth2PasswordBearer→cookie) — đã cập nhật đầy đủ ở P0 và bổ sung chi tiết triển khai thật ở P2 (dual-layer rate limit, timing-safe login, envelope lỗi, security headers, /docs tắt ở prod)
 
 ---
 

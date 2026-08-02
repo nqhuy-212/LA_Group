@@ -19,6 +19,7 @@ dependencies = [
     "python-multipart==0.0.32",
     "anthropic==0.120.2",
     "python-dotenv==1.2.2",
+    "email-validator==2.3.0",
 ]
 
 [dependency-groups]
@@ -35,6 +36,7 @@ extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008"]  # Depends(...)/Cookie(...) làm default value là idiom chuẩn của FastAPI
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

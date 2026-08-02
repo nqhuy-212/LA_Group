@@ -9,21 +9,12 @@ import argparse
 import getpass
 import sys
 
-import bcrypt
 from sqlalchemy import select
 
+from app.core.security import hash_password
 from app.db.session import SessionLocal
 from app.models import User
 from app.models.enums import UserRole
-
-MAX_PASSWORD_BYTES = 72  # D2: bcrypt cắt ở 72 byte, chặn tay để không silent truncate
-
-
-def hash_password(password: str) -> str:
-    password_bytes = password.encode("utf-8")
-    if len(password_bytes) > MAX_PASSWORD_BYTES:
-        raise ValueError(f"Mật khẩu vượt quá {MAX_PASSWORD_BYTES} byte (bcrypt sẽ cắt bớt)")
-    return bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode("utf-8")
 
 
 def main() -> None:
