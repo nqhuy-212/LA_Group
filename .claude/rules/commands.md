@@ -15,8 +15,10 @@ uv run alembic revision --autogenerate -m "..."   # tạo migration khi đổi m
 uv run alembic upgrade head      # áp migration
 uv run alembic check             # kiểm model↔migration có khớp không (bắt buộc trước khi commit migration, chạy trong CI)
 uv run ruff check .              # lint backend
-uv run pytest                    # chạy test backend (cần Postgres đang chạy — xem docker compose bên dưới)
+uv run pytest                    # chạy test backend (tự tạo DB lagroup_test + migrate qua conftest.py, chỉ cần Postgres đang chạy)
 uv export --no-dev --no-hashes --format requirements-txt > requirements.txt   # export lại cho Dockerfile sau khi đổi dependency — KHÔNG sửa tay requirements.txt
+uv run python -m scripts.seed_dev   # seed dữ liệu dev idempotent (tỉnh/KCN/danh mục/công ty/job/post khớp mock-data.ts cũ)
+uv run python -m scripts.create_user --email you@lahr.vn --role admin   # tạo tài khoản nội bộ đầu tiên (không có endpoint đăng ký public)
 
 # Database dev (docker-compose.yml ở root — CHỈ chạy Postgres, dùng cho máy dev local)
 docker compose up -d        # khởi động container Postgres (lagroup/lagroup/lagroup, chỉ bind 127.0.0.1:5432)
@@ -27,4 +29,4 @@ docker compose down         # tắt container (thêm -v nếu muốn xoá luôn 
 docker stats                 # theo dõi RAM/CPU từng container
 ```
 
-(Cập nhật danh sách này ngay khi cấu trúc project thực tế có thay đổi — đừng để mục này lệch với repo. Lệnh `seed_dev.py`/`create_user.py` sẽ thêm vào đây khi có ở P1, xem `docs/PLAN.md`.)
+(Cập nhật danh sách này ngay khi cấu trúc project thực tế có thay đổi — đừng để mục này lệch với repo.)

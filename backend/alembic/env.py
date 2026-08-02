@@ -24,6 +24,16 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# Index tạo bằng raw SQL (không nằm trong Base.metadata) — loại khỏi so sánh
+# autogenerate/`alembic check`, nếu không sẽ bị đề xuất drop nhầm.
+RAW_SQL_MANAGED_OBJECTS = {"ix_jobs_title_unaccent"}
+
+
+def include_object(object_, name, type_, reflected, compare_to):
+    if type_ == "index" and reflected and name in RAW_SQL_MANAGED_OBJECTS:
+        return False
+    return True
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -45,6 +55,7 @@ def run_migrations_offline() -> None:
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
         compare_server_default=True,
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -70,6 +81,7 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             compare_type=True,
             compare_server_default=True,
+            include_object=include_object,
         )
 
         with context.begin_transaction():

@@ -189,12 +189,12 @@ Hoãn sang migration sau, đúng [data-models.md](../.claude/rules/data-models.m
 - `backend/tests/conftest.py` — DB test `lagroup_test` (Postgres thật, **không SQLite** vì JSONB/enum/unaccent là Postgres-specific), migrate 1 lần/session, mỗi test 1 transaction rollback.
 
 **DoD P1**
-- [ ] `alembic upgrade head` từ DB rỗng sạch; `downgrade base` cũng sạch (kiểm enum drop)
-- [ ] `alembic check` = "No new upgrade operations detected"
-- [ ] Query `pg_constraint` xác nhận constraint có prefix `fk_/uq_/ix_`
-- [ ] `seed_dev.py` chạy **2 lần liên tiếp** không lỗi, không nhân đôi
-- [ ] **Checklist đối chiếu [feature-admin-dashboard.md](../.claude/rules/feature-admin-dashboard.md)**: mỗi biểu đồ truy được về cột đã có (ngày→`created_at`, tỉnh→`province_code`, tuổi→`birth_date`, KCN→`industrial_park_id`, ngành→`category_id`, trạng thái→`status`)
-- [ ] `data-models.md` cập nhật khớp schema thật
+- [x] `alembic upgrade head` từ DB rỗng sạch; `downgrade base` cũng sạch (kiểm enum drop) — verify full cycle: upgrade → downgrade base (0 bảng, 0 enum type còn lại, chỉ giữ `alembic_version`) → upgrade head lại thành công
+- [x] `alembic check` = "No new upgrade operations detected"
+- [x] Query `pg_constraint` xác nhận constraint có prefix `fk_/uq_/ix_` (0 constraint nào lệch khỏi `pk_/fk_/uq_` ngoài `alembic_version_pkc` mặc định; unique field dùng unique index nên nằm ở `pg_indexes` với prefix `ix_`)
+- [x] `seed_dev.py` chạy **2 lần liên tiếp** không lỗi, không nhân đôi (1 tỉnh, 5 KCN, 4 danh mục, 6 công ty, 6 job, 3 post — đúng số lượng cả 2 lần)
+- [x] **Checklist đối chiếu [feature-admin-dashboard.md](../.claude/rules/feature-admin-dashboard.md)**: ngày→`applications.created_at`, tỉnh→`applications.province_code`, tuổi→`applications.birth_date`, trạng thái→`applications.status`; KCN/ngành truy qua `applications.job_id → jobs.industrial_park_id/category_id` (không trùng lặp cột)
+- [x] `data-models.md` cập nhật khớp schema thật
 
 ---
 
