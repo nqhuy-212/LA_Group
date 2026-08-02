@@ -2,8 +2,8 @@
 
 Hệ thống lưu dữ liệu cá nhân nhạy cảm (CCCD, ảnh, lương, hợp đồng) và có khu vực quản trị nội bộ — bảo mật phải được thiết kế từ đầu, không thêm sau:
 
-- JWT trong httpOnly + Secure + SameSite=strict cookie (không lưu localStorage); access token sống ngắn (15-30 phút) + refresh token xoay vòng.
-- Mật khẩu hash bằng `bcrypt`/`argon2` qua `passlib`, không bao giờ lưu plaintext.
+- JWT trong httpOnly + Secure + SameSite=strict cookie (không lưu localStorage; `OAuth2PasswordBearer` chỉ optional cho test qua `/docs` ở dev, không phải luồng thật); access token sống ngắn (15-30 phút) + refresh token xoay vòng.
+- Mật khẩu hash bằng `bcrypt` **trực tiếp** (không dùng `passlib` — `passlib 1.7.4` không tương thích `bcrypt` ≥4.1, đọc `bcrypt.__about__.__version__` đã bị xoá), không bao giờ lưu plaintext. bcrypt cắt input ở 72 byte — chặn `max_length=72` ngay ở Pydantic schema để tránh silent truncation.
 - RBAC kiểm tra ở **cả** middleware Next.js lẫn dependency FastAPI trên từng endpoint — không tin tưởng một lớp duy nhất.
 - Rate limiting cho endpoint đăng nhập (chặn brute-force).
 - File upload (CCCD, ảnh) lưu ngoài web-root, truy xuất qua endpoint có kiểm tra quyền (không link public vĩnh viễn); kiểm tra MIME type thực tế + giới hạn dung lượng.

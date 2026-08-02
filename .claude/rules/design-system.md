@@ -21,7 +21,7 @@ Phong cách bám theo ảnh tham khảo `vieclamhaiphong.net_.png`: **tối gi�
 - **Nền**: trắng/xám rất nhạt cho nội dung chính, khối màu xanh đậm cho header/footer để tạo tương phản thương hiệu.
 - **Text**: xám đậm/đen cho nội dung chính, đảm bảo tương phản đạt chuẩn WCAG AA tối thiểu.
 
-Khi bắt đầu implement, trích xuất mã màu chính xác từ ảnh tham khảo và định nghĩa thành design tokens trong `tailwind.config.ts` (không hard-code màu rải rác trong component).
+Khi bắt đầu implement, trích xuất mã màu chính xác từ ảnh tham khảo và định nghĩa thành design tokens trong `app/globals.css` qua Tailwind v4 `@theme` (không hard-code màu rải rác trong component; **không tạo `tailwind.config.ts`** — Tailwind v4 không đọc file đó theo mặc định).
 
 ## Layout tham khảo từ ảnh
 - Header cố định: logo + thanh tìm kiếm việc làm (từ khóa, khu vực, ngành nghề) + menu chính.
@@ -35,7 +35,9 @@ Khi bắt đầu implement, trích xuất mã màu chính xác từ ảnh tham k
 
 ## Yêu cầu bắt buộc — Đối chiếu thiết kế
 
-**Sau mỗi thay đổi lớn về UI** (thêm/sửa trang, layout, component chính, đổi màu/typography...), **bắt buộc**:
+**Phạm vi áp dụng: chỉ site công khai** (route `/`, `/viec-lam`, `/tin-tuc`, `/gioi-thieu`, `/lien-he`...). `vieclamhaiphong.net_.png` là ảnh tham khảo của một job board hướng khách/lao động — **không phải chuẩn đối chiếu cho khu vực nội bộ** `(internal)`/`/dashboard/*` (xem `feature-admin-dashboard.md`). Khu vực nội bộ có tiêu chí riêng: responsive từ 375px, không tràn ngang, vùng chạm ≥44px, layout Sidebar + Topbar — không cần giống ảnh tham khảo về màu/bố cục.
+
+**Sau mỗi thay đổi lớn về UI ở site công khai** (thêm/sửa trang, layout, component chính, đổi màu/typography...), **bắt buộc**:
 
 1. Chạy dev server, chụp screenshot màn hình đã thay đổi — chụp cả bản mobile (viewport ~375px) và desktop, vì đối tượng chính dùng di động.
 2. So sánh trực tiếp với ảnh thiết kế gốc `vieclamhaiphong.net_.png` (bố cục, mật độ thông tin, tông màu, cỡ chữ, khoảng trắng).

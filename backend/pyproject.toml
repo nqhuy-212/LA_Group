@@ -1,0 +1,40 @@
+[project]
+name = "la-group-backend"
+version = "0.1.0"
+description = "LA Group Job Portal — FastAPI backend"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi==0.141.1",
+    "uvicorn[standard]==0.52.1",
+    "sqlalchemy==2.0.51",
+    "alembic==1.18.5",
+    "psycopg2-binary==2.9.12",
+    "pydantic==2.13.4",
+    "pydantic-settings==2.14.2",
+    "bcrypt==5.0.0",
+    "pyjwt==2.13.0",
+    "slowapi==0.1.10",
+    "python-slugify==8.0.4",
+    "filetype==1.2.0",
+    "python-multipart==0.0.32",
+    "anthropic==0.120.2",
+    "python-dotenv==1.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "httpx==0.28.1",
+    "ruff==0.16.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
