@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.models.company import Company
     from app.models.industrial_park import IndustrialPark
     from app.models.job_category import JobCategory
+    from app.models.province import Province
 
 
 class Job(IdMixin, TimestampMixin, Base):
@@ -57,3 +58,4 @@ class Job(IdMixin, TimestampMixin, Base):
     company: Mapped["Company"] = relationship()
     category: Mapped["JobCategory"] = relationship()
     industrial_park: Mapped["IndustrialPark | None"] = relationship()
+    province: Mapped["Province"] = relationship()

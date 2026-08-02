@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { jobCategories, jobs, type JobCategorySlug } from "@/lib/mock-data";
 import { JobCard } from "@/components/home/JobCard";
+import type { JobCardVM, JobCategoryTab } from "@/lib/view-models/types";
 
-export function JobListSection() {
-  const [activeCategory, setActiveCategory] = useState<"all" | JobCategorySlug>("all");
+export function JobListSection({
+  jobs,
+  categoryTabs,
+}: {
+  jobs: JobCardVM[];
+  categoryTabs: JobCategoryTab[];
+}) {
+  const [activeCategory, setActiveCategory] = useState<JobCategoryTab["slug"]>("all");
 
   return (
     <section id="viec-lam">
@@ -22,7 +28,7 @@ export function JobListSection() {
           data-reveal
           className="reveal no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1"
         >
-          {jobCategories.map((category) => (
+          {categoryTabs.map((category) => (
             <button
               key={category.slug}
               type="button"
@@ -38,16 +44,20 @@ export function JobListSection() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-3">
-          {jobs.map((job, index) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              index={index}
-              hidden={activeCategory !== "all" && job.category !== activeCategory}
-            />
-          ))}
-        </div>
+        {jobs.length === 0 ? (
+          <p className="py-6 text-center text-sm text-text-muted">Đang cập nhật...</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {jobs.map((job, index) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                index={index}
+                hidden={activeCategory !== "all" && job.category !== activeCategory}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

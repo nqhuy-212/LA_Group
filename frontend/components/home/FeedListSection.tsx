@@ -10,7 +10,7 @@ import {
   IconStore,
   IconTruck,
 } from "@/components/ui/icons";
-import type { FeedItem } from "@/lib/mock-data";
+import type { FeedItem } from "@/lib/view-models/types";
 import { revealStyle } from "@/lib/reveal";
 
 const icons = {
@@ -39,13 +39,16 @@ export function FeedListSection({
     <section className={alert ? "" : "bg-white"}>
       <Container className="py-10 md:py-14">
         <SectionHeading title={title} description={description} moreHref={alert ? undefined : "#"} />
+        {items.length === 0 ? (
+          <p className="py-6 text-center text-sm text-text-muted">Đang cập nhật...</p>
+        ) : (
         <div className="flex flex-col">
           {items.map((item, index) => {
             const Icon = icons[item.icon];
             return (
               <Link
                 key={item.id}
-                href="#"
+                href={item.href}
                 data-reveal
                 style={revealStyle(index)}
                 className="reveal flex items-start gap-3 border-b border-border py-3 last:border-none"
@@ -69,6 +72,7 @@ export function FeedListSection({
             );
           })}
         </div>
+        )}
         {children}
       </Container>
     </section>

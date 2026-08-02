@@ -251,6 +251,50 @@ POSTS = [
         "type": PostType.NEWS,
         "published_at": datetime(2026, 7, 8, tzinfo=UTC),
     },
+    # type=event — hiển thị ở carousel "Sự kiện" trang chủ
+    {
+        "slug": "ky-ket-hop-tac-2026",
+        "title": "Lễ ký kết hợp tác cung ứng lao động đầu năm 2026",
+        "excerpt": "Lễ ký kết hợp tác cung ứng lao động đầu năm 2026.",
+        "type": PostType.EVENT,
+        "published_at": datetime(2026, 7, 28, tzinfo=UTC),
+    },
+    {
+        "slug": "dao-tao-ky-nang-nghe",
+        "title": "Chương trình đào tạo kỹ năng nghề miễn phí cho người lao động",
+        "excerpt": "Chương trình đào tạo kỹ năng nghề miễn phí cho người lao động.",
+        "type": PostType.EVENT,
+        "published_at": datetime(2026, 7, 22, tzinfo=UTC),
+    },
+    {
+        "slug": "mo-rong-5-kcn",
+        "title": "LA Group mở rộng cung ứng lao động cho 5 khu công nghiệp tại Hải Dương",
+        "excerpt": "LA Group mở rộng cung ứng lao động cho 5 khu công nghiệp tại Hải Dương.",
+        "type": PostType.EVENT,
+        "published_at": datetime(2026, 7, 15, tzinfo=UTC),
+    },
+    # type=scam_alert — hiển thị ở feed "Cảnh báo lừa đảo" trang chủ
+    {
+        "slug": "mao-danh-thu-phi",
+        "title": "Cảnh giác chiêu trò mạo danh LA Group để thu phí giới thiệu việc làm",
+        "excerpt": "Cảnh giác chiêu trò mạo danh LA Group để thu phí giới thiệu việc làm.",
+        "type": PostType.SCAM_ALERT,
+        "published_at": datetime(2026, 7, 27, tzinfo=UTC),
+    },
+    {
+        "slug": "viec-nhe-luong-cao",
+        "title": 'Không có chuyện "việc nhẹ lương cao" không yêu cầu kinh nghiệm',
+        "excerpt": 'Không có chuyện "việc nhẹ lương cao" không yêu cầu kinh nghiệm.',
+        "type": PostType.SCAM_ALERT,
+        "published_at": datetime(2026, 7, 19, tzinfo=UTC),
+    },
+    {
+        "slug": "nhan-biet-tin-gia",
+        "title": "Hướng dẫn nhận biết tin tuyển dụng giả mạo trên mạng xã hội",
+        "excerpt": "Hướng dẫn nhận biết tin tuyển dụng giả mạo trên mạng xã hội.",
+        "type": PostType.SCAM_ALERT,
+        "published_at": datetime(2026, 7, 10, tzinfo=UTC),
+    },
 ]
 
 

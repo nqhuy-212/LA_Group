@@ -2,10 +2,10 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IconFileText } from "@/components/ui/icons";
-import { newsPosts } from "@/lib/mock-data";
+import type { NewsPost } from "@/lib/view-models/types";
 import { revealStyle } from "@/lib/reveal";
 
-export function NewsSection() {
+export function NewsSection({ posts }: { posts: NewsPost[] }) {
   return (
     <section id="tin-tuc" className="bg-white py-10 md:py-14">
       <Container>
@@ -14,11 +14,14 @@ export function NewsSection() {
           description="Thông tin chính sách lao động và hoạt động của LA Group"
           moreHref="#"
         />
+        {posts.length === 0 ? (
+          <p className="py-6 text-center text-sm text-text-muted">Đang cập nhật...</p>
+        ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {newsPosts.map((post, index) => (
+          {posts.map((post, index) => (
             <Link
               key={post.id}
-              href="#"
+              href={post.href}
               data-reveal
               style={revealStyle(index)}
               className="reveal overflow-hidden rounded-xl border border-border bg-white shadow-brand"
@@ -39,6 +42,7 @@ export function NewsSection() {
             </Link>
           ))}
         </div>
+        )}
       </Container>
     </section>
   );

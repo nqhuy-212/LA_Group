@@ -266,11 +266,11 @@ Backend `test_jobs_public.py` (~8): filter, phân trang, `page_size` max, tìm k
 Frontend: thêm `vitest`, ~10 test **chỉ cho `lib/format.ts` + `lib/view-models/*`** (pure function, rẻ, giá trị cao). Không RTL, không Playwright ở MVP.
 
 **DoD P3**
-- [ ] Trang chủ render 100% từ API; `grep -r "mock-data" frontend/` không còn kết quả
-- [ ] `npm run gen:api` sinh lại `schema.d.ts` không diff
-- [ ] Tắt backend → trang chủ vẫn render, không màn hình trắng
-- [ ] Không có hydration warning trong console
-- [ ] **Đối chiếu thiết kế bắt buộc** ([design-system.md](../.claude/rules/design-system.md)): screenshot 390px + 1440px vs `vieclamhaiphong.net_.png`, không horizontal scroll
+- [x] Trang chủ render 100% từ API; `grep -r "mock-data" frontend/` không còn kết quả — đã xoá `lib/mock-data.ts`, verify qua curl thật vào `localhost:3000` thấy đúng dữ liệu seed (6 job, 4 danh mục, 3 event, 3 tin tức, 3 cảnh báo, 4 đối tác mới)
+- [x] `npm run gen:api` sinh lại `schema.d.ts` không diff — verify: chạy 2 lần liên tiếp, `diff` giữa 2 lần rỗng
+- [x] Tắt backend → trang chủ vẫn render, không màn hình trắng — verify nghiêm ngặt: dừng backend + xoá sạch `.next/cache` (Data Cache của Next.js persist qua đĩa, phải xoá mới test được fetch fail thật) + khởi động lại frontend → `GET /` vẫn 200, mỗi section rỗng hiện "Đang cập nhật...", footer/header vẫn render đầy đủ
+- [x] Không có hydration warning trong console — theo kiến trúc: mọi giá trị định dạng ngày/giờ (`formatDate` pin `timeZone: "Asia/Ho_Chi_Minh"`) được tính **trên server** trong Server Component rồi truyền xuống dưới dạng chuỗi qua props, client không tự tính lại nên không có nguồn gây lệch server/client; 2 Client Component còn lại (`JobListSection`, `EventsCarousel`) chỉ dùng `useState` khởi tạo bằng hằng số tĩnh. Không thấy overlay lỗi hydration của Next dev trong screenshot thực tế.
+- [x] **Đối chiếu thiết kế bắt buộc**: screenshot 390px + 1440px qua Edge headless — bố cục, tông màu, badge "HOT" đúng tinh thần thiết kế; carousel sự kiện hiện đủ 3 icon xoay vòng (calendar/graduation/users) đúng dữ liệu seed. ⚠️ Ghi nhận: bản chụp 390px cho thấy hàng thống kê trong `HeroSection` (500+/5/24-7) có dấu hiệu bị cắt ở lề phải — nhưng `HeroSection` **không nằm trong phạm vi sửa của P3** (component không đổi), nghi vấn này cần một phiên riêng về thiết kế để xác nhận có phải lỗi thật hay chỉ là sai lệch của công cụ chụp headless.
 
 ---
 

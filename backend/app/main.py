@@ -6,6 +6,10 @@ from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1.auth import router as auth_router
+from app.api.v1.public.companies import router as companies_router
+from app.api.v1.public.jobs import router as jobs_router
+from app.api.v1.public.posts import router as posts_router
+from app.api.v1.public.taxonomies import router as taxonomies_router
 from app.core.config import settings
 from app.core.errors import (
     http_exception_handler,
@@ -48,6 +52,10 @@ async def security_headers_middleware(request: Request, call_next):
 
 
 app.include_router(auth_router)
+app.include_router(companies_router)
+app.include_router(jobs_router)
+app.include_router(posts_router)
+app.include_router(taxonomies_router)
 
 
 @app.get("/api/health")

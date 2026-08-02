@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { HotBadge } from "@/components/ui/Badge";
 import { IconClock, IconMapPin, IconWallet } from "@/components/ui/icons";
-import type { Job } from "@/lib/mock-data";
+import type { JobCardVM } from "@/lib/view-models/types";
 import { revealStyle } from "@/lib/reveal";
 
 export function JobCard({
@@ -9,13 +9,13 @@ export function JobCard({
   index,
   hidden,
 }: {
-  job: Job;
+  job: JobCardVM;
   index: number;
   hidden?: boolean;
 }) {
   return (
     <Link
-      href="#"
+      href={job.href}
       data-reveal
       data-job-category={job.category}
       style={revealStyle(index)}

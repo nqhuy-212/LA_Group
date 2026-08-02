@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { IconCalendarBox, IconGraduationCap, IconUsers } from "@/components/ui/icons";
-import type { EventItem } from "@/lib/mock-data";
+import type { EventItem } from "@/lib/view-models/types";
 import { revealStyle } from "@/lib/reveal";
 
 const icons = {
@@ -46,7 +46,7 @@ export function EventsCarousel({ events }: { events: EventItem[] }) {
           return (
             <Link
               key={event.id}
-              href="#"
+              href={event.href}
               data-event-card
               className="flex flex-shrink-0 basis-[78%] snap-start flex-col overflow-hidden rounded-xl bg-white shadow-brand-lg md:basis-[calc(33.333%-8px)]"
               style={revealStyle(index)}

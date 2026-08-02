@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IconFactory, IconGear, IconStore, IconTruck } from "@/components/ui/icons";
-import { jobCategoryCards } from "@/lib/mock-data";
+import type { JobCategoryCard } from "@/lib/view-models/types";
 import { revealStyle } from "@/lib/reveal";
 
 const icons = {
@@ -11,7 +11,7 @@ const icons = {
   kv: IconTruck,
 };
 
-export function CategoriesSection() {
+export function CategoriesSection({ categories }: { categories: JobCategoryCard[] }) {
   return (
     <section className="bg-white py-10 md:py-14">
       <Container>
@@ -20,7 +20,7 @@ export function CategoriesSection() {
           description="Chọn lĩnh vực bạn quan tâm để xem việc làm phù hợp"
         />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {jobCategoryCards.map((category, index) => {
+          {categories.map((category, index) => {
             const Icon = icons[category.slug];
             return (
               <div
