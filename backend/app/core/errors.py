@@ -15,9 +15,13 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 async def validation_exception_handler(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
+    # Pydantic v2 nhét object exception gốc (không serialize được JSON) vào "ctx" khi
+    # một @field_validator raise ValueError thường (ví dụ so sánh salary_min/max) —
+    # bỏ "ctx" đi, "msg" đã có sẵn thông điệp lỗi dạng chuỗi, không mất thông tin.
+    fields = [{k: v for k, v in err.items() if k != "ctx"} for err in exc.errors()]
     return JSONResponse(
         status_code=422,
-        content={"error": {"message": "Dữ liệu gửi lên không hợp lệ", "fields": exc.errors()}},
+        content={"error": {"message": "Dữ liệu gửi lên không hợp lệ", "fields": fields}},
     )
 
 

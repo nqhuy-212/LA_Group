@@ -191,6 +191,117 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Jobs Admin */
+        get: operations["list_jobs_admin_api_admin_jobs_get"];
+        put?: never;
+        /** Create Job Admin */
+        post: operations["create_job_admin_api_admin_jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Job Admin */
+        get: operations["get_job_admin_api_admin_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Job Admin */
+        delete: operations["delete_job_admin_api_admin_jobs__job_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Job Admin */
+        patch: operations["update_job_admin_api_admin_jobs__job_id__patch"];
+        trace?: never;
+    };
+    "/api/admin/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Posts Admin */
+        get: operations["list_posts_admin_api_admin_posts_get"];
+        put?: never;
+        /** Create Post Admin */
+        post: operations["create_post_admin_api_admin_posts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/posts/{post_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Post Admin */
+        get: operations["get_post_admin_api_admin_posts__post_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Post Admin */
+        delete: operations["delete_post_admin_api_admin_posts__post_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Post Admin */
+        patch: operations["update_post_admin_api_admin_posts__post_id__patch"];
+        trace?: never;
+    };
+    "/api/admin/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Companies Admin */
+        get: operations["list_companies_admin_api_admin_companies_get"];
+        put?: never;
+        /** Create Company Admin */
+        post: operations["create_company_admin_api_admin_companies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/companies/{company_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Company Admin */
+        get: operations["get_company_admin_api_admin_companies__company_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Company Admin */
+        delete: operations["delete_company_admin_api_admin_companies__company_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Company Admin */
+        patch: operations["update_company_admin_api_admin_companies__company_id__patch"];
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -212,6 +323,62 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CompanyAdminCreate */
+        CompanyAdminCreate: {
+            /** Display Name Public */
+            display_name_public?: string | null;
+            /** Logo Initials */
+            logo_initials?: string | null;
+            /** Logo Url */
+            logo_url?: string | null;
+            /**
+             * Is Partner
+             * @default true
+             */
+            is_partner: boolean;
+            /** Name */
+            name: string;
+        };
+        /** CompanyAdminOut */
+        CompanyAdminOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Display Name Public */
+            display_name_public: string | null;
+            /** Logo Initials */
+            logo_initials: string | null;
+            /** Logo Url */
+            logo_url: string | null;
+            /** Is Partner */
+            is_partner: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CompanyAdminUpdate */
+        CompanyAdminUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Display Name Public */
+            display_name_public?: string | null;
+            /** Logo Initials */
+            logo_initials?: string | null;
+            /** Logo Url */
+            logo_url?: string | null;
+            /** Is Partner */
+            is_partner?: boolean | null;
+        };
         /** CompanyPublic */
         CompanyPublic: {
             /** Slug */
@@ -250,6 +417,175 @@ export interface components {
             slug: string;
             /** Name */
             name: string;
+        };
+        /** JobAdminCreate */
+        JobAdminCreate: {
+            /** Salary Min */
+            salary_min?: number | null;
+            /** Salary Max */
+            salary_max?: number | null;
+            /**
+             * Salary Negotiable
+             * @default false
+             */
+            salary_negotiable: boolean;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
+            /** Age Min */
+            age_min?: number | null;
+            /** Age Max */
+            age_max?: number | null;
+            /** Shift Type */
+            shift_type?: string | null;
+            /** Employment Type */
+            employment_type?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Requirements */
+            requirements?: string | null;
+            /** Benefits */
+            benefits?: string | null;
+            /** Deadline */
+            deadline?: string | null;
+            /** @default draft */
+            status: components["schemas"]["JobStatus"];
+            /**
+             * Is Hot
+             * @default false
+             */
+            is_hot: boolean;
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
+            /** Title */
+            title: string;
+            /** Company Slug */
+            company_slug: string;
+            /** Category Slug */
+            category_slug: string;
+            /** Industrial Park Slug */
+            industrial_park_slug?: string | null;
+            /** Province Code */
+            province_code: string;
+        };
+        /** JobAdminOut */
+        JobAdminOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Company Slug */
+            company_slug: string;
+            /** Company Name */
+            company_name: string;
+            /** Category Slug */
+            category_slug: string;
+            /** Category Name */
+            category_name: string;
+            /** Industrial Park Slug */
+            industrial_park_slug: string | null;
+            /** Industrial Park Name */
+            industrial_park_name: string | null;
+            /** Province Code */
+            province_code: string;
+            /** Province Name */
+            province_name: string;
+            /** Salary Min */
+            salary_min: number | null;
+            /** Salary Max */
+            salary_max: number | null;
+            /** Salary Negotiable */
+            salary_negotiable: boolean;
+            /** Quantity */
+            quantity: number;
+            /** Age Min */
+            age_min: number | null;
+            /** Age Max */
+            age_max: number | null;
+            /** Shift Type */
+            shift_type: string | null;
+            /** Employment Type */
+            employment_type: string | null;
+            /** Description */
+            description: string | null;
+            /** Requirements */
+            requirements: string | null;
+            /** Benefits */
+            benefits: string | null;
+            /** Deadline */
+            deadline: string | null;
+            /** Status */
+            status: string;
+            /** Is Hot */
+            is_hot: boolean;
+            /** Published At */
+            published_at: string | null;
+            /** View Count */
+            view_count: number;
+            /** Meta Title */
+            meta_title: string | null;
+            /** Meta Description */
+            meta_description: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** JobAdminUpdate */
+        JobAdminUpdate: {
+            /** Title */
+            title?: string | null;
+            /** Company Slug */
+            company_slug?: string | null;
+            /** Category Slug */
+            category_slug?: string | null;
+            /** Industrial Park Slug */
+            industrial_park_slug?: string | null;
+            /** Province Code */
+            province_code?: string | null;
+            /** Salary Min */
+            salary_min?: number | null;
+            /** Salary Max */
+            salary_max?: number | null;
+            /** Salary Negotiable */
+            salary_negotiable?: boolean | null;
+            /** Quantity */
+            quantity?: number | null;
+            /** Age Min */
+            age_min?: number | null;
+            /** Age Max */
+            age_max?: number | null;
+            /** Shift Type */
+            shift_type?: string | null;
+            /** Employment Type */
+            employment_type?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Requirements */
+            requirements?: string | null;
+            /** Benefits */
+            benefits?: string | null;
+            /** Deadline */
+            deadline?: string | null;
+            status?: components["schemas"]["JobStatus"] | null;
+            /** Is Hot */
+            is_hot?: boolean | null;
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
         };
         /** JobCategoryPublic */
         JobCategoryPublic: {
@@ -341,6 +677,11 @@ export interface components {
             /** Published At */
             published_at: string | null;
         };
+        /**
+         * JobStatus
+         * @enum {string}
+         */
+        JobStatus: "draft" | "published" | "closed" | "archived";
         /** LoginRequest */
         LoginRequest: {
             /**
@@ -360,6 +701,28 @@ export interface components {
             /** Role */
             role: string;
         };
+        /** PageResponse[CompanyAdminOut] */
+        PageResponse_CompanyAdminOut_: {
+            /** Items */
+            items: components["schemas"]["CompanyAdminOut"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
+        /** PageResponse[JobAdminOut] */
+        PageResponse_JobAdminOut_: {
+            /** Items */
+            items: components["schemas"]["JobAdminOut"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
         /** PageResponse[JobListItem] */
         PageResponse_JobListItem_: {
             /** Items */
@@ -370,6 +733,87 @@ export interface components {
             page: number;
             /** Page Size */
             page_size: number;
+        };
+        /** PageResponse[PostAdminOut] */
+        PageResponse_PostAdminOut_: {
+            /** Items */
+            items: components["schemas"]["PostAdminOut"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
+        /** PostAdminCreate */
+        PostAdminCreate: {
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            /** @default draft */
+            status: components["schemas"]["PostStatus"];
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
+            /** Title */
+            title: string;
+            type: components["schemas"]["PostType"];
+        };
+        /** PostAdminOut */
+        PostAdminOut: {
+            /** Id */
+            id: number;
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Excerpt */
+            excerpt: string | null;
+            /** Content */
+            content: string | null;
+            /** Cover Image Url */
+            cover_image_url: string | null;
+            /** Type */
+            type: string;
+            /** Status */
+            status: string;
+            /** Published At */
+            published_at: string | null;
+            /** Meta Title */
+            meta_title: string | null;
+            /** Meta Description */
+            meta_description: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** PostAdminUpdate */
+        PostAdminUpdate: {
+            /** Title */
+            title?: string | null;
+            type?: components["schemas"]["PostType"] | null;
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Cover Image Url */
+            cover_image_url?: string | null;
+            status?: components["schemas"]["PostStatus"] | null;
+            /** Meta Title */
+            meta_title?: string | null;
+            /** Meta Description */
+            meta_description?: string | null;
         };
         /** PostDetail */
         PostDetail: {
@@ -407,6 +851,16 @@ export interface components {
             /** Published At */
             published_at: string | null;
         };
+        /**
+         * PostStatus
+         * @enum {string}
+         */
+        PostStatus: "draft" | "published" | "archived";
+        /**
+         * PostType
+         * @enum {string}
+         */
+        PostType: "news" | "policy" | "guide" | "scam_alert" | "event";
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -760,6 +1214,521 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IndustrialParkOut"][];
+                };
+            };
+        };
+    };
+    list_jobs_admin_api_admin_jobs_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["JobStatus"] | null;
+                q?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse_JobAdminOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_job_admin_api_admin_jobs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobAdminCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_job_admin_api_admin_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_job_admin_api_admin_jobs__job_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_job_admin_api_admin_jobs__job_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobAdminUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_posts_admin_api_admin_posts_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["PostStatus"] | null;
+                q?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse_PostAdminOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_post_admin_api_admin_posts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostAdminCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_post_admin_api_admin_posts__post_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_post_admin_api_admin_posts__post_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_post_admin_api_admin_posts__post_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostAdminUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_companies_admin_api_admin_companies_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse_CompanyAdminOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_company_admin_api_admin_companies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyAdminCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_company_admin_api_admin_companies__company_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_company_admin_api_admin_companies__company_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_company_admin_api_admin_companies__company_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyAdminUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

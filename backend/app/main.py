@@ -5,6 +5,9 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.v1.admin.companies import router as admin_companies_router
+from app.api.v1.admin.jobs import router as admin_jobs_router
+from app.api.v1.admin.posts import router as admin_posts_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.public.companies import router as companies_router
 from app.api.v1.public.jobs import router as jobs_router
@@ -56,6 +59,9 @@ app.include_router(companies_router)
 app.include_router(jobs_router)
 app.include_router(posts_router)
 app.include_router(taxonomies_router)
+app.include_router(admin_jobs_router)
+app.include_router(admin_posts_router)
+app.include_router(admin_companies_router)
 
 
 @app.get("/api/health")

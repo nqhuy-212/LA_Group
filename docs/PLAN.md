@@ -1,6 +1,6 @@
 # Kế hoạch triển khai LA Group Job Portal (v2 — sau phản biện)
 
-> **Trạng thái**: đã duyệt 2026-08-02. P0–P4 đã hoàn thành (xem DoD từng phase bên dưới); tiếp theo là P5.
+> **Trạng thái**: đã duyệt 2026-08-02. P0–P5 đã hoàn thành (xem DoD từng phase bên dưới); tiếp theo là P6.
 > **Nguồn sự thật duy nhất** cho roadmap. Khi có quyết định mới, cập nhật file này — đừng để lệch với `.claude/rules/*` và `CLAUDE.md`.
 
 ## Cách dùng file này
@@ -313,12 +313,12 @@ Giải nghịch lý "ai nhập dữ liệu" (D15). Sau phase này **site công k
 `app/(internal)/layout.tsx` (Sidebar + Topbar, **mobile-friendly** — quản lý xem trên điện thoại), `dang-nhap/page.tsx`, `dashboard/viec-lam/{page,[id]}.tsx`, `dashboard/tin-tuc/{page,[id]}.tsx`, và **`frontend/middleware.ts` (chưa tồn tại)** chặn `/dashboard/*` khi thiếu cookie hợp lệ — lớp 1; lớp 2 vẫn là dependency FastAPI. Đây chính là "không tin tưởng một lớp duy nhất".
 
 **DoD P5**
-- [ ] Nhân viên **không biết code** đăng được tin đầy đủ từ trình duyệt điện thoại, tin lên trang chủ + `/viec-lam` sau ≤5 phút
-- [ ] `/dashboard/viec-lam` chưa đăng nhập → redirect `/dang-nhap`
-- [ ] `curl POST /api/admin/jobs` không cookie → 401 (**không chỉ dựa middleware**)
-- [ ] `staff` gọi endpoint chỉ dành `admin` → 403 (có test)
-- [ ] Mọi thao tác có bản ghi `audit_logs`
-- [ ] ⚠️ `vieclamhaiphong.net_.png` là ảnh site public, **không phải chuẩn cho dashboard** → sửa `design-system.md` (mục A6) và dùng tiêu chí riêng cho `(internal)`: responsive 375px, không tràn ngang, touch ≥44px
+- [x] Nhân viên **không biết code** đăng được tin đầy đủ từ trình duyệt điện thoại, tin lên trang chủ + `/viec-lam` sau ≤5 phút — verify: tạo tin qua UI `/dashboard/viec-lam/moi` với `status=published`, `GET /api/jobs` (public) trả về tin ngay (không cache chặn vì admin viết thẳng DB, trang chủ/`/viec-lam` revalidate 300s như đã có từ P3)
+- [x] `/dashboard/viec-lam` chưa đăng nhập → redirect `/dang-nhap` — verify bằng `curl -D-` thấy `307` + `location: /dang-nhap?next=%2Fdashboard%2Fviec-lam`
+- [x] `curl POST /api/admin/jobs` không cookie → 401 (**không chỉ dựa middleware**) — verify bằng `curl` thật, không kèm cookie
+- [x] `staff` gọi endpoint chỉ dành `admin`/`manager` → 403 (có test) — `test_admin_jobs.py::test_staff_forbidden_to_delete_job`, `test_admin_companies.py::test_staff_can_list_companies_but_not_create` + verify lại bằng `curl` thật (login staff → DELETE job → 403)
+- [x] Mọi thao tác có bản ghi `audit_logs` — verify bằng test (`test_create_job_writes_audit_log` etc.) + `SELECT` trực tiếp vào Postgres thật sau khi tạo/xoá qua `curl`
+- [x] ⚠️ `vieclamhaiphong.net_.png` là ảnh site public, **không phải chuẩn cho dashboard** → `design-system.md` (mục A6) **đã sửa từ P0** (mục "Yêu cầu bắt buộc — Đối chiếu thiết kế" đã giới hạn phạm vi vào site công khai, nêu rõ tiêu chí riêng cho `(internal)`); P5 áp dụng đúng tiêu chí đó — verify bằng screenshot Edge headless (CDP + cookie tiêm qua `Network.setCookie`) ở 375px/1440px cho `/dang-nhap`, `/dashboard`, `/dashboard/viec-lam`, `/dashboard/viec-lam/moi`: không tràn ngang, Sidebar ẩn thành hamburger ở mobile/cố định ở desktop, nút bấm đủ ≥44px
 
 ---
 
