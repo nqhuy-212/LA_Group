@@ -25,6 +25,6 @@ Triết lý: chỉ test thứ **(a) đắt khi sai** và **(b) khó phát hiện
 Một workflow (`.github/workflows/ci.yml`), 2 job, chạy trên mọi PR + push nhánh `main`:
 
 - **backend**: Postgres service container → `ruff check` → `alembic upgrade head` → `alembic check` → `pytest`.
-- **frontend**: `npm ci` → `lint` → `typecheck` → `build`.
+- **frontend**: `npm ci` → `lint` → `typecheck` → `test` (vitest) → `build`.
 
 Không có CD tự động ở giai đoạn MVP (deploy VPS là thao tác tay theo `commands.md`/P9 trong `docs/PLAN.md`).

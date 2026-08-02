@@ -7,6 +7,8 @@ npm run build        # build production (output: 'standalone')
 npm run lint         # kiểm tra lint
 npm run typecheck    # kiểm tra type (script riêng, không lồng vào build)
 npm run format        # format bằng Prettier (--write)
+npm run test          # chạy vitest (chỉ test lib/format.ts + lib/view-models/* — pure function)
+npm run gen:api        # sinh lại lib/api/schema.d.ts từ OpenAPI thật của backend (cần backend đang chạy ở :8000), commit file này
 
 # Backend (thư mục backend/) — FastAPI, Python 3.11, dependency quản lý bằng uv (pyproject.toml + uv.lock)
 uv sync                          # cài đúng dependency đã lock vào backend/.venv (cần .env đã copy từ .env.example)
@@ -28,5 +30,7 @@ docker compose down         # tắt container (thêm -v nếu muốn xoá luôn 
 # (Nginx reverse proxy + Certbot, Next.js standalone, FastAPI/uvicorn, PostgreSQL, n8n qua profile "automation")
 docker stats                 # theo dõi RAM/CPU từng container
 ```
+
+⚠️ **Windows + `npm run test`**: nếu vitest báo lỗi `Cannot find native binding` (rolldown), đây là bug cài optional dependency của npm trên Windows (xem [npm/cli#4828](https://github.com/npm/cli/issues/4828)), không phải lỗi code. Sửa: `npm install --no-save @rolldown/binding-win32-x64-msvc@<version khớp với rolldown trong package-lock.json>`.
 
 (Cập nhật danh sách này ngay khi cấu trúc project thực tế có thay đổi — đừng để mục này lệch với repo.)
