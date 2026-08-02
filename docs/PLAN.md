@@ -154,7 +154,7 @@ Chặn toàn bộ phase sau. Mọi thứ ở đây bị **migration 0001 khóa c
 - [x] Clone mới → cài deps → `docker compose up -d` → `alembic upgrade head` → `uvicorn` → `GET /api/health` = 200, không thao tác tay nào ngoài copy `.env.example`
 - [x] `python -c "import bcrypt, jwt"` chạy; `passlib`/`jose` **không còn** trong lockfile
 - [x] `Settings(environment="prod", jwt_secret_key="change-me")` **raise ValidationError**
-- [x] `ruff check .` sạch; `npm run lint && typecheck && build` sạch — verify local. ⚠️ **CI chưa chạy xanh thật sự** — `.github/workflows/ci.yml` đã tạo và các bước bên trong đã verify tương đương ở local, nhưng chưa push lên GitHub nên workflow chưa có lần chạy thật nào. Tích nốt ô này ở phiên đầu tiên có push.
+- [x] `ruff check .` sạch; `npm run lint && typecheck && build` sạch; **CI xanh** (push lên `origin/main`, [run #1](https://github.com/nqhuy-212/LA_Group/actions/runs/30741306603) `success`)
 
 ---
 
