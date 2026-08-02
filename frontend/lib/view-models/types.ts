@@ -26,6 +26,18 @@ export type JobCategoryCard = {
   countLabel: string;
 };
 
+export type JobDetailVM = JobCardVM & {
+  quantityLabel: string;
+  ageLabel: string | null;
+  shiftType: string | null;
+  employmentType: string | null;
+  description: string[];
+  requirements: string[];
+  benefits: string[];
+  isExpired: boolean;
+  publishedDateLabel: string | null;
+};
+
 export type EventItem = {
   id: string;
   href: string;

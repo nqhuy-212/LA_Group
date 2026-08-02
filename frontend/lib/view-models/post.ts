@@ -9,6 +9,8 @@ const NEWS_TAG_LABELS: Record<string, string> = {
   news: "Tin tức",
   policy: "Chính sách",
   guide: "Hướng dẫn",
+  event: "Sự kiện",
+  scam_alert: "Cảnh báo",
 };
 
 // Backend không lưu icon trang trí riêng cho từng bài viết (không đáng để thêm cột

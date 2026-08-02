@@ -12,7 +12,7 @@ export function NewsSection({ posts }: { posts: NewsPost[] }) {
         <SectionHeading
           title="Chính sách & Tin tức"
           description="Thông tin chính sách lao động và hoạt động của LA Group"
-          moreHref="#"
+          moreHref="/tin-tuc"
         />
         {posts.length === 0 ? (
           <p className="py-6 text-center text-sm text-text-muted">Đang cập nhật...</p>

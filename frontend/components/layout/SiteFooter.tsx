@@ -12,16 +12,16 @@ import {
 
 const quickLinks = [
   { href: "/", label: "Trang chủ" },
-  { href: "#viec-lam", label: "Việc làm" },
+  { href: "/viec-lam", label: "Việc làm" },
   { href: "#chatbot-ai", label: "Tư vấn AI" },
-  { href: "#tin-tuc", label: "Chính sách & Tin tức" },
+  { href: "/tin-tuc", label: "Chính sách & Tin tức" },
 ];
 
 const candidateLinks = [
-  { href: "#", label: "Hướng dẫn ứng tuyển" },
-  { href: "#", label: "Câu hỏi thường gặp" },
-  { href: "#", label: "Cảnh báo lừa đảo" },
-  { href: "#", label: "Liên hệ hỗ trợ" },
+  { href: "/tin-tuc/5-buoc-chuan-bi-ho-so", label: "Hướng dẫn ứng tuyển" },
+  { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
+  { href: "/tin-tuc?loai=scam_alert", label: "Cảnh báo lừa đảo" },
+  { href: "tel:0922869966", label: "Liên hệ hỗ trợ" },
 ];
 
 export function SiteFooter() {

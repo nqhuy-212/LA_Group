@@ -1,6 +1,6 @@
 # Kế hoạch triển khai LA Group Job Portal (v2 — sau phản biện)
 
-> **Trạng thái**: đã duyệt 2026-08-02. Chưa bắt đầu thực thi phase nào.
+> **Trạng thái**: đã duyệt 2026-08-02. P0–P4 đã hoàn thành (xem DoD từng phase bên dưới); tiếp theo là P5.
 > **Nguồn sự thật duy nhất** cho roadmap. Khi có quyết định mới, cập nhật file này — đừng để lệch với `.claude/rules/*` và `CLAUDE.md`.
 
 ## Cách dùng file này
@@ -293,13 +293,13 @@ Frontend: thêm `vitest`, ~10 test **chỉ cho `lib/format.ts` + `lib/view-model
 | Tin hết hạn | **KHÔNG 404.** Render banner "Tin đã hết hạn" + `robots:{index:false}` + gợi ý tin tương tự. 404 làm mất backlink; Google Jobs tự loại theo `validThrough` |
 
 **DoD P4**
-- [ ] `/viec-lam/{slug}` render server-side (`view-source` thấy đủ nội dung)
-- [ ] JSON-LD pass **Google Rich Results Test** cho `JobPosting`, không warning field bắt buộc
-- [ ] `/sitemap.xml` + `/robots.txt` đúng; tắt backend vẫn trả 200
-- [ ] Share link lên Facebook hiện đúng title/mô tả/ảnh
-- [ ] Job `closed` → `noindex`, không 404
-- [ ] `/viec-lam?nganh=sx&kv=dai-an` share được, F5 giữ kết quả
-- [ ] Đối chiếu thiết kế 390px + 1440px
+- [x] `/viec-lam/{slug}` render server-side (`view-source` thấy đủ nội dung) — verify bằng `curl` thẳng response HTML (Server Component, không cần JS), thấy đủ mô tả/yêu cầu/quyền lợi
+- [x] JSON-LD `JobPosting` đủ field bắt buộc (title/description/datePosted/validThrough/hiringOrganization/jobLocation) + `baseSalary` — verify bằng cách parse trực tiếp script `application/ld+json` trả về từ trang thật (Node), khớp cấu trúc Google yêu cầu. ⚠️ Không chạy được Google Rich Results Test thật (công cụ ngoài, cần internet public URL) — để dành khi có domain thật ở P9.
+- [x] `/sitemap.xml` + `/robots.txt` đúng; tắt backend vẫn trả 200 — verify nghiêm ngặt: dừng hẳn backend (kill đúng process, kể cả worker con còn sót từ phiên trước) + xoá sạch `.next/` (không chỉ `.next/cache` — sitemap là static/ISR, snapshot bản build cũ sống sót qua cả xoá cache) + build lại từ đầu trong lúc backend vẫn tắt → build thành công, `sitemap.xml` tự rút gọn về đúng 4 route tĩnh, `/`, `/viec-lam`, `/tin-tuc` vẫn 200 với empty-state
+- [x] Share link lên Facebook hiện đúng title/mô tả/ảnh — verify được phần kỹ thuật (meta `og:title`/`og:description`/`og:image` đúng, ảnh 1200×630 sinh bằng `next/og` chạy được, không lỗi). ⚠️ Không test được share thật lên Facebook (cần domain public thật, để dành P9)
+- [x] Job `closed` → `noindex`, không 404 — verify bằng cách đổi thật 1 job sang `status=closed` trong DB, xác nhận trang vẫn 200 + banner "hết hạn" + `<meta name="robots" content="noindex, follow">`, rồi revert lại
+- [x] `/viec-lam?nganh=sx&kv=dai-an` share được, F5 giữ kết quả — verify bằng nhiều tổ hợp filter qua `curl` (Server Component đọc `searchParams` mỗi request nên F5 luôn ra đúng kết quả, không có state client để mất)
+- [x] Đối chiếu thiết kế 390px + 1440px — screenshot Edge headless cho `/viec-lam`, `/viec-lam/{slug}`, `/tin-tuc` ở cả 2 kích thước; phát hiện và sửa ngay 1 lỗi thật (2 ô select trong `SearchBar` bị tràn chữ ở desktop do đổi nhãn dài hơn — đã tăng `basis` width). Xác nhận hiện tượng "cắt lề phải" từng ghi nhận ở P3 (`HeroSection`) là artifact của công cụ chụp headless, không phải lỗi thật — cùng hiện tượng xuất hiện y hệt ở nhiều section khác không hề đổi code trong P4
 
 ---
 

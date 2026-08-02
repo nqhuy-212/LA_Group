@@ -8,9 +8,9 @@ import { IconClose, IconMenu } from "@/components/ui/icons";
 
 const navLinks = [
   { href: "/", label: "Trang chủ" },
-  { href: "#viec-lam", label: "Việc làm" },
+  { href: "/viec-lam", label: "Việc làm" },
   { href: "#chatbot-ai", label: "Tư vấn AI" },
-  { href: "#tin-tuc", label: "Chính sách & Tin tức" },
+  { href: "/tin-tuc", label: "Chính sách & Tin tức" },
   { href: "#lien-he", label: "Liên hệ" },
 ];
 
@@ -53,10 +53,10 @@ export function MainNav() {
         </nav>
 
         <div className="hidden items-center gap-2.5 md:flex">
-          <ButtonLink href="#viec-lam" variant="outline-light">
+          <ButtonLink href="/viec-lam" variant="outline-light">
             Nộp CV
           </ButtonLink>
-          <ButtonLink href="#viec-lam" variant="accent">
+          <ButtonLink href="#lien-he" variant="accent">
             Đăng tuyển dụng
           </ButtonLink>
         </div>
@@ -89,10 +89,10 @@ export function MainNav() {
           </ul>
           <div className="mx-2 h-px bg-white/10" />
           <div className="flex gap-2 p-3">
-            <ButtonLink href="#viec-lam" variant="ghost" block>
+            <ButtonLink href="/viec-lam" variant="ghost" block>
               Nộp CV
             </ButtonLink>
-            <ButtonLink href="#viec-lam" variant="accent" block>
+            <ButtonLink href="#lien-he" variant="accent" block>
               Đăng tuyển
             </ButtonLink>
           </div>

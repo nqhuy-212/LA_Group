@@ -48,3 +48,32 @@ export function initials(name: string): string {
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
+
+export function formatAgeRange(ageMin: number | null, ageMax: number | null): string | null {
+  if (ageMin != null && ageMax != null) return `${ageMin} - ${ageMax} tuổi`;
+  if (ageMin != null) return `Từ ${ageMin} tuổi`;
+  if (ageMax != null) return `Đến ${ageMax} tuổi`;
+  return null;
+}
+
+// Nội dung mô tả/yêu cầu/quyền lợi lưu dạng Text tự do (không phải rich text/HTML) —
+// tách theo dòng trống để render mỗi đoạn thành 1 <p>, bỏ dòng rỗng thừa.
+export function splitParagraphs(text: string | null | undefined): string[] {
+  if (!text) return [];
+  return text
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+// Dùng cho fallback validThrough của JSON-LD JobPosting khi tin không đặt deadline.
+export function addDaysIso(isoDateTime: string, days: number): string {
+  const date = new Date(isoDateTime);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+export function toIsoDate(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value.slice(0, 10);
+}

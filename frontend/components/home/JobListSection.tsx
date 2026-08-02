@@ -20,7 +20,7 @@ export function JobListSection({
         <SectionHeading
           title="Việc làm mới nhất"
           description="Cập nhật liên tục từ các doanh nghiệp đối tác của LA Group"
-          moreHref="#"
+          moreHref="/viec-lam"
           moreLabel="Xem tất cả việc làm →"
         />
 
