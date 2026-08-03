@@ -1,12 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { browserFetch } from "@/lib/api/client";
 
 export function LoginForm({ nextPath }: { nextPath: string }) {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -25,13 +23,17 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
       }),
     });
 
-    setPending(false);
     if (!res.ok) {
+      setPending(false);
       setError(res.error);
       return;
     }
-    router.push(nextPath);
-    router.refresh();
+    // Cố tình dùng full page load (không phải router.push + router.refresh của
+    // App Router) — ngay sau khi vừa nhận cookie mới, router.push tới route yêu
+    // cầu đăng nhập có thể dính Router Cache cũ (đã fetch/redirect lúc chưa có
+    // cookie), khiến điều hướng "không có tác dụng" dù login đã thành công. Full
+    // navigation luôn đọc cookie mới nhất, không phụ thuộc cache phía client.
+    window.location.href = nextPath;
   }
 
   return (

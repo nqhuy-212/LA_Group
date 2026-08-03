@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { browserFetch } from "@/lib/api/client";
@@ -49,7 +48,6 @@ export function JobForm({
   companies: Taxonomy[];
   initialJob?: JobAdminOutDTO;
 }) {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const isEdit = Boolean(initialJob);
@@ -96,13 +94,15 @@ export function JobForm({
           body: JSON.stringify(payload),
         });
 
-    setPending(false);
     if (!res.ok) {
+      setPending(false);
       setError(res.error);
       return;
     }
-    router.push("/dashboard/viec-lam");
-    router.refresh();
+    // Full page load thay vì router.push + router.refresh — pattern đó không thực
+    // sự điều hướng được sau khi vừa ghi xong dữ liệu (đã xác nhận qua test thật,
+    // xem CLAUDE.md). window.location luôn lấy dữ liệu mới nhất từ server.
+    window.location.href = "/dashboard/viec-lam";
   }
 
   return (

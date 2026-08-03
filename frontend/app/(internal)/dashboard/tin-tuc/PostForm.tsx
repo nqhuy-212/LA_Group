@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { browserFetch } from "@/lib/api/client";
@@ -33,7 +32,6 @@ function stringOrNull(value: FormDataEntryValue | null): string | null {
 }
 
 export function PostForm({ initialPost }: { initialPost?: PostAdminOutDTO }) {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const isEdit = Boolean(initialPost);
@@ -67,13 +65,14 @@ export function PostForm({ initialPost }: { initialPost?: PostAdminOutDTO }) {
           body: JSON.stringify(payload),
         });
 
-    setPending(false);
     if (!res.ok) {
+      setPending(false);
       setError(res.error);
       return;
     }
-    router.push("/dashboard/tin-tuc");
-    router.refresh();
+    // Full page load thay vì router.push + router.refresh — xem ghi chú tương tự
+    // ở JobForm.tsx/CLAUDE.md.
+    window.location.href = "/dashboard/tin-tuc";
   }
 
   return (

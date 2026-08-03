@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import {
   IconBriefcase,
@@ -40,12 +40,13 @@ export function InternalShell({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
 
   async function handleLogout() {
     await browserFetch("/api/auth/logout", { method: "POST" });
-    router.push("/dang-nhap");
-    router.refresh();
+    // Full page load — router.push + router.refresh không thực sự điều hướng
+    // được ngay sau một thao tác đổi trạng thái đăng nhập (đã xác nhận qua test
+    // thật, xem CLAUDE.md).
+    window.location.href = "/dang-nhap";
   }
 
   function isActive(href: string) {
