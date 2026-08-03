@@ -11,6 +11,7 @@ from app.models.enums import ApplicationSource, ApplicationStatus, Gender, enum_
 
 if TYPE_CHECKING:
     from app.models.job import Job
+    from app.models.province import Province
     from app.models.user import User
 
 
@@ -57,3 +58,4 @@ class Application(IdMixin, TimestampMixin, Base):
 
     job: Mapped["Job | None"] = relationship()
     assigned_to: Mapped["User | None"] = relationship()
+    province: Mapped["Province | None"] = relationship()

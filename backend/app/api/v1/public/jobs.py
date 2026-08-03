@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.core.search import unaccent_ilike
 from app.db.session import get_db
 from app.models import Company, IndustrialPark, Job, JobCategory
 from app.models.enums import JobStatus
@@ -74,11 +75,6 @@ def _job_detail(job: Job) -> JobDetail:
     )
 
 
-def _unaccent_ilike(column, term: str):
-    pattern = func.concat("%", func.immutable_unaccent(func.lower(term)), "%")
-    return func.immutable_unaccent(func.lower(column)).ilike(pattern)
-
-
 @router.get("/jobs", response_model=PageResponse[JobListItem])
 def list_jobs(
     q: str | None = None,
@@ -93,7 +89,7 @@ def list_jobs(
 ) -> PageResponse[JobListItem]:
     conditions = [Job.status == JobStatus.PUBLISHED]
     if q:
-        conditions.append(_unaccent_ilike(Job.title, q))
+        conditions.append(unaccent_ilike(Job.title, q))
     if category:
         conditions.append(Job.category.has(JobCategory.slug == category))
     if industrial_park:

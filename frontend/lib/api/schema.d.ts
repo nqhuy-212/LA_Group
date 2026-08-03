@@ -89,6 +89,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Chat */
+        post: operations["chat_api_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/companies/recent": {
         parameters: {
             query?: never;
@@ -319,6 +336,58 @@ export interface paths {
         patch: operations["update_company_admin_api_admin_companies__company_id__patch"];
         trace?: never;
     };
+    "/api/admin/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Applications Admin */
+        get: operations["list_applications_admin_api_admin_applications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/applications/export.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Applications Csv */
+        get: operations["export_applications_csv_api_admin_applications_export_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/applications/{application_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Application Admin */
+        get: operations["get_application_admin_api_admin_applications__application_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Application Admin */
+        patch: operations["update_application_admin_api_admin_applications__application_id__patch"];
+        trace?: never;
+    };
     "/api/admin/applications/{application_id}/cv": {
         parameters: {
             query?: never;
@@ -358,6 +427,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/stats/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Overview */
+        get: operations["get_overview_api_admin_stats_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/stats/by-province": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get By Province */
+        get: operations["get_by_province_api_admin_stats_by_province_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/stats/by-age-group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get By Age Group */
+        get: operations["get_by_age_group_api_admin_stats_by_age_group_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/stats/by-industrial-park": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get By Industrial Park */
+        get: operations["get_by_industrial_park_api_admin_stats_by_industrial_park_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users Admin */
+        get: operations["list_users_admin_api_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -379,6 +533,71 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AgeGroupStatOut */
+        AgeGroupStatOut: {
+            /** Bucket */
+            bucket: string;
+            /** Label */
+            label: string;
+            /** Count */
+            count: number;
+        };
+        /** ApplicationAdminOut */
+        ApplicationAdminOut: {
+            /** Id */
+            id: number;
+            /** Reference Code */
+            reference_code: string;
+            /** Job Id */
+            job_id: number | null;
+            /** Job Slug */
+            job_slug: string | null;
+            /** Job Title */
+            job_title: string | null;
+            /** Full Name */
+            full_name: string;
+            /** Phone */
+            phone: string;
+            /** Email */
+            email: string | null;
+            /** Birth Date */
+            birth_date: string | null;
+            /** Age */
+            age: number | null;
+            /** Gender */
+            gender: string | null;
+            /** Province Code */
+            province_code: string | null;
+            /** Province Name */
+            province_name: string | null;
+            /** Hometown Text */
+            hometown_text: string | null;
+            /** Has Cv */
+            has_cv: boolean;
+            /** Cv Original Name */
+            cv_original_name: string | null;
+            /** Source */
+            source: string;
+            /** Status */
+            status: string;
+            /** Assigned To Id */
+            assigned_to_id: number | null;
+            /** Assigned To Email */
+            assigned_to_email: string | null;
+            /** Purged At */
+            purged_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ApplicationAdminUpdate */
+        ApplicationAdminUpdate: {
+            status?: components["schemas"]["ApplicationStatus"] | null;
+            /** Assigned To Id */
+            assigned_to_id?: number | null;
+        };
         /** ApplicationCreateResponse */
         ApplicationCreateResponse: {
             /** Ok */
@@ -393,6 +612,16 @@ export interface components {
             /** Message */
             message?: string | null;
         };
+        /**
+         * ApplicationSource
+         * @enum {string}
+         */
+        ApplicationSource: "web" | "chatbot" | "zalo" | "facebook" | "walk_in";
+        /**
+         * ApplicationStatus
+         * @enum {string}
+         */
+        ApplicationStatus: "new" | "contacted" | "interviewing" | "hired" | "rejected";
         /** Body_create_application_api_applications_post */
         Body_create_application_api_applications_post: {
             /** Full Name */
@@ -424,6 +653,23 @@ export interface components {
             form_rendered_at: string;
             /** Cv */
             cv: string;
+        };
+        /** ChatMessageIn */
+        ChatMessageIn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /** Content */
+            content: string;
+        };
+        /** ChatRequest */
+        ChatRequest: {
+            /** Message */
+            message: string;
+            /** History */
+            history?: components["schemas"]["ChatMessageIn"][];
         };
         /** CompanyAdminCreate */
         CompanyAdminCreate: {
@@ -524,6 +770,15 @@ export interface components {
             slug: string;
             /** Name */
             name: string;
+        };
+        /** IndustrialParkStatOut */
+        IndustrialParkStatOut: {
+            /** Industrial Park Slug */
+            industrial_park_slug: string | null;
+            /** Industrial Park Name */
+            industrial_park_name: string;
+            /** Count */
+            count: number;
         };
         /** JobAdminCreate */
         JobAdminCreate: {
@@ -808,6 +1063,17 @@ export interface components {
             /** Role */
             role: string;
         };
+        /** PageResponse[ApplicationAdminOut] */
+        PageResponse_ApplicationAdminOut_: {
+            /** Items */
+            items: components["schemas"]["ApplicationAdminOut"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
         /** PageResponse[CompanyAdminOut] */
         PageResponse_CompanyAdminOut_: {
             /** Items */
@@ -968,6 +1234,54 @@ export interface components {
          * @enum {string}
          */
         PostType: "news" | "policy" | "guide" | "scam_alert" | "event";
+        /** ProvinceStatOut */
+        ProvinceStatOut: {
+            /** Province Code */
+            province_code: string | null;
+            /** Province Name */
+            province_name: string;
+            /** Count */
+            count: number;
+        };
+        /** StatsOverviewOut */
+        StatsOverviewOut: {
+            /**
+             * Date From
+             * Format: date
+             */
+            date_from: string;
+            /**
+             * Date To
+             * Format: date
+             */
+            date_to: string;
+            /** Granularity */
+            granularity: string;
+            /** Total */
+            total: number;
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+            /** Series */
+            series: components["schemas"]["StatsSeriesPoint"][];
+        };
+        /** StatsSeriesPoint */
+        StatsSeriesPoint: {
+            /** Period */
+            period: string;
+            /** Count */
+            count: number;
+        };
+        /** UserAdminOut */
+        UserAdminOut: {
+            /** Id */
+            id: number;
+            /** Email */
+            email: string;
+            /** Role */
+            role: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -1142,6 +1456,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApplicationCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    chat_api_chat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -1873,6 +2220,162 @@ export interface operations {
             };
         };
     };
+    list_applications_admin_api_admin_applications_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["ApplicationStatus"] | null;
+                source?: components["schemas"]["ApplicationSource"] | null;
+                job_id?: number | null;
+                industrial_park_slug?: string | null;
+                province_code?: string | null;
+                assigned_to_id?: number | null;
+                unassigned_only?: boolean;
+                q?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse_ApplicationAdminOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_applications_csv_api_admin_applications_export_csv_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["ApplicationStatus"] | null;
+                source?: components["schemas"]["ApplicationSource"] | null;
+                job_id?: number | null;
+                industrial_park_slug?: string | null;
+                province_code?: string | null;
+                assigned_to_id?: number | null;
+                unassigned_only?: boolean;
+                q?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_application_admin_api_admin_applications__application_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_application_admin_api_admin_applications__application_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplicationAdminUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     download_application_cv_api_admin_applications__application_id__cv_get: {
         parameters: {
             query?: never;
@@ -1925,6 +2428,174 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_overview_api_admin_stats_overview_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+                granularity?: "day" | "week" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatsOverviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_by_province_api_admin_stats_by_province_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProvinceStatOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_by_age_group_api_admin_stats_by_age_group_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgeGroupStatOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_by_industrial_park_api_admin_stats_by_industrial_park_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IndustrialParkStatOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_users_admin_api_admin_users_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserAdminOut"][];
+                };
             };
             /** @description Validation Error */
             422: {

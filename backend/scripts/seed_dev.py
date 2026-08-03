@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
-from app.models import Company, IndustrialPark, Job, JobCategory, Post, Province
+from app.models import AddressMapping, Company, IndustrialPark, Job, JobCategory, Post, Province
 from app.models.enums import JobStatus, PostStatus, PostType
 
 HAI_DUONG_CODE = "30"
@@ -34,6 +34,42 @@ def seed_province(session: Session) -> None:
         Province,
         "code",
         {"code": HAI_DUONG_CODE, "name": "Hải Dương", "type": "Tỉnh", "is_active": True},
+    )
+
+
+def seed_address_mappings(session: Session) -> None:
+    """Dữ liệu MINH HOẠ cho dev/test cơ chế roll-up D13 (address_mappings) — không
+    phải danh sách sáp nhập tỉnh chính thức đã xác minh. Khi có dữ liệu GSO thật,
+    thay hẳn nội dung dưới đây.
+
+    `applications.province_code` có FK tới `provinces.code`, nên mã tỉnh cũ ở
+    `old_code` PHẢI tồn tại như một dòng Province riêng (is_active=False) — nếu
+    không, không ứng viên nào lưu được province_code là mã cũ, và address_mappings
+    sẽ không bao giờ có dữ liệu thật để roll-up.
+    """
+    old_code = "77"
+    upsert(
+        session,
+        Province,
+        "code",
+        {
+            "code": old_code,
+            "name": "Đơn vị hành chính cũ (dữ liệu minh hoạ dev)",
+            "type": "Tỉnh",
+            "is_active": False,
+        },
+    )
+    upsert(
+        session,
+        AddressMapping,
+        "old_code",
+        {
+            "old_code": old_code,
+            "old_name": "Đơn vị hành chính cũ (dữ liệu minh hoạ dev)",
+            "new_code": HAI_DUONG_CODE,
+            "level": "province",
+            "effective_date": date(2025, 1, 1),
+        },
     )
 
 
@@ -460,6 +496,7 @@ def main() -> None:
 
     with SessionLocal() as session:
         seed_province(session)
+        seed_address_mappings(session)
         seed_industrial_parks(session)
         seed_job_categories(session)
         seed_companies(session)

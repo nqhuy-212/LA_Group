@@ -10,6 +10,7 @@ import {
   IconLayoutDashboard,
   IconLogout,
   IconMenu,
+  IconUsers,
 } from "@/components/ui/icons";
 import { browserFetch } from "@/lib/api/client";
 
@@ -20,6 +21,7 @@ import { browserFetch } from "@/lib/api/client";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Tổng quan", icon: IconLayoutDashboard },
   { href: "/dashboard/viec-lam", label: "Việc làm", icon: IconBriefcase },
+  { href: "/dashboard/ung-vien", label: "Ứng viên", icon: IconUsers },
   { href: "/dashboard/tin-tuc", label: "Tin tức & Chính sách", icon: IconFileText },
 ];
 

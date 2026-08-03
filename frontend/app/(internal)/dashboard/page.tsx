@@ -1,46 +1,93 @@
-import Link from "next/link";
-import { IconBriefcase, IconFileText } from "@/components/ui/icons";
+import { serverFetchAuthed } from "@/lib/api/server-auth-client";
+import type { components } from "@/lib/api/schema";
+import { HorizontalBarList, StatCard, TimeSeriesBars } from "@/components/internal/charts";
+
+type StatsOverviewOutDTO = components["schemas"]["StatsOverviewOut"];
+type ProvinceStatOutDTO = components["schemas"]["ProvinceStatOut"];
+type AgeGroupStatOutDTO = components["schemas"]["AgeGroupStatOut"];
+type IndustrialParkStatOutDTO = components["schemas"]["IndustrialParkStatOut"];
 
 export const metadata = { title: "Tổng quan | LA Group nội bộ" };
 
-// Dashboard tổng quan có số liệu/biểu đồ thật là phạm vi P7 (xem docs/PLAN.md) —
-// trang này là điểm vào tạm thời cho P5, chỉ có lối tắt tới 2 khu vực quản lý nội
-// dung đã có (Việc làm/Tin tức), tránh hứa hẹn số liệu chưa tồn tại.
-export default function DashboardHomePage() {
+const STATUS_LABEL: Record<string, string> = {
+  new: "Mới",
+  contacted: "Đã liên hệ",
+  interviewing: "Đang phỏng vấn",
+  hired: "Đã tuyển",
+  rejected: "Từ chối",
+};
+
+export default async function DashboardHomePage() {
+  const [overviewRes, provinceRes, ageRes, parkRes] = await Promise.all([
+    serverFetchAuthed<StatsOverviewOutDTO>("/api/admin/stats/overview"),
+    serverFetchAuthed<ProvinceStatOutDTO[]>("/api/admin/stats/by-province"),
+    serverFetchAuthed<AgeGroupStatOutDTO[]>("/api/admin/stats/by-age-group"),
+    serverFetchAuthed<IndustrialParkStatOutDTO[]>("/api/admin/stats/by-industrial-park"),
+  ]);
+
+  if (!overviewRes.ok || !provinceRes.ok || !ageRes.ok || !parkRes.ok) {
+    return (
+      <div>
+        <h1 className="mb-4 text-lg font-extrabold text-text">Tổng quan</h1>
+        <p className="rounded-xl border border-border bg-white p-5 text-sm text-text-muted">
+          Không tải được số liệu thống kê. Vui lòng thử lại sau.
+        </p>
+      </div>
+    );
+  }
+
+  const overview = overviewRes.data;
+  const byStatus = Object.entries(overview.by_status).map(([status, count]) => ({
+    label: STATUS_LABEL[status] ?? status,
+    value: count,
+  }));
+
   return (
     <div>
       <h1 className="mb-1 text-lg font-extrabold text-text">Tổng quan</h1>
-      <p className="mb-6 text-sm text-text-muted">
-        Số liệu thống kê chi tiết (ứng viên mới, theo vùng, theo độ tuổi...) sẽ có ở giai đoạn
-        tiếp theo. Hiện tại bạn có thể quản lý tin tuyển dụng và tin tức/chính sách bên dưới.
+      <p className="mb-5 text-sm text-text-muted">
+        Số liệu 30 ngày gần nhất ({overview.date_from} → {overview.date_to}).
       </p>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Link
-          href="/dashboard/viec-lam"
-          className="flex items-center gap-3 rounded-xl border border-border bg-white p-5 shadow-brand transition-colors hover:border-primary-300"
-        >
-          <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
-            <IconBriefcase className="h-5 w-5" />
-          </span>
-          <span>
-            <span className="block text-sm font-bold text-text">Việc làm</span>
-            <span className="block text-xs text-text-muted">Đăng tin, sửa, ẩn/xoá tin</span>
-          </span>
-        </Link>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label="Hồ sơ mới nhận" value={overview.total} />
+        {byStatus.map((s) => (
+          <StatCard key={s.label} label={s.label} value={s.value} />
+        ))}
+      </div>
 
-        <Link
-          href="/dashboard/tin-tuc"
-          className="flex items-center gap-3 rounded-xl border border-border bg-white p-5 shadow-brand transition-colors hover:border-primary-300"
-        >
-          <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
-            <IconFileText className="h-5 w-5" />
-          </span>
-          <span>
-            <span className="block text-sm font-bold text-text">Tin tức & Chính sách</span>
-            <span className="block text-xs text-text-muted">Đăng bài, sửa, ẩn/xoá bài</span>
-          </span>
-        </Link>
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <section className="rounded-xl border border-border bg-white p-4 shadow-brand">
+          <h2 className="mb-3 text-sm font-bold text-text">Hồ sơ theo ngày</h2>
+          <TimeSeriesBars data={overview.series} />
+        </section>
+
+        <section className="rounded-xl border border-border bg-white p-4 shadow-brand">
+          <h2 className="mb-3 text-sm font-bold text-text">Theo tỉnh/thành</h2>
+          <HorizontalBarList
+            data={provinceRes.data.map((p) => ({
+              label: p.province_name,
+              value: p.count,
+            }))}
+          />
+        </section>
+
+        <section className="rounded-xl border border-border bg-white p-4 shadow-brand">
+          <h2 className="mb-3 text-sm font-bold text-text">Theo độ tuổi</h2>
+          <HorizontalBarList
+            data={ageRes.data.map((a) => ({ label: a.label, value: a.count }))}
+          />
+        </section>
+
+        <section className="rounded-xl border border-border bg-white p-4 shadow-brand">
+          <h2 className="mb-3 text-sm font-bold text-text">Theo khu công nghiệp</h2>
+          <HorizontalBarList
+            data={parkRes.data.map((p) => ({
+              label: p.industrial_park_name,
+              value: p.count,
+            }))}
+          />
+        </section>
       </div>
     </div>
   );

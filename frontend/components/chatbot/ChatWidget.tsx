@@ -25,13 +25,19 @@ const suggestions = [
   "Mức lương mong muốn 8-10 triệu",
 ];
 
-const DEMO_REPLY =
-  "Cảm ơn bạn! Đây là bản demo giao diện — trợ lý AI thực tế sẽ gợi ý việc làm phù hợp dựa trên dữ liệu tuyển dụng của LA Group.";
+const CONNECTION_ERROR_TEXT =
+  "Xin lỗi, không kết nối được trợ lý AI. Vui lòng thử lại sau hoặc gọi hotline 0922.86.99.66.";
+
+type ChatEvent =
+  | { type: "token"; text: string }
+  | { type: "done" }
+  | { type: "error"; message: string };
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,14 +52,68 @@ export function ChatWidget() {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
   }, [messages]);
 
-  function sendMessage(text: string) {
+  async function sendMessage(text: string) {
     const trimmed = text.trim();
-    if (!trimmed) return;
-    setMessages((prev) => [...prev, { id: prev.length, from: "user", text: trimmed }]);
+    if (!trimmed || sending) return;
+
+    // Lịch sử gửi kèm mỗi lần gọi — server không lưu session (P8). Bỏ lời chào tĩnh
+    // ban đầu (id 0) vì đó không phải lượt hội thoại thật của model.
+    const history = messages
+      .filter((m) => m.id !== 0)
+      .map((m): { role: "assistant" | "user"; content: string } => ({
+        role: m.from === "bot" ? "assistant" : "user",
+        content: m.text,
+      }));
+
+    const userMsgId = messages.length;
+    const botMsgId = userMsgId + 1;
+    setMessages((prev) => [
+      ...prev,
+      { id: userMsgId, from: "user", text: trimmed },
+      { id: botMsgId, from: "bot", text: "" },
+    ]);
     setInput("");
-    window.setTimeout(() => {
-      setMessages((prev) => [...prev, { id: prev.length, from: "bot", text: DEMO_REPLY }]);
-    }, 500);
+    setSending(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed, history }),
+      });
+      if (!res.ok || !res.body) throw new Error("request-failed");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const chunks = buffer.split("\n\n");
+        buffer = chunks.pop() ?? "";
+        for (const chunk of chunks) {
+          const line = chunk.trim();
+          if (!line.startsWith("data:")) continue;
+          const event = JSON.parse(line.slice(5).trim()) as ChatEvent;
+          if (event.type === "token") {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === botMsgId ? { ...m, text: m.text + event.text } : m)),
+            );
+          } else if (event.type === "error") {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === botMsgId ? { ...m, text: event.message } : m)),
+            );
+          }
+        }
+      }
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === botMsgId ? { ...m, text: CONNECTION_ERROR_TEXT } : m)),
+      );
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -124,8 +184,9 @@ export function ChatWidget() {
               <button
                 key={suggestion}
                 type="button"
+                disabled={sending}
                 onClick={() => sendMessage(suggestion)}
-                className="rounded-full border border-primary-600 bg-white px-3.5 py-2 text-xs font-bold text-primary-700"
+                className="rounded-full border border-primary-600 bg-white px-3.5 py-2 text-xs font-bold text-primary-700 disabled:opacity-50"
               >
                 {suggestion}
               </button>
@@ -137,18 +198,21 @@ export function ChatWidget() {
           <input
             type="text"
             value={input}
+            maxLength={1000}
+            disabled={sending}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") sendMessage(input);
             }}
             placeholder="Nhập câu hỏi của bạn..."
-            className="min-h-11 flex-1 rounded-full border border-border px-4 text-[13.5px] outline-none"
+            className="min-h-11 flex-1 rounded-full border border-border px-4 text-[13.5px] outline-none disabled:opacity-50"
           />
           <button
             type="button"
             onClick={() => sendMessage(input)}
+            disabled={sending}
             aria-label="Gửi"
-            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-white"
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-white disabled:opacity-50"
           >
             <IconSend className="h-4 w-4" />
           </button>

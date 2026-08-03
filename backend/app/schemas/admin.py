@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.models.enums import JobStatus, PostStatus, PostType
+from app.models.enums import ApplicationStatus, JobStatus, PostStatus, PostType
 
 # ---------------------------------------------------------------------------
 # Jobs
@@ -186,3 +186,50 @@ class CompanyAdminOut(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Applications
+# ---------------------------------------------------------------------------
+
+
+class ApplicationAdminOut(BaseModel):
+    id: int
+    reference_code: str
+    job_id: int | None
+    job_slug: str | None
+    job_title: str | None
+    full_name: str
+    phone: str
+    email: str | None
+    birth_date: date | None
+    age: int | None
+    gender: str | None
+    province_code: str | None
+    province_name: str | None
+    hometown_text: str | None
+    has_cv: bool
+    cv_original_name: str | None
+    source: str
+    status: str
+    assigned_to_id: int | None
+    assigned_to_email: str | None
+    purged_at: datetime | None
+    created_at: datetime
+
+
+class ApplicationAdminUpdate(BaseModel):
+    status: ApplicationStatus | None = None
+    assigned_to_id: int | None = None
+
+
+# ---------------------------------------------------------------------------
+# Users (chỉ đọc — phục vụ dropdown "gán người phụ trách" ở P7; tạo/sửa tài
+# khoản vẫn qua backend/scripts/create_user.py, không có endpoint ghi ở đây)
+# ---------------------------------------------------------------------------
+
+
+class UserAdminOut(BaseModel):
+    id: int
+    email: str
+    role: str
