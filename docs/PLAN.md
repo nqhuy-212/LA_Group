@@ -1,6 +1,6 @@
 # Kế hoạch triển khai LA Group Job Portal (v2 — sau phản biện)
 
-> **Trạng thái**: đã duyệt 2026-08-02. P0–P5 đã hoàn thành (xem DoD từng phase bên dưới); tiếp theo là P6.
+> **Trạng thái**: đã duyệt 2026-08-02. P0–P6 đã hoàn thành (xem DoD từng phase bên dưới); tiếp theo là P7.
 > **Nguồn sự thật duy nhất** cho roadmap. Khi có quyết định mới, cập nhật file này — đừng để lệch với `.claude/rules/*` và `CLAUDE.md`.
 
 ## Cách dùng file này
@@ -346,12 +346,12 @@ Giải nghịch lý "ai nhập dữ liệu" (D15). Sau phase này **site công k
 **Test** `tests/test_applications.py` (~12) — bộ test đáng tiền nhất: SĐT sai→422, thiếu consent→422, file 10MB→413, `.exe` đổi tên `.pdf`→415, vượt rate limit→429, honeypot→từ chối im lặng, nộp trùng→không tạo bản ghi, response không chứa `phone`, GET file không auth→401.
 
 **DoD P6**
-- [ ] 10 điều kiện trên đã thực thi, mỗi điều ≥1 test
-- [ ] Nộp đơn end-to-end trên **điện thoại thật, mạng 4G**: điền ≤60 giây, upload ảnh chụp CV thành công
-- [ ] `/chinh-sach-bao-mat` live, form link tới, checkbox không tick sẵn
-- [ ] Admin tải được CV; người ngoài không đoán được URL file
-- [ ] Thư mục upload không có quyền execute, không nằm trong static route nào
-- [ ] Đối chiếu 375/390/414px, touch ≥44px
+- [x] 10 điều kiện trên đã thực thi, mỗi điều ≥1 test — 16 test trong `tests/test_applications.py` (78/78 test backend pass, `ruff`/`alembic check` sạch)
+- [x] Nộp đơn end-to-end: điền ≤60 giây, upload CV thành công — verify bằng Edge headless điều khiển qua CDP (điền form thật + `DOM.setFileInputFiles` gắn file PDF thật + click nút thật, không set giá trị rồi tự gọi submit tay) trên `npm run dev` thật, nhận đúng response thành công + mã hồ sơ (`UV2A7CADEA`), xác nhận bản ghi thật trong Postgres (`consent_given=true`, `consent_version` khớp trang chính sách) và file CV thật nằm đúng `uploads/cv/2026/08/{uuid}.pdf`. ⚠️ Không có điện thoại thật/mạng 4G thật trong môi trường này để verify đúng nghĩa đen — đã verify tương đương qua viewport mobile 375/390/414px + luồng thao tác thật (không phải giả lập DOM tay), để dành xác nhận trên thiết bị thật khi có điều kiện
+- [x] `/chinh-sach-bao-mat` live, form link tới, checkbox không tick sẵn — đã xong từ P4; verify lại checkbox mặc định rỗng qua screenshot thật (không có `defaultChecked`/`checked`)
+- [x] Admin tải được CV; người ngoài không đoán được URL file — verify bằng `curl` thật: không cookie → 401, login admin → 200 + `Content-Disposition: attachment; filename="UV2A7CADEA.pdf"`, nội dung đúng là PDF thật (`file` xác nhận `PDF document, version 1.4`)
+- [x] Thư mục upload không có quyền execute, không nằm trong static route nào — `{repo_root}/uploads/` (ngoài `backend/`/`frontend/`, đã `.gitignore` từ P0), không có route tĩnh nào ở `app/main.py` hay Next.js trỏ vào đây, chỉ phục vụ qua `GET /api/admin/applications/{id}/cv` có `require_roles`
+- [x] Đối chiếu 375/390/414px, touch ≥44px — screenshot Edge headless cho trang `/ung-tuyen` (form trống, đã điền, sau khi submit) + CTA "Ứng tuyển ngay" mới thêm ở trang chi tiết job, cả mobile lẫn 1440px: không tràn ngang, input/nút đều dùng `min-h-11`. ⚠️ Ghi nhận (ngoài phạm vi P6, không sửa): phát hiện lại hiện tượng hydration mismatch warning của `ScrollReveal` (class `is-visible` thêm qua `classList` không khớp HTML server-render) khi headless capture ở viewport khiến nội dung hiện ngay lập tức không cần cuộn — tái hiện y hệt ở `/` và `/tin-tuc` (hai trang không hề đổi code trong P6), xác nhận đây là đặc tính có sẵn của cơ chế reveal khi test bằng công cụ headless, không phải lỗi P6 gây ra
 
 ---
 

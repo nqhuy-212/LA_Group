@@ -72,6 +72,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Application */
+        post: operations["create_application_api_applications_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/companies/recent": {
         parameters: {
             query?: never;
@@ -302,6 +319,45 @@ export interface paths {
         patch: operations["update_company_admin_api_admin_companies__company_id__patch"];
         trace?: never;
     };
+    "/api/admin/applications/{application_id}/cv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download Application Cv */
+        get: operations["download_application_cv_api_admin_applications__application_id__cv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/applications/{application_id}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Purge Application
+         * @description Xoá dữ liệu cá nhân theo yêu cầu của ứng viên (NĐ13/2023) — giữ lại
+         *     `reference_code`/`job_id`/`status`/`created_at` để không phá vỡ thống kê tổng
+         *     hợp (P7), chỉ xoá hẳn các trường định danh cá nhân + file CV trên đĩa.
+         */
+        post: operations["purge_application_api_admin_applications__application_id__purge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -323,6 +379,52 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ApplicationCreateResponse */
+        ApplicationCreateResponse: {
+            /** Ok */
+            ok: boolean;
+            /** Reference Code */
+            reference_code: string;
+            /**
+             * Duplicate
+             * @default false
+             */
+            duplicate: boolean;
+            /** Message */
+            message?: string | null;
+        };
+        /** Body_create_application_api_applications_post */
+        Body_create_application_api_applications_post: {
+            /** Full Name */
+            full_name: string;
+            /** Phone */
+            phone: string;
+            /** Email */
+            email?: string | null;
+            /** Birth Date */
+            birth_date?: string | null;
+            gender?: components["schemas"]["Gender"] | null;
+            /** Province Code */
+            province_code?: string | null;
+            /** Hometown Text */
+            hometown_text?: string | null;
+            /** Job Slug */
+            job_slug: string;
+            /**
+             * Consent Given
+             * @default false
+             */
+            consent_given: boolean;
+            /**
+             * Website
+             * @default
+             */
+            website: string;
+            /** Form Rendered At */
+            form_rendered_at: string;
+            /** Cv */
+            cv: string;
+        };
         /** CompanyAdminCreate */
         CompanyAdminCreate: {
             /** Display Name Public */
@@ -395,6 +497,11 @@ export interface components {
              */
             created_at: string;
         };
+        /**
+         * Gender
+         * @enum {string}
+         */
+        Gender: "male" | "female" | "other";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1002,6 +1109,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_application_api_applications_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_create_application_api_applications_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCreateResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1721,6 +1861,70 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CompanyAdminOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_application_cv_api_admin_applications__application_id__cv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purge_application_api_admin_applications__application_id__purge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

@@ -162,13 +162,21 @@ export default async function JobDetailPage({
 
         <div className="mt-6 flex flex-col gap-3 rounded-xl bg-primary-50 p-4 md:flex-row md:items-center md:justify-between">
           <p className="text-sm font-semibold text-primary-900">
-            Quan tâm vị trí này? Gọi ngay hoặc để lại thông tin qua chatbot AI để được LA Group tư
-            vấn và hẹn lịch phỏng vấn.
+            {vm.isExpired
+              ? "Tin này đã hết hạn — gọi hotline để được tư vấn các vị trí đang tuyển khác."
+              : "Quan tâm vị trí này? Gửi hồ sơ ứng tuyển ngay hoặc gọi hotline để được LA Group tư vấn và hẹn lịch phỏng vấn."}
           </p>
-          <ButtonLink href="tel:0922869966" variant="accent" className="flex-shrink-0">
-            <IconPhone className="h-4 w-4" />
-            Gọi ngay: 0922.86.99.66
-          </ButtonLink>
+          <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row">
+            {!vm.isExpired ? (
+              <ButtonLink href={`/viec-lam/${slug}/ung-tuyen`} variant="primary">
+                Ứng tuyển ngay
+              </ButtonLink>
+            ) : null}
+            <ButtonLink href="tel:0922869966" variant="accent">
+              <IconPhone className="h-4 w-4" />
+              Gọi ngay: 0922.86.99.66
+            </ButtonLink>
+          </div>
         </div>
       </div>
 
