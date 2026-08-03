@@ -1,6 +1,6 @@
 # Kế hoạch triển khai — LA Group Job Portal
 
-> **Trạng thái**: P0–P8 xong. **Tiếp theo: P9 (cuối cùng).**
+> **Trạng thái**: P0–P9 xong về mã nguồn. Chỉ còn thao tác tay trên VPS/domain thật (xem [CLAUDE.md](../CLAUDE.md) §Giới hạn môi trường + mục "Verify hạ tầng thật" bên dưới) — dự án không còn phase code nào.
 > File này là **nguồn sự thật duy nhất cho việc phải làm tiếp**. Trạng thái hiện tại + bẫy kỹ thuật đã gặp nằm ở [CLAUDE.md](../CLAUDE.md); quy tắc thường trực nằm ở `.claude/rules/*`.
 
 ## Cách dùng
@@ -60,7 +60,7 @@ P0 ─> P1 ─> P2 ─┬─> P3 ─> P4 ─┬─> P6 ─> P7 ─> P9
 | 11 | Quản lý ứng viên + API stats | P7-be | backend | 1 ngày | 10 | ✅ |
 | 12 | Dashboard tổng quan + biểu đồ | P7-fe | frontend | 1 ngày | 11 | ✅ |
 | 13 | Chatbot RAG | P8 | backend | 2 ngày | 4 | ✅ (mã nguồn xong; DoD hành vi LLM cần `ANTHROPIC_API_KEY` thật để verify) |
-| **14** | **Deploy VPS** | **P9** | **devops** | **1–2 ngày** | **tất cả** | **⬅ tiếp theo** |
+| 14 | Deploy VPS | P9 | devops | 1–2 ngày | tất cả | ✅ (artifact + verify local xong; DoD cần VPS/domain/SSH thật — xem Việc còn nợ) |
 
 **Khi tách be/fe trong cùng phase**: phiên backend kết thúc bằng pytest xanh + gọi thử qua `/docs`; **DoD của phase chỉ tích khi phiên frontend xong** (DoD viết theo trải nghiệm người dùng cuối). Đừng tích sớm.
 
@@ -83,12 +83,13 @@ Chi tiết triển khai xem git log; các quyết định và bẫy rút ra đã
 | **P6** | `api/v1/public/applications.py` + `core/{reference_code,notify}.py` + `schemas/application.py`; `api/v1/admin/applications.py` (mới có `GET /{id}/cv` + `POST /{id}/purge`). FE: `components/forms/ApplyForm.tsx` + `/viec-lam/[slug]/ung-tuyen`. 16 test (78/78 backend pass) |
 | **P7** | `api/v1/admin/applications.py` mở rộng (list/filter/PATCH status+assign/export CSV) + `api/v1/admin/stats.py` (overview/by-province/by-age-group/by-industrial-park) + `api/v1/admin/users.py` (chỉ đọc); `schemas/admin.py`/`schemas/stats.py` bổ sung; seed `address_mappings`. FE: `dashboard/page.tsx` (số liệu thật), `dashboard/ung-vien/{page,ApplicationRowActions}.tsx`, `components/internal/charts.tsx` (bar chart SVG/CSS thuần). 19 test mới (97/97 backend pass) |
 | **P8** | `app/services/chat_service.py` (system prompt + tool `search_jobs` + vòng lặp streaming SSE + trần token/ngày) + `api/v1/public/chat.py` (`POST /api/chat`, async def duy nhất — D1) + `schemas/chat.py`; tách `core/search.py` (`unaccent_ilike` dùng chung với `public/jobs.py`). FE: `components/chatbot/ChatWidget.tsx` gọi `/api/chat` qua SSE thật thay `setTimeout`. 13 test mới (110/110 backend pass) |
+| **P9** | `backend/Dockerfile`, `frontend/Dockerfile` (multi-stage standalone), `nginx/lahr.conf`, `docker-compose.prod.yml`, `scripts/{backup,restore}.sh`, `.env.prod.example`; migration `d1def644e25b` sửa bug `immutable_unaccent` (phát hiện qua test restore thật — xem CLAUDE.md § Bẫy đã gặp) |
 
 ---
 
 ## Primitive có sẵn — tái dùng, đừng viết lại
 
-Trước khi thêm code mới ở P9, kiểm mục này trước.
+Không còn phase nào tiếp theo trong roadmap gốc — kiểm mục này trước khi thêm bất kỳ tính năng mới nào (Employee/Contract/Timesheet... xem § Entity giai đoạn sau).
 
 **Backend**
 - `app/api/deps.py` — `get_current_user`, `require_roles(...)` → dùng cho mọi endpoint admin mới
@@ -112,27 +113,6 @@ Trước khi thêm code mới ở P9, kiểm mục này trước.
 
 ---
 
-## PHASE 9 — Triển khai production VPS (~1–2 ngày, phiên 14)
-
-`docker-compose.prod.yml` (Nginx + Certbot + Next standalone + FastAPI + Postgres; n8n qua profile `automation`), `backend/Dockerfile`, `frontend/Dockerfile`, `nginx/lahr.conf` (`/`→Next, `/api/`→FastAPI theo D5, `client_max_body_size 6m`, forwarded headers để `get_client_ip` hoạt động đúng ở prod).
-
-`scripts/backup.sh` — `pg_dump` → **mã hoá** → rclone lên B2/Drive, **kèm script restore và test restore thật một lần**: backup chưa restore được là backup không tồn tại.
-
-**Không build Next trên VPS** (RAM 4GB dễ OOM) — build local/CI rồi push image. `ufw` chỉ 80/443 + SSH đổi port; `fail2ban`; Postgres/FastAPI chỉ trên docker network nội bộ. Volume `uploads/` ngoài web-root, có trong backup.
-
-**DoD P9**
-- [ ] `https://lahr.vn` chạy, SSL A trên SSL Labs, HTTP→HTTPS
-- [ ] `docker stats` RAM ổn định dưới 4GB
-- [ ] `nmap` từ ngoài chỉ thấy 80/443/SSH-port-mới
-- [ ] Cron backup chạy, file mã hoá, **đã restore thử thành công vào DB trống**
-- [ ] `/docs` trả 404 ở production
-- [ ] Lighthouse mobile: Performance ≥85, SEO ≥95 (trang chủ + 1 trang job)
-- [ ] **Google Rich Results Test** thật cho `JobPosting` (P4 chỉ verify được bằng parse JSON-LD tay — công cụ Google cần URL public)
-- [ ] **Facebook Sharing Debugger** thật (P4 chỉ verify được meta tag đúng)
-- [ ] `commands.md` cập nhật đủ lệnh thật (test, lint, seed, backup, deploy)
-
----
-
 ## Việc còn nợ (chưa gắn vào phase nào)
 
 | Việc | Ghi chú |
@@ -143,6 +123,7 @@ Trước khi thêm code mới ở P9, kiểm mục này trước.
 | `#chatbot-ai` còn là link neo | Chỉ hoạt động ở trang chủ. Chatbot là widget không có route riêng |
 | Entity giai đoạn sau | `Employee`, `Document`, `Contract`, `TimesheetImport`/`AttendanceRecord`, `PayrollRule` — xem `.claude/rules/data-models.md` §Entity mở rộng |
 | **Verify hành vi LLM thật của chatbot (P8)** | Môi trường dev hiện chưa có `ANTHROPIC_API_KEY` thật nên chưa gọi được Claude API sống. Đã verify bằng test (mock Anthropic client): rate limit 10/10phút hoạt động đúng, không sập server, key không lộ ở client bundle. **Chưa verify được** (cần key thật + `uv run uvicorn` rồi hỏi qua UI): (1) câu hỏi có tin thật → trả đúng tin kèm link, (2) hỏi việc không tồn tại → không bịa, (3) hỏi ngoài phạm vi → từ chối lịch sự |
+| **Verify hạ tầng thật trên VPS (P9)** | Môi trường hiện tại **không có VPS/domain/SSH thật** — chỉ verify được phần chạy cục bộ trên máy dev: `docker build` cả 2 image thành công; container backend chạy đúng ở `ENVIRONMENT=prod` (`/docs` trả 404 xác nhận thật, không chỉ suy luận); `docker stats` idle ~215MB tổng 3 container (dev machine, không phải RAM thật của VPS Tino); **restore thật đã chạy vào DB trống và đối chiếu số dòng khớp 100%** — quá trình này phát hiện + sửa 1 bug thật (xem CLAUDE.md § Bẫy đã gặp: `immutable_unaccent` vỡ khi restore vì pg_dump set search_path rỗng, migration `d1def644e25b` đã sửa). Lighthouse mobile chạy local qua `next start` (không phải domain thật, không qua Nginx/gzip thật): SEO trang chủ = 100 (đạt), Performance = 49 (**dưới mục tiêu 85** — TBT cao, cần đo lại trên hạ tầng thật trước khi kết luận, có thể cần tối ưu thêm). **Cần user tự làm khi có VPS thật**: thuê VPS + trỏ domain `lahr.vn`, `cp .env.prod.example` → `.env.prod` điền secret thật, `docker build`+push 2 image, chạy `docker-compose.prod.yml`, xin SSL qua certbot, cấu hình `ufw`/`fail2ban`/ SSH đổi port, cấu hình `rclone` cho backup, và chạy lại đúng 5 hạng mục không thể giả lập cục bộ: SSL Labs, `nmap` ngoài, cron backup thật, Google Rich Results Test, Facebook Sharing Debugger (xem `commands.md` §lệnh deploy) |
 
 ---
 

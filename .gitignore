@@ -23,7 +23,9 @@ htmlcov/
 # Secrets chung
 .env
 .env.local
+.env.prod
 !.env.example
+!.env.prod.example
 
 # OS junk
 Thumbs.db

@@ -1,0 +1,94 @@
+# Stack production trên VPS (Tino, 4GB RAM — xem tech-stack.md). Image `backend`/
+# `frontend` PHẢI được build ở CI/máy dev rồi push lên registry — không build trên
+# VPS (RAM thấp dễ OOM lúc `npm run build`). VPS chỉ chạy `docker compose pull && up`.
+#
+# Cần file `.env.prod` cùng thư mục (copy từ `.env.prod.example`, KHÔNG commit) chứa
+# cả biến cho compose (${...}) lẫn biến runtime của backend (JWT_SECRET_KEY,
+# DATABASE_URL, CORS_ORIGINS, ANTHROPIC_API_KEY...) — Settings đọc thẳng từ env
+# process, không cần có file backend/.env bên trong image.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: .env.prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    # Không publish port ra host — chỉ giao tiếp qua network Docker nội bộ
+    # (Postgres/FastAPI/n8n không bao giờ expose trực tiếp, xem tech-stack.md/security.md).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    restart: unless-stopped
+    env_file: .env.prod
+    environment:
+      ENVIRONMENT: prod
+    volumes:
+      - uploads:/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/lahr.conf:/etc/nginx/conf.d/default.conf:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_certs:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    # Lệnh xin chứng chỉ LẦN ĐẦU chạy tay (xem commands.md), container này chỉ lo
+    # gia hạn định kỳ (Let's Encrypt hết hạn 90 ngày).
+    entrypoint: >
+      sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done"
+
+  # n8n CHỈ dùng cho tích hợp nhẹ (webhook ứng viên mới), không phải core dependency
+  # — bật bằng `docker compose --profile automation up -d` (tech-stack.md).
+  n8n:
+    image: n8nio/n8n
+    restart: unless-stopped
+    profiles: ["automation"]
+    env_file: .env.prod
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  db_data:
+  uploads:
+  certbot_www:
+  certbot_certs:
+  n8n_data:

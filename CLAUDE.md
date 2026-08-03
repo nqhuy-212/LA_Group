@@ -44,20 +44,20 @@ Làm trong **cùng commit** với code của phase, đúng theo bảng phân vai
 
 ---
 
-## Trạng thái dự án (2026-08-03, sau P8)
+## Trạng thái dự án (2026-08-03, sau P9)
 
-**P0–P8 xong. Tiếp theo: P9 (Deploy VPS — phase cuối).** Site công khai chạy 100% trên API thật, nhận hồ sơ online, có Dashboard nội bộ + quản lý ứng viên + chatbot RAG thật; còn thiếu domain/HTTPS production. Chatbot **chưa verify được bằng LLM thật** ở môi trường dev (thiếu `ANTHROPIC_API_KEY`) — xem `docs/PLAN.md` §Việc còn nợ.
+**P0–P9 xong về mã nguồn — không còn phase nào trong roadmap gốc.** Site công khai chạy 100% API thật, nhận hồ sơ online, có Dashboard nội bộ + quản lý ứng viên + chatbot RAG + artifact deploy production đầy đủ. **Môi trường phiên làm việc này không có VPS/domain/SSH thật và không có `ANTHROPIC_API_KEY` thật** — mọi thứ liên quan hạ tầng thật (SSL, nmap, cron backup, Google/Facebook debugger) và hành vi LLM sống **chưa verify được**, chỉ verify cục bộ (Docker build/run, restore DB thật, Lighthouse qua `next start`) — chi tiết ở `docs/PLAN.md` §Việc còn nợ.
 
 | Vùng | Trạng thái |
 |---|---|
 | `feature-recruitment` | ✅ Danh sách + chi tiết + lọc qua URL (P4); form ứng tuyển thật + upload CV + anti-spam + chống trùng (P6) |
 | `feature-company-content` | ✅ Tin tức/chính sách trang chủ + `/tin-tuc` + `/chinh-sach-bao-mat` (P4); CMS đăng bài qua Admin UI (P5) |
 | `security` | ✅ Auth backend đầy đủ (P2); UI đăng nhập + `proxy.ts` + RBAC thật ở FastAPI (P5); endpoint public ghi PII đủ rate limit/sniff file/consent NĐ13 + purge (P6) |
-| `seo` | ✅ JSON-LD `JobPosting`/`Organization`, sitemap/robots, OG (P4). ⏳ Rich Results Test + Facebook Debugger thật cần domain public → P9 |
-| `data-models` | ✅ 11 model + migration 0001 (P1); API đọc (P3); Admin API ghi + audit log (P5); `applications` có dữ liệu thật (P6); list/filter/assign/export ứng viên + stats GROUP BY (P7) |
+| `seo` | ✅ JSON-LD `JobPosting`/`Organization`, sitemap/robots, OG (P4). ⏳ Rich Results Test + Facebook Debugger thật cần domain public thật |
+| `data-models` | ✅ 11 model + migration 0001+`d1def644e25b` (P1/P9); API đọc (P3); Admin API ghi + audit log (P5); list/filter/assign/export ứng viên + stats (P7) |
 | `feature-admin-dashboard` | ✅ `(internal)` + đăng nhập + RBAC 3 role + CRUD Job/Post/Company (P5); Dashboard tổng quan + Quản lý ứng viên (P7). ❌ Nhân sự, Nhập liệu, Hợp đồng, Chấm công/OCR — giai đoạn sau |
 | `feature-chatbot-ai` | ✅ RAG qua tool `search_jobs` + SSE streaming thật (P8), mã nguồn xong + test mock. ⏳ Verify hành vi LLM thật cần `ANTHROPIC_API_KEY` |
-| `tech-stack` | ✅ Dev env + CI. ❌ Stack production VPS (Nginx/Certbot/n8n) → P9 |
+| `tech-stack` | ✅ Dockerfile BE/FE + `docker-compose.prod.yml` + `nginx/lahr.conf` + backup/restore (P9), build/run/restore đã verify local. ⏳ Deploy thật cần VPS/domain |
 
 ---
 
@@ -100,8 +100,9 @@ D1–D15 nằm ở [`docs/PLAN.md`](docs/PLAN.md). Dưới đây là các quyế
 - **Tool `search_jobs` nhận free-text cho `province`/`category` (không phải slug)**, so khớp qua `unaccent_ilike` trên tên Tỉnh/KCN/Ngành nghề — Claude chỉ cần hiểu ngôn ngữ tự nhiên, không cần biết trước slug nội bộ.
 - **`_search_jobs_sync` nhận `Session` làm tham số thay vì tự mở `SessionLocal()`** — để unit-test trực tiếp bằng `db_session` fixture; hàm tự mở session riêng (`_search_jobs_with_own_session`) chỉ dùng ở luồng thật, chạy qua `run_in_threadpool` (D1: chat là async def duy nhất, không đụng DB đồng bộ trực tiếp trong coroutine).
 - **Trần chi tiêu ngày đếm token trong bộ nhớ tiến trình, không bảng DB riêng** — chấp nhận được vì kiến trúc chỉ 1 worker/VPS 4GB (tech-stack.md); soft-cap gần đúng đủ dùng cho MVP.
-- **SSE tự parse bằng `fetch` + `ReadableStream`, không dùng `EventSource`** — `EventSource` chỉ hỗ trợ GET, endpoint chat cần POST kèm body JSON (`message` + `history`).
-- **Header `X-Accel-Buffering: no` trên response SSE** — Nginx mặc định buffer response proxy (D5), thiếu header này người dùng sẽ không thấy chữ chạy dần theo stream ở production.
+- **SSE tự parse bằng `fetch` + `ReadableStream` (không `EventSource`, chỉ hỗ trợ GET còn chat cần POST kèm JSON), response set thêm header `X-Accel-Buffering: no`** — thiếu header này Nginx sẽ buffer response proxy (D5), người dùng không thấy chữ chạy dần theo stream ở production.
+- **`backend/Dockerfile` tự chạy `alembic upgrade head` trước `uvicorn` mỗi lần start container** — chấp nhận được vì chỉ 1 instance duy nhất (không có nhiều container chạy migration song song); `frontend/Dockerfile` dùng user `node` có sẵn trong base image thay vì tự tạo user mới (base `node:*-slim` đã có UID 1000, tạo trùng sẽ lỗi `useradd`).
+- **Backup mã hoá bằng `openssl enc -aes-256-cbc -pbkdf2`, không dùng `age`/gpg** — đã có sẵn trên mọi VPS Linux, không cần cài thêm gói, đủ an toàn cho nhu cầu MVP.
 
 ### Frontend
 - **API công khai trả dữ liệu có cấu trúc (`salary_min: 9000000`), không trả chuỗi đã format** — cùng dữ liệu phải render khác nhau ở card / trang chi tiết / JSON-LD / chatbot; format ở tầng view-model.
@@ -139,3 +140,4 @@ D1–D15 nằm ở [`docs/PLAN.md`](docs/PLAN.md). Dưới đây là các quyế
 - **Ảnh chụp headless hay báo "cắt lề phải" giả** — P4 xác nhận hiện tượng này lặp lại y hệt ở các section không hề đổi code, là artifact của công cụ chứ không phải lỗi CSS. Đừng vội sửa layout khi chỉ thấy qua screenshot headless.
 - **`address_mappings.old_code` không tự đứng một mình được** — `applications.province_code` có FK tới `provinces.code`, nên mọi mã tỉnh cũ muốn roll-up qua D13 phải có một dòng `Province(is_active=False)` tương ứng, nếu không insert Application với mã cũ sẽ vỡ `IntegrityError` (P7 phát hiện qua test, đã sửa `seed_dev.py`).
 - **Chỉnh sửa file backend trong lúc pytest nền đang chạy có thể gây fail giả** — test nào gọi `importlib.reload(app.main)` (VD `test_docs_disabled_in_prod`) đọc lại file `main.py` mới nhất từ đĩa nhưng vẫn dùng `sys.modules` cũ cho các submodule đã import trước đó → lệch trạng thái, `ImportError` không tái lập được ở lần chạy sạch. Đừng sửa code khi một lần chạy pytest đầy đủ đang chờ kết quả.
+- **Bug thật phát hiện qua test restore (P9)**: `pg_dump` luôn set `search_path` rỗng đầu bản dump để buộc mọi tham chiếu phải schema-qualify — hàm `immutable_unaccent` gọi `unaccent('unaccent', $1)` không schema-qualify (cả tên hàm lẫn tên dictionary) chạy bình thường được (search_path mặc định có `public`) nhưng **vỡ đúng lúc restore** (`CREATE INDEX` inline lại function body, search_path rỗng không resolve được). Fix: `public.unaccent('public.unaccent', $1)`, cả hàm lẫn literal dictionary đều phải qualify. Bài học: **test restore thật vào DB trống** là cách duy nhất bắt được lớp bug này — `alembic check`/pytest không chạm tới.

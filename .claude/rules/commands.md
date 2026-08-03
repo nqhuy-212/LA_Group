@@ -26,9 +26,28 @@ uv run python -m scripts.create_user --email you@lahr.vn --role admin   # tạo 
 docker compose up -d        # khởi động container Postgres (lagroup/lagroup/lagroup, chỉ bind 127.0.0.1:5432)
 docker compose down         # tắt container (thêm -v nếu muốn xoá luôn volume dữ liệu)
 
-# Hạ tầng production (VPS) — chưa scaffold, sẽ có docker-compose riêng khi triển khai
+# Build & push image production (chạy ở CI/máy dev — KHÔNG build trên VPS, xem tech-stack.md)
+docker build -t $BACKEND_IMAGE ./backend
+docker build -t $FRONTEND_IMAGE ./frontend
+docker push $BACKEND_IMAGE && docker push $FRONTEND_IMAGE
+
+# Hạ tầng production (VPS) — docker-compose.prod.yml + nginx/lahr.conf ở root
 # (Nginx reverse proxy + Certbot, Next.js standalone, FastAPI/uvicorn, PostgreSQL, n8n qua profile "automation")
-docker stats                 # theo dõi RAM/CPU từng container
+cp .env.prod.example .env.prod && nano .env.prod   # điền giá trị thật, KHÔNG commit .env.prod
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml --profile automation up -d   # thêm n8n nếu cần
+
+# Xin chứng chỉ SSL lần đầu (certbot service chỉ lo gia hạn định kỳ sau đó)
+docker compose -f docker-compose.prod.yml run --rm certbot \
+  certonly --webroot -w /var/www/certbot -d lahr.vn -d www.lahr.vn
+
+docker stats                 # theo dõi RAM/CPU từng container — mục tiêu <4GB (DoD P9)
+
+# Backup / restore (scripts/backup.sh, scripts/restore.sh — cần rclone đã config sẵn remote)
+RCLONE_REMOTE=b2:lahr-backups BACKUP_ENCRYPTION_KEY=... ./scripts/backup.sh
+BACKUP_ENCRYPTION_KEY=... ./scripts/restore.sh /root/backups/lagroup-<timestamp>.sql.gz.enc
+# Cron hằng đêm: crontab -e -> 0 2 * * * cd /path/to/repo && ./scripts/backup.sh >> /var/log/backup.log 2>&1
 ```
 
 ⚠️ **Windows + `npm run test`**: nếu vitest báo lỗi `Cannot find native binding` (rolldown), đây là bug cài optional dependency của npm trên Windows (xem [npm/cli#4828](https://github.com/npm/cli/issues/4828)), không phải lỗi code. Sửa: `npm install --no-save @rolldown/binding-win32-x64-msvc@<version khớp với rolldown trong package-lock.json>`.
