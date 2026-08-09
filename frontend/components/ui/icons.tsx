@@ -98,6 +98,14 @@ export function IconClock({ className }: IconProps) {
   );
 }
 
+export function IconFilter({ className }: IconProps) {
+  return (
+    <svg className={className} {...base}>
+      <path d="M22 3H2l8 9.46V19l4 2v-8.54z" />
+    </svg>
+  );
+}
+
 export function IconFileText({ className }: IconProps) {
   return (
     <svg className={className} {...base}>

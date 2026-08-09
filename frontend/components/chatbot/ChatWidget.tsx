@@ -24,10 +24,12 @@ const initialMessages: Message[] = [
 const CONNECTION_ERROR_TEXT =
   "Xin lỗi, không kết nối được trợ lý AI. Vui lòng thử lại sau hoặc gọi hotline 0922.86.99.66.";
 
+const AUTO_OPENED_KEY = "la-group:chat-auto-opened";
+const AUTO_OPEN_DELAY_MS = 2500;
+const GREETING_VISIBLE_MS = 8000;
+
 type ChatEvent =
-  | { type: "token"; text: string }
-  | { type: "done" }
-  | { type: "error"; message: string };
+  { type: "token"; text: string } | { type: "done" } | { type: "error"; message: string };
 
 export function ChatWidget({
   industrialParks = [],
@@ -35,6 +37,7 @@ export function ChatWidget({
   industrialParks?: { slug: string; name: string }[];
 }) {
   const [open, setOpen] = useState(false);
+  const [greetingShown, setGreetingShown] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -53,6 +56,28 @@ export function ChatWidget({
     window.addEventListener(OPEN_CHAT_EVENT, handleOpen);
     return () => window.removeEventListener(OPEN_CHAT_EVENT, handleOpen);
   }, []);
+
+  // Chủ động chào khi người dùng vừa vào site, nhưng CHỈ bằng bóng chữ nhỏ cạnh
+  // nút chat — không tự mở panel. Panel chiếm 78% màn hình điện thoại và overlay
+  // của nó nuốt mất cú chạm đầu tiên (đo bằng trình duyệt thật: người đang định
+  // bấm "Tìm việc làm" thì chat đè lên). `sessionStorage` để chỉ chào một lần
+  // mỗi phiên, kể cả khi người dùng chuyển sang trang khác trong site.
+  useEffect(() => {
+    if (sessionStorage.getItem(AUTO_OPENED_KEY)) return;
+    const timer = setTimeout(() => {
+      sessionStorage.setItem(AUTO_OPENED_KEY, "1");
+      setGreetingShown(true);
+    }, AUTO_OPEN_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Tự thu lại nếu người dùng không tương tác — bóng chào nằm đè lên góc dưới
+  // phải, nơi có CTA "Xem việc làm mới" của trang chủ.
+  useEffect(() => {
+    if (!greetingShown) return;
+    const timer = setTimeout(() => setGreetingShown(false), GREETING_VISIBLE_MS);
+    return () => clearTimeout(timer);
+  }, [greetingShown]);
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
@@ -131,17 +156,52 @@ export function ChatWidget({
         />
       ) : null}
 
+      {/* Lời chào chủ động: bóng chữ nhỏ, KHÔNG che nội dung và không chặn thao
+          tác — khác hẳn việc tự bật panel (xem ghi chú ở effect auto-greeting). */}
+      {greetingShown && !open ? (
+        <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-[80] max-w-[230px]">
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(true);
+              setGreetingShown(false);
+            }}
+            className="block w-full rounded-2xl rounded-br-sm bg-white px-3.5 py-2.5 text-left text-[13px] leading-snug text-text shadow-[0_10px_26px_rgba(15,60,120,.2)] ring-1 ring-border active:bg-primary-50"
+          >
+            Chào bạn! Cần tìm việc phù hợp? Bấm vào đây để mình tư vấn nhé 👋
+          </button>
+          <button
+            type="button"
+            onClick={() => setGreetingShown(false)}
+            aria-label="Đóng lời chào"
+            className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-text-muted text-white shadow-brand"
+          >
+            <IconClose className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ) : null}
+
+      {/* `bottom-4` thuần khiến nút nằm lọt dưới thanh công cụ của trình duyệt
+          di động (Chrome/Safari trên iOS vẽ đè lên viewport) — người dùng bấm
+          trúng thanh công cụ chứ không trúng nút, tưởng là chat hỏng. Cộng thêm
+          `env(safe-area-inset-bottom)` để tránh cả home indicator. */}
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          setGreetingShown(false);
+        }}
         aria-label="Mở trợ lý AI"
-        className="fixed bottom-4 right-4 z-[80] flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-[0_10px_26px_rgba(15,60,120,.35)] active:scale-95"
+        aria-hidden={open}
+        className={`fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-4 z-[80] flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-[0_10px_26px_rgba(15,60,120,.35)] transition-opacity active:scale-95 ${
+          open ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
       >
         <IconChatBubble className="h-6 w-6" />
       </button>
 
       <div
-        className={`fixed inset-x-0 bottom-0 z-[90] flex h-[78vh] flex-col rounded-t-2xl bg-white shadow-[0_-10px_40px_rgba(10,30,60,.25)] transition-transform duration-300 ${
+        className={`fixed inset-x-0 bottom-0 z-[90] flex h-[78dvh] flex-col rounded-t-2xl bg-white shadow-[0_-10px_40px_rgba(10,30,60,.25)] transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         } md:inset-x-auto md:bottom-[88px] md:right-6 md:h-[560px] md:w-[380px] md:rounded-2xl md:transition-[transform,opacity] ${
           open
@@ -196,7 +256,8 @@ export function ChatWidget({
           <ChatQuiz industrialParks={industrialParks} onPushMessage={pushMessage} />
         </div>
 
-        <div className="flex flex-shrink-0 gap-2 border-t border-border bg-white p-3">
+        {/* pb thêm safe-area: trên iPhone home indicator che mất ô nhập nếu chỉ `p-3`. */}
+        <div className="flex flex-shrink-0 gap-2 border-t border-border bg-white p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] md:pb-3">
           <input
             type="text"
             value={input}

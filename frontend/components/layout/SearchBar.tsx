@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import {
   IconBriefcase,
   IconCalendarBox,
   IconClock,
+  IconFilter,
   IconMapPin,
   IconSearch,
   IconWallet,
@@ -47,6 +48,8 @@ export function SearchBar({
   industrialParks: SearchBarTaxonomy[];
 }) {
   const router = useRouter();
+  // Chỉ ảnh hưởng mobile: từ `md` trở lên 5 ô lọc luôn hiện (`md:!flex`).
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Điều hướng thẳng tới /viec-lam với query string — hoạt động từ bất kỳ trang
   // nào vì SearchBar nằm trong layout dùng chung của toàn bộ site công khai.
@@ -82,70 +85,91 @@ export function SearchBar({
             <input type="text" name="q" placeholder="Tìm theo vị trí, công ty, kỹ năng..." />
           </label>
 
-          <button
-            type="submit"
-            className="order-2 inline-flex min-h-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-5 text-sm font-bold text-white shadow-brand transition-colors hover:bg-primary-700 md:order-7"
-          >
-            <IconSearch className="h-4 w-4" />
-            Tìm việc làm
-          </button>
+          <div className="order-2 flex gap-2.5 md:order-7 md:flex-none">
+            <button
+              type="submit"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-5 text-sm font-bold text-white shadow-brand transition-colors hover:bg-primary-700 md:flex-none"
+            >
+              <IconSearch className="h-4 w-4" />
+              Tìm việc làm
+            </button>
 
-          <label className={`${fieldClasses} order-3 md:order-2 md:flex-none md:basis-[210px]`}>
-            <IconBriefcase className="h-5 w-5 flex-shrink-0 text-primary-600" />
-            <select name="nganh" defaultValue="">
-              <option value="">Tất cả ngành nghề</option>
-              {categories.map((category) => (
-                <option key={category.slug} value={category.slug}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
+            {/* Trên mobile 5 ô lọc chiếm ~340px chiều cao — gom sau nút này để màn
+                hình đầu tiên còn chỗ cho danh sách việc làm. Ẩn hẳn từ `md`. */}
+            <button
+              type="button"
+              onClick={() => setFiltersOpen((v) => !v)}
+              aria-expanded={filtersOpen}
+              aria-controls="search-filters"
+              className="inline-flex min-h-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border bg-bg px-4 text-sm font-bold text-text transition-colors active:bg-primary-50 md:hidden"
+            >
+              <IconFilter className="h-4 w-4 text-primary-600" />
+              Bộ lọc
+            </button>
+          </div>
 
-          <label className={`${fieldClasses} order-4 md:order-3 md:flex-none md:basis-[225px]`}>
-            <IconMapPin className="h-5 w-5 flex-shrink-0 text-primary-600" />
-            <select name="kv" defaultValue="">
-              <option value="">Tất cả khu công nghiệp</option>
-              {industrialParks.map((park) => (
-                <option key={park.slug} value={park.slug}>
-                  {park.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          {/* `display:contents` để các ô lọc vẫn là flex item trực tiếp của form
+              (giữ nguyên `order-*`/`basis-*` đã canh cho desktop). Ẩn bằng
+              `display:none` chứ không unmount — select vẫn nằm trong form nên
+              FormData đọc đúng, và giá trị người dùng chọn không mất khi thu gọn. */}
+          <div id="search-filters" className={`${filtersOpen ? "contents" : "hidden"} md:contents`}>
+            <label className={`${fieldClasses} order-3 md:order-2 md:flex-none md:basis-[210px]`}>
+              <IconBriefcase className="h-5 w-5 flex-shrink-0 text-primary-600" />
+              <select name="nganh" defaultValue="">
+                <option value="">Tất cả ngành nghề</option>
+                {categories.map((category) => (
+                  <option key={category.slug} value={category.slug}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className={`${fieldClasses} order-5 md:order-4 md:flex-none md:basis-[185px]`}>
-            <IconWallet className="h-5 w-5 flex-shrink-0 text-primary-600" />
-            <select name="luong" defaultValue="">
-              {SALARY_BANDS.map((band) => (
-                <option key={band.value} value={band.value}>
-                  {band.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className={`${fieldClasses} order-4 md:order-3 md:flex-none md:basis-[225px]`}>
+              <IconMapPin className="h-5 w-5 flex-shrink-0 text-primary-600" />
+              <select name="kv" defaultValue="">
+                <option value="">Tất cả khu công nghiệp</option>
+                {industrialParks.map((park) => (
+                  <option key={park.slug} value={park.slug}>
+                    {park.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className={`${fieldClasses} order-6 md:order-5 md:flex-none md:basis-[190px]`}>
-            <IconClock className="h-5 w-5 flex-shrink-0 text-primary-600" />
-            <select name="hinh_thuc" defaultValue="">
-              {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className={`${fieldClasses} order-5 md:order-4 md:flex-none md:basis-[185px]`}>
+              <IconWallet className="h-5 w-5 flex-shrink-0 text-primary-600" />
+              <select name="luong" defaultValue="">
+                {SALARY_BANDS.map((band) => (
+                  <option key={band.value} value={band.value}>
+                    {band.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className={`${fieldClasses} order-7 md:order-6 md:flex-none md:basis-[190px]`}>
-            <IconCalendarBox className="h-5 w-5 flex-shrink-0 text-primary-600" />
-            <select name="ky_luong" defaultValue="">
-              {SALARY_PERIOD_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className={`${fieldClasses} order-6 md:order-5 md:flex-none md:basis-[190px]`}>
+              <IconClock className="h-5 w-5 flex-shrink-0 text-primary-600" />
+              <select name="hinh_thuc" defaultValue="">
+                {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className={`${fieldClasses} order-7 md:order-6 md:flex-none md:basis-[190px]`}>
+              <IconCalendarBox className="h-5 w-5 flex-shrink-0 text-primary-600" />
+              <select name="ky_luong" defaultValue="">
+                {SALARY_PERIOD_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </form>
       </div>
     </div>
