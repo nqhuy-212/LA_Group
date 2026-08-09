@@ -176,7 +176,7 @@ grep '^NGINX_CONF=' .env.prod                      # phải là bootstrap.conf.t
 curl -sS http://rg-nqhuy.io.vn/healthz             # "bootstrap ok" — nếu timeout là DNS/firewall chưa thông
 
 # Bước 2: xin cert
-./scripts/dc.sh run --rm certbot certonly --webroot -w /var/www/certbot \
+./scripts/dc.sh run --rm --entrypoint certbot certbot certonly --webroot -w /var/www/certbot \
   --agree-tos --no-eff-email -m <email-cua-ban> \
   -d rg-nqhuy.io.vn -d www.rg-nqhuy.io.vn
 
@@ -192,6 +192,8 @@ sed -i 's|^NGINX_CONF=.*|NGINX_CONF=lahr.conf.template|' .env.prod
 **Verify**: `curl -sSI https://rg-nqhuy.io.vn/` trả 200 · `curl -sSI http://rg-nqhuy.io.vn/` trả 301 · `curl -sS https://rg-nqhuy.io.vn/api/health` trả `{"status":"ok"}` — **không dùng `-k`**.
 
 > Let's Encrypt giới hạn 5 cert trùng tên/tuần. Nếu đang thử nghiệm nhiều lần, thêm `--dry-run` trước.
+>
+> ⚠️ **Bắt buộc `--entrypoint certbot`** trước tên service — service `certbot` trong compose có `entrypoint:` riêng (vòng lặp `renew` định kỳ, không forward `"$@"`). Thiếu cờ này thì `certonly ...` bị nuốt mất, container chạy vòng lặp renew vô thời hạn thay vì xin cert (xem `CLAUDE.md` §Bẫy đã gặp — phát hiện qua deploy thật).
 
 ---
 
@@ -258,7 +260,7 @@ Hạ tầng:
 - [ ] `docker stats --no-stream` tổng **< 2GB**; `df -h /` **< 40%**
 - [ ] `./scripts/dc.sh up -d --force-recreate backend` xong, `curl` ngay → **không 502** (nginx phải re-resolve DNS)
 - [ ] Sau ~1h: `curl -sS https://rg-nqhuy.io.vn/sitemap.xml | grep rg-nqhuy` ra kết quả (sitemap prerender lúc build không có backend nên ban đầu rỗng, tự lành nhờ `revalidate: 3600`)
-- [ ] `./scripts/dc.sh run --rm certbot renew --dry-run` thành công (nginx tự reload mỗi 6h nên cert mới sẽ được nạp)
+- [ ] `./scripts/dc.sh run --rm --entrypoint certbot certbot renew --dry-run` thành công (nginx tự reload mỗi 6h nên cert mới sẽ được nạp)
 - [ ] `curl -sSI https://rg-nqhuy.io.vn/ | grep -i strict-transport` có HSTS; `curl -sH 'Accept-Encoding: gzip' -I https://rg-nqhuy.io.vn/ | grep -i content-encoding` có gzip
 
 SEO (chỉ chạy khi đã sang domain khách hàng chính thức — đừng submit domain demo cho Google):
@@ -282,7 +284,7 @@ cd /opt/lahr
 #    vì cấu hình đầy đủ chỉ khai báo server_name của domain CŨ.
 sed -i 's|^NGINX_CONF=.*|NGINX_CONF=bootstrap.conf.template|' .env.prod
 ./scripts/dc.sh up -d --force-recreate nginx
-./scripts/dc.sh run --rm certbot certonly --webroot -w /var/www/certbot \
+./scripts/dc.sh run --rm --entrypoint certbot certbot certonly --webroot -w /var/www/certbot \
   --agree-tos --no-eff-email -m <email> -d <domain-khach> -d www.<domain-khach>
 
 # 3. Đổi toàn bộ cấu hình sang domain mới

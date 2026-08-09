@@ -115,8 +115,22 @@ services:
     # bộ nhớ và không tự biết. Không reload thì sau ~60-90 ngày site phục vụ cert
     # hết hạn — lỗi câm, không ai biết tới khi khách phản ánh. Tự reload mỗi 6h rẻ
     # và an toàn hơn nhiều so với mount docker socket vào container certbot.
+    #
+    # Ghi đè `command:` khiến entrypoint gốc của image nginx (docker-entrypoint.sh)
+    # BỎ QUA bước envsubst-templates: nó chỉ tự render /etc/nginx/templates/*.template
+    # khi argv[1] là "nginx"/"nginx-debug", còn ở đây argv[1] là "sh" — phát hiện qua
+    # test thật trên VPS (curl /healthz ra 404, conf.d/default.conf vẫn là file mặc
+    # định của image, không phải bản đã envsubst). Gọi tường minh script gốc trước
+    # khi start nginx để không phải tự chép lại logic filter của nó.
+    #
+    # `&&` rồi `&` KHÔNG tự nhiên tuần tự — `A && B & C` là `(A && B) &` chạy nền
+    # SONG SONG với `C`, nên `exec nginx` khởi động ngay, không đợi envsubst ghi
+    # xong conf.d/default.conf (race condition, cũng phát hiện qua test thật: file
+    # trên đĩa đúng nhưng nginx đang chạy vẫn phục vụ config cũ). Phải để envsubst
+    # chạy xong (đứng một mình, không có `&`) rồi mới `&&` sang phần còn lại.
     command: >
-      sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done &
+      sh -c "/docker-entrypoint.d/20-envsubst-on-templates.sh &&
+             (while :; do sleep 6h & wait $${!}; nginx -s reload; done &) &&
              exec nginx -g 'daemon off;'"
 
   certbot:
