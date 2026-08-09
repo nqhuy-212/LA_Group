@@ -33,7 +33,8 @@ docker manifest inspect ghcr.io/nqhuy-212/lahr-backend:latest  >/dev/null 2>&1 &
 docker manifest inspect ghcr.io/nqhuy-212/lahr-frontend:latest >/dev/null 2>&1 && echo "OK image FE" || echo "THIẾU image FE"
 ```
 
-> Nếu `docker manifest inspect` báo `denied` → package GHCR đang ở chế độ private. Vào GitHub → Packages → chọn package → Package settings → Change visibility → **Public**. Image không chứa secret (`.dockerignore` đã loại `.env`), và để public thì khỏi tốn quota 500MB của repo private.
+> Tính tới commit `9947f25`, cả hai image **đã có trên GHCR và ở chế độ public** (đã kiểm bằng pull ẩn danh), nên VPS không cần `docker login ghcr.io`.
+> Nếu về sau `docker manifest inspect` báo `denied` → package đã bị chuyển sang private: vào GitHub → Packages → chọn package → Package settings → Change visibility → **Public**. Image không chứa secret (`.dockerignore` đã loại `.env`).
 
 **Cần có sẵn trong tay**: IP VPS · quyền sửa DNS của `rg-nqhuy.io.vn` · `OPENAI_API_KEY` · thông tin remote lưu trữ backup (Backblaze B2 / Google Drive) · email để đăng ký Let's Encrypt.
 

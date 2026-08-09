@@ -140,14 +140,16 @@ Mã nguồn xong, artifact deploy xong, restore đã verify thật. Còn lại l
 | Bước | Việc | Ai làm | Tài liệu | Trạng thái |
 |---|---|---|---|---|
 | 0 | **GĐ A + B** — sửa 22 vấn đề của artifact P9, tham số hoá `DOMAIN`, thêm job CI push GHCR | Claude, phiên repo | [`DEPLOY.md`](DEPLOY.md) §Phần 2 | ✅ |
-| 1 | Commit + push `main`, đợi CI xanh và image lên GHCR | người dùng | — | ⬅ tiếp theo |
-| 2 | Thuê VPS Ubuntu, kết nối Remote SSH từ IDE | người dùng | — | ⬜ |
+| 1 | Commit + push `main`, đợi CI xanh và image lên GHCR | người dùng | — | ✅ CI #14 xanh cả 3 job; image `ghcr.io/nqhuy-212/lahr-{backend,frontend}:latest` đã public |
+| 2 | Thuê VPS Ubuntu, kết nối Remote SSH từ IDE | người dùng | — | ⬅ tiếp theo |
 | 3 | `git clone https://github.com/nqhuy-212/LA_Group.git` | người dùng | — | ⬜ |
 | 4 | Phiên Claude **mới trên VPS** tự động triển khai | Claude, phiên VPS | [`../VPS.md`](../VPS.md) §1–§9 | ⬜ |
 | 5 | Site demo chạy thật ở `https://rg-nqhuy.io.vn` | — | `VPS.md` §9 Nghiệm thu | ⬜ |
 | 6 | Sau khi demo xong → chuyển sang tên miền khách hàng | Claude, phiên VPS | `VPS.md` §10 | ⬜ |
 
-**Chưa verify được ở bước 0** (Docker Desktop không chạy lúc làm): `pytest` + `alembic check` backend, `docker build` 2 image, và `docker compose up` thật. Backend Python code không bị GĐ A đụng tới, nhưng working tree có sẵn ~70 file P7/P8 chưa qua CI lần nào → **CI ở bước 1 là hàng rào thật, phải đợi xanh trước khi sang bước 2**.
+**CI đã bù xong phần không verify được cục bộ** (máy dev không bật Docker): `pytest`/`alembic check` cho ~70 file P7/P8 chưa từng qua CI, và `docker build` thật cho cả 2 image. Việc thêm job `images` lộ ra ngay 1 lỗi có sẵn trong repo — xem `CLAUDE.md` §Bẫy, mục `requirements.txt`.
+
+**Còn lại chưa chạy ở đâu**: `docker compose up` thật (chỉ verify được `config` + render nginx template bằng `envsubst` cục bộ) — sẽ biết ở bước 4.
 
 **Quyết định mới phát sinh** (khác `DEPLOY.md` vốn viết cho `lahr.vn`):
 - **Tham số hoá `DOMAIN`** qua cơ chế template của image nginx (`nginx/*.conf.template` + `NGINX_ENVSUBST_FILTER`), vì domain còn đổi ít nhất 1 lần nữa (demo → khách hàng).
