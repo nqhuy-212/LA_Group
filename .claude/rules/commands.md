@@ -18,7 +18,10 @@ uv run alembic upgrade head      # áp migration
 uv run alembic check             # kiểm model↔migration có khớp không (bắt buộc trước khi commit migration, chạy trong CI)
 uv run ruff check .              # lint backend
 uv run pytest                    # chạy test backend (tự tạo DB lagroup_test + migrate qua conftest.py, chỉ cần Postgres đang chạy)
-uv export --no-dev --no-hashes --format requirements-txt > requirements.txt   # export lại cho Dockerfile sau khi đổi dependency — KHÔNG sửa tay requirements.txt
+# Export lại cho backend/Dockerfile (dùng pip) sau khi đổi dependency — KHÔNG sửa tay requirements.txt.
+# BẮT BUỘC có --quiet: thiếu nó, dòng trạng thái "Resolved N packages in Xms" lọt vào đầu
+# file và pip đọc thành requirement rồi fail ngay lúc docker build (đã dính một lần).
+uv export --no-dev --no-hashes --quiet --format requirements-txt > requirements.txt
 uv run python -m scripts.seed_dev   # seed dữ liệu dev idempotent (tỉnh/KCN/danh mục/công ty/job/post khớp mock-data.ts cũ)
 uv run python -m scripts.create_user --email you@lahr.vn --role admin   # tạo tài khoản nội bộ đầu tiên (không có endpoint đăng ký public)
 

@@ -38,6 +38,32 @@ jobs:
       - run: uv python install
       - run: uv sync --frozen
       - run: uv run ruff check .
+      # requirements.txt là file export cho backend/Dockerfile (dùng pip, không
+      # dùng uv). CI và dev đều chạy qua `uv sync` nên không bao giờ đọc file này
+      # -> lỗi ở đây chỉ lộ ra lúc `docker build`, tức rất muộn. Kiểm sớm ở đây.
+      # Đã từng dính: `uv export` ghi dòng "Resolved N packages in Xms" vào đầu
+      # file, pip đọc thành requirement và fail.
+      - name: requirements.txt phải parse được bằng pip
+        run: |
+          uv run python - <<'PY'
+          from packaging.requirements import InvalidRequirement, Requirement
+          import sys
+          bad = []
+          for n, raw in enumerate(open("requirements.txt", encoding="utf-8"), 1):
+              line = raw.strip()
+              if not line or line.startswith("#"):
+                  continue
+              try:
+                  Requirement(line)
+              except InvalidRequirement as e:
+                  bad.append(f"  dòng {n}: {line!r} -> {e}")
+          if bad:
+              print("requirements.txt có dòng pip không đọc được:")
+              print("\n".join(bad))
+              print("Sinh lại bằng: uv export --no-dev --no-hashes --quiet --format requirements-txt > requirements.txt")
+              sys.exit(1)
+          print("requirements.txt hợp lệ")
+          PY
       - run: uv run alembic upgrade head
       - run: uv run alembic check
       - run: uv run pytest
