@@ -79,6 +79,16 @@ services:
       INTERNAL_API_URL: http://backend:8000
       # Biến runtime (không phải NEXT_PUBLIC_*) — đổi domain không cần build lại image.
       SITE_URL: ${SITE_URL}
+      # Docker tự set HOSTNAME=<container ID> cho mọi container; server.js chuẩn
+      # (output "standalone") đọc thẳng process.env.HOSTNAME làm địa chỉ bind
+      # (`server.js`: `const hostname = process.env.HOSTNAME || '0.0.0.0'`). Vì
+      # /etc/hosts trong container map container-ID đó về đúng IP bridge của nó
+      # (không phải 127.0.0.1), Next chỉ lắng nghe trên IP đó — traffic qua nginx
+      # (gọi bằng tên service `frontend`, trùng IP) vẫn thông, nhưng healthcheck
+      # gọi `localhost` bị ECONNREFUSED, báo "unhealthy" liên tục dù site chạy
+      # bình thường (phát hiện qua deploy thật: `docker inspect` cho thấy
+      # FailingStreak hàng trăm lần từ lúc container start). Ép về 0.0.0.0.
+      HOSTNAME: "0.0.0.0"
     depends_on:
       backend:
         condition: service_healthy
