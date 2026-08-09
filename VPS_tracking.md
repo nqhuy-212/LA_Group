@@ -2,7 +2,20 @@
 
 > File theo dõi tiến độ deploy trên **VPS thật** (khác `VPS.md` là hướng dẫn quy trình chung). Cập nhật file này mỗi khi có phiên làm việc mới trên VPS. Không lặp lại nội dung đã có ở `CLAUDE.md`/`VPS.md` — chỉ ghi trạng thái hiện tại + việc còn nợ.
 
-**Cập nhật lần cuối**: 2026-08-09 — Phase 1 (chạy trên `rg-nqhuy.io.vn`) **hoàn thành**.
+**Cập nhật lần cuối**: 2026-08-09 — Phase 1 (chạy trên `rg-nqhuy.io.vn`) **hoàn thành** + đã vá 3 lỗi UX mobile báo qua test thật trên điện thoại + 1 bug hạ tầng (`frontend` healthcheck).
+
+### Đợt sửa lỗi mobile UX (cùng ngày, sau khi Phase 1 lên)
+
+Người dùng báo qua điện thoại thật: (1) thanh tìm kiếm sticky che hết nội dung, (2) bấm icon chatbot không phản hồi, (3) muốn chatbot chủ động chào. Tái hiện + verify bằng Puppeteer thật (viewport 375/390/1280px) vì máy này không có Chrome/Playwright sẵn — đã cài `libnspr4`/`libnss3`/... + `npm install puppeteer` để chạy được.
+
+- **Root cause 1**: `SiteHeader.tsx` gộp `TopBar+MainNav+SearchBar` vào một `<header className="sticky">` → cao **461px trên iPhone (55% của viewport 844px)**. Fix: tách `SearchBar` ra khỏi khối sticky, thu 5 ô lọc sau nút "Bộ lọc" trên mobile (ẩn bằng `display:none`, không unmount). Còn **64px (8%)**.
+- **Root cause 2**: nút chat thực ra vẫn nhận click đúng (verify bằng `page.tap()` + `elementFromPoint`) — vấn đề thật là `bottom-4` thuần bị **thanh công cụ trình duyệt di động** (Chrome/Safari iOS — log nginx cho thấy `CriOS`) vẽ đè lên, người dùng bấm trúng thanh công cụ. Fix: cộng `env(safe-area-inset-bottom)`, panel đổi `vh`→`dvh`.
+- **Yêu cầu 3**: thêm bóng chào tự động sau 2.5s, tự thu sau 8s, `sessionStorage` chỉ 1 lần/phiên. **Thử phương án mở hẳn panel trước, bị bác** vì panel chiếm 78% màn hình và overlay của nó nuốt mất cú chạm đầu tiên của người dùng (verify bằng `elementFromPoint` tại tâm nút "Tìm việc làm" — bị overlay chặn) — đổi sang bóng chữ nhỏ theo yêu cầu người dùng.
+- **Bug phụ phát hiện khi kiểm tra lại**: `docker inspect` cho thấy container `frontend` đã `unhealthy` với `FailingStreak≈389` **từ lúc deploy Phase 1** (không phải do đợt sửa này) — Next.js standalone `server.js` bind theo `process.env.HOSTNAME`, Docker tự set biến này = container ID, `/etc/hosts` map ID đó về IP bridge (không phải `127.0.0.1`) → healthcheck `fetch('http://localhost:3000/')` luôn refused dù site vẫn chạy bình thường qua nginx. Fix: ép `HOSTNAME: "0.0.0.0"` trong `docker-compose.prod.yml`. Chi tiết đầy đủ + bài học ở `docs/PITFALLS.md`.
+
+**Quy trình deploy gặp trở ngại**: VPS này **không có git credential** để push (`git push` báo lỗi "could not read Username"), dù đã `git clone` được (chỉ cần quyền đọc). Giải: người dùng dùng panel **Source Control của VS Code** (đã đăng nhập GitHub sẵn trong IDE, đang Remote-SSH vào đúng VPS này) để push — Bash tool/terminal của agent không tự có credential đó dù cùng máy. Nếu VPS cần push code lần sau, lặp lại cách này hoặc cấu hình PAT/SSH deploy key tường minh.
+
+Cả 3 fix + bug healthcheck đã **verify sống trên production** bằng Puppeteer thật nhắm thẳng `https://rg-nqhuy.io.vn` sau khi CI build xong + `docker compose up -d --force-recreate frontend`.
 
 ---
 
