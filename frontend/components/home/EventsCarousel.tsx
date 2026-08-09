@@ -39,6 +39,7 @@ export function EventsCarousel({ events }: { events: EventItem[] }) {
         ref={trackRef}
         onScroll={handleScroll}
         data-reveal
+        suppressHydrationWarning
         className="reveal no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1.5 pt-1 md:px-0"
       >
         {events.map((event, index) => {

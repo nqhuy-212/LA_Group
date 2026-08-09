@@ -13,6 +13,8 @@ export type JobCardVM = {
   salaryLabel: string;
   location: string;
   deadlineLabel: string;
+  employmentType: string | null;
+  salaryPeriodLabel: string | null;
 };
 
 export type JobCategoryTab = {
@@ -30,7 +32,6 @@ export type JobDetailVM = JobCardVM & {
   quantityLabel: string;
   ageLabel: string | null;
   shiftType: string | null;
-  employmentType: string | null;
   description: string[];
   requirements: string[];
   benefits: string[];

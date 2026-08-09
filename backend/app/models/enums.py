@@ -53,3 +53,13 @@ class UserRole(enum.StrEnum):
     ADMIN = "admin"
     MANAGER = "manager"
     STAFF = "staff"
+
+
+class EmploymentType(enum.StrEnum):
+    OFFICIAL = "official"  # chính thức
+    SEASONAL = "seasonal"  # thời vụ
+
+
+class SalaryPeriod(enum.StrEnum):
+    WEEKLY = "weekly"  # lương tuần
+    MONTHLY = "monthly"  # lương tháng

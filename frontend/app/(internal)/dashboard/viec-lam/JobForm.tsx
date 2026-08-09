@@ -21,6 +21,16 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "archived", label: "Lưu trữ" },
 ];
 
+const EMPLOYMENT_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "official", label: "Chính thức" },
+  { value: "seasonal", label: "Thời vụ" },
+];
+
+const SALARY_PERIOD_OPTIONS: { value: string; label: string }[] = [
+  { value: "weekly", label: "Lương tuần" },
+  { value: "monthly", label: "Lương tháng" },
+];
+
 const fieldClass =
   "min-h-11 w-full rounded-lg border border-border bg-white px-3 text-[16px] text-text outline-none focus:border-primary-500";
 const labelClass = "flex flex-col gap-1.5 text-sm font-semibold text-text";
@@ -72,6 +82,7 @@ export function JobForm({
       age_max: numberOrNull(form.get("age_max")),
       shift_type: stringOrNull(form.get("shift_type")),
       employment_type: stringOrNull(form.get("employment_type")),
+      salary_period: stringOrNull(form.get("salary_period")),
       description: stringOrNull(form.get("description")),
       requirements: stringOrNull(form.get("requirements")),
       benefits: stringOrNull(form.get("benefits")),
@@ -262,14 +273,34 @@ export function JobForm({
           />
         </label>
         <label className={labelClass}>
-          Hình thức làm việc
-          <input
+          Loại hình công việc
+          <select
             name="employment_type"
-            maxLength={50}
-            defaultValue={initialJob?.employment_type ?? undefined}
-            placeholder="VD: Toàn thời gian"
+            defaultValue={initialJob?.employment_type ?? ""}
             className={fieldClass}
-          />
+          >
+            <option value="">Không xác định</option>
+            {EMPLOYMENT_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={labelClass}>
+          Kỳ trả lương
+          <select
+            name="salary_period"
+            defaultValue={initialJob?.salary_period ?? ""}
+            className={fieldClass}
+          >
+            <option value="">Không xác định</option>
+            {SALARY_PERIOD_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 

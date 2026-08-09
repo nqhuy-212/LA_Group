@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -206,7 +206,9 @@ def test_date_range_filter(client, db_session, taxonomy):
     _make_application(db_session, taxonomy["job"], ref="UV000002")
     _login(client, db_session, UserRole.ADMIN, "admin-daterange@lahr.vn")
 
-    today = date.today().isoformat()
+    # UTC, không phải date.today() (local) — server lọc date_from/date_to theo UTC
+    # (xem admin/applications.py), local giờ VN (UTC+7) qua nửa đêm sẽ lệch ngày.
+    today = datetime.now(UTC).date().isoformat()
     resp = client.get("/api/admin/applications", params={"date_from": today, "date_to": today})
     assert resp.status_code == 200
     body = resp.json()

@@ -11,6 +11,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini .
+# scripts/ BẮT BUỘC có trong image prod: create_user.py là cách duy nhất tạo tài
+# khoản admin đầu tiên (không có endpoint đăng ký public), seed_dev.py nạp danh mục
+# nền (tỉnh/KCN/ngành nghề) mà thiếu nó thì admin không đăng tin được.
+COPY scripts ./scripts
 
 RUN useradd --create-home --uid 1000 appuser && \
     mkdir -p /uploads && chown appuser:appuser /uploads

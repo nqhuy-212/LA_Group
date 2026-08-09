@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -55,6 +55,12 @@ class Application(IdMixin, TimestampMixin, Base):
     user_agent: Mapped[str | None] = mapped_column(String(500), default=None)
 
     purged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
+
+    # Ghi chú tự do — dùng để lưu tóm tắt lựa chọn quiz chatbot (thời vụ/lương
+    # tuần/KCN) khi lead tới từ /api/leads, giúp nhân viên tư vấn có ngữ cảnh
+    # ngay trong Dashboard trước khi gọi lại. Cũng dùng chung được cho ghi chú
+    # thủ công sau này.
+    notes: Mapped[str | None] = mapped_column(Text, default=None)
 
     job: Mapped["Job | None"] = relationship()
     assigned_to: Mapped["User | None"] = relationship()

@@ -17,9 +17,9 @@ dependencies = [
     "python-slugify==8.0.4",
     "filetype==1.2.0",
     "python-multipart==0.0.32",
-    "anthropic==0.120.2",
     "python-dotenv==1.2.2",
     "email-validator==2.3.0",
+    "openai>=2.53.0",
 ]
 
 [dependency-groups]

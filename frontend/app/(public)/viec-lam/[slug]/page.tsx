@@ -83,13 +83,18 @@ export default async function JobDetailPage({
       {vm.isExpired ? (
         <div
           data-reveal
+          suppressHydrationWarning
           className="reveal mb-5 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm font-semibold text-accent-dark"
         >
           Tin tuyển dụng này đã hết hạn hoặc ngừng nhận hồ sơ. Xem các việc làm tương tự bên dưới.
         </div>
       ) : null}
 
-      <div data-reveal className="reveal rounded-xl border border-border bg-white p-5 shadow-brand md:p-7">
+      <div
+        data-reveal
+        suppressHydrationWarning
+        className="reveal rounded-xl border border-border bg-white p-5 shadow-brand md:p-7"
+      >
         <div className="flex flex-wrap items-start gap-3">
           <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-base font-extrabold text-primary-700">
             {vm.logoInitials}
@@ -124,6 +129,9 @@ export default async function JobDetailPage({
           {vm.shiftType ? <span className="rounded-full bg-bg px-3 py-1">{vm.shiftType}</span> : null}
           {vm.employmentType ? (
             <span className="rounded-full bg-bg px-3 py-1">{vm.employmentType}</span>
+          ) : null}
+          {vm.salaryPeriodLabel ? (
+            <span className="rounded-full bg-bg px-3 py-1">{vm.salaryPeriodLabel}</span>
           ) : null}
         </div>
 
@@ -181,7 +189,7 @@ export default async function JobDetailPage({
       </div>
 
       {relatedJobs.length > 0 ? (
-        <section data-reveal className="reveal mt-8">
+        <section data-reveal suppressHydrationWarning className="reveal mt-8">
           <h2 className="mb-4 text-lg font-extrabold">Việc làm tương tự</h2>
           <div className="flex flex-col gap-3">
             {relatedJobs.map((related, index) => (

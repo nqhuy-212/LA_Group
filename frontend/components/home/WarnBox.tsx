@@ -10,6 +10,7 @@ export function WarnBox() {
   return (
     <div
       data-reveal
+      suppressHydrationWarning
       className="reveal mt-[18px] flex gap-3 rounded-xl border-[1.5px] border-[#f3b9b5] bg-[#fdf1f0] p-4"
     >
       <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-lg bg-accent text-white">

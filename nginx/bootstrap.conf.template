@@ -1,0 +1,51 @@
+# Cấu hình BOOTSTRAP — chỉ dùng cho lần khởi động ĐẦU TIÊN, khi chưa có chứng chỉ.
+#
+# Vì sao cần file riêng: lahr.conf.template tham chiếu /etc/letsencrypt/live/${DOMAIN}/
+# — file chưa tồn tại thì nginx crash-loop, mà certbot lại cần nginx phục vụ
+# /.well-known/acme-challenge/ mới cấp được chứng chỉ. Thế bí gà-và-trứng.
+#
+# Quy trình: NGINX_CONF=bootstrap.conf.template -> up -d -> certbot certonly
+# -> NGINX_CONF=lahr.conf.template -> up -d --force-recreate nginx. Xem VPS.md §6.
+#
+# File này cũng là cách chạy thử toàn bộ stack qua HTTP trên máy dev (không cần SSL).
+
+# Docker DNS. BẮT BUỘC vì proxy_pass dùng biến — xem ghi chú ở lahr.conf.template.
+resolver 127.0.0.11 valid=10s ipv6=off;
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    # Certbot xác thực quyền sở hữu domain qua webroot.
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "bootstrap ok\n";
+    }
+
+    client_max_body_size 6m;
+
+    location /api/ {
+        set $upstream_be http://backend:8000;
+        proxy_pass $upstream_be;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+
+    location / {
+        set $upstream_fe http://frontend:3000;
+        proxy_pass $upstream_fe;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

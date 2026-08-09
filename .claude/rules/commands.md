@@ -26,28 +26,38 @@ uv run python -m scripts.create_user --email you@lahr.vn --role admin   # tạo 
 docker compose up -d        # khởi động container Postgres (lagroup/lagroup/lagroup, chỉ bind 127.0.0.1:5432)
 docker compose down         # tắt container (thêm -v nếu muốn xoá luôn volume dữ liệu)
 
-# Build & push image production (chạy ở CI/máy dev — KHÔNG build trên VPS, xem tech-stack.md)
-docker build -t $BACKEND_IMAGE ./backend
-docker build -t $FRONTEND_IMAGE ./frontend
-docker push $BACKEND_IMAGE && docker push $FRONTEND_IMAGE
+# Build & push image production: KHÔNG làm tay nữa — job `images` trong
+# .github/workflows/ci.yml tự build và push lên GHCR mỗi lần push lên main
+# (ghcr.io/<owner>/lahr-backend, ghcr.io/<owner>/lahr-frontend). Tuyệt đối
+# không build trên VPS: `npm run build` của Next ăn 2-3GB, VPS 4GB sẽ OOM.
 
-# Hạ tầng production (VPS) — docker-compose.prod.yml + nginx/lahr.conf ở root
-# (Nginx reverse proxy + Certbot, Next.js standalone, FastAPI/uvicorn, PostgreSQL, n8n qua profile "automation")
-cp .env.prod.example .env.prod && nano .env.prod   # điền giá trị thật, KHÔNG commit .env.prod
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
-docker compose -f docker-compose.prod.yml --profile automation up -d   # thêm n8n nếu cần
+# Hạ tầng production (VPS) — quy trình đầy đủ ở VPS.md, tóm tắt lệnh:
+# LUÔN dùng ./scripts/dc.sh thay cho `docker compose` trần — nó tự kèm
+# `--env-file .env.prod`. Thiếu cờ đó thì mọi ${...} trong compose rỗng
+# (env_file: chỉ nạp biến VÀO container, không dùng cho thay thế biến).
+cp .env.prod.example .env.prod && nano .env.prod   # điền giá trị thật, KHÔNG commit
+./scripts/dc.sh pull
+./scripts/dc.sh up -d
+./scripts/dc.sh --profile automation up -d   # thêm n8n nếu cần (mặc định tắt)
+./scripts/dc.sh logs -f backend
+docker stats                 # theo dõi RAM/CPU — mục tiêu <2GB (DoD P9)
 
-# Xin chứng chỉ SSL lần đầu (certbot service chỉ lo gia hạn định kỳ sau đó)
-docker compose -f docker-compose.prod.yml run --rm certbot \
-  certonly --webroot -w /var/www/certbot -d lahr.vn -d www.lahr.vn
+# Xin chứng chỉ SSL lần đầu — phải chạy khi NGINX_CONF=bootstrap.conf.template,
+# vì cấu hình đầy đủ tham chiếu file cert chưa tồn tại (nginx sẽ crash-loop).
+./scripts/dc.sh run --rm certbot certonly --webroot -w /var/www/certbot \
+  --agree-tos --no-eff-email -m <email> -d $DOMAIN -d www.$DOMAIN
+# Xong thì đổi NGINX_CONF=lahr.conf.template trong .env.prod rồi:
+./scripts/dc.sh up -d --force-recreate nginx
 
-docker stats                 # theo dõi RAM/CPU từng container — mục tiêu <4GB (DoD P9)
+# Nạp danh mục nền + tạo tài khoản admin đầu tiên (DB sau migrate là RỖNG)
+./scripts/dc.sh exec backend python -m scripts.seed_dev
+./scripts/dc.sh exec -it backend python -m scripts.create_user --email you@lahr.vn --role admin
 
-# Backup / restore (scripts/backup.sh, scripts/restore.sh — cần rclone đã config sẵn remote)
-RCLONE_REMOTE=b2:lahr-backups BACKUP_ENCRYPTION_KEY=... ./scripts/backup.sh
-BACKUP_ENCRYPTION_KEY=... ./scripts/restore.sh /root/backups/lagroup-<timestamp>.sql.gz.enc
-# Cron hằng đêm: crontab -e -> 0 2 * * * cd /path/to/repo && ./scripts/backup.sh >> /var/log/backup.log 2>&1
+# Backup / restore — biến đọc thẳng từ .env.prod, không cần truyền tay
+./scripts/backup.sh                                        # DB + volume uploads
+./scripts/restore.sh /root/backups/lagroup-<ts>.sql.gz.enc # database
+./scripts/restore.sh /root/backups/uploads-<ts>.tar.gz.enc # file CV
+# Cron hằng đêm: crontab -e -> 0 2 * * * cd /opt/lahr && ./scripts/backup.sh >> /var/log/lahr-backup.log 2>&1
 ```
 
 ⚠️ **Windows + `npm run test`**: nếu vitest báo lỗi `Cannot find native binding` (rolldown), đây là bug cài optional dependency của npm trên Windows (xem [npm/cli#4828](https://github.com/npm/cli/issues/4828)), không phải lỗi code. Sửa: `npm install --no-save @rolldown/binding-win32-x64-msvc@<version khớp với rolldown trong package-lock.json>`.

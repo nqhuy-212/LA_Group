@@ -54,14 +54,18 @@ export default async function TinTucPage({
 
   return (
     <Container className="py-8 md:py-12">
-      <div data-reveal className="reveal mb-5">
+      <div data-reveal suppressHydrationWarning className="reveal mb-5">
         <h1 className="text-xl font-extrabold md:text-2xl">Tin tức & Chính sách</h1>
         <p className="mt-1 text-sm text-text-muted">
           Cập nhật hoạt động, chính sách lao động và cảnh báo lừa đảo từ LA Group (LAHR)
         </p>
       </div>
 
-      <div data-reveal className="reveal no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-1">
+      <div
+        data-reveal
+        suppressHydrationWarning
+        className="reveal no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-1"
+      >
         {TABS.map((tab) => (
           <Link
             key={tab.label}
@@ -86,6 +90,7 @@ export default async function TinTucPage({
               key={post.id}
               href={post.href}
               data-reveal
+              suppressHydrationWarning
               style={revealStyle(index)}
               className="reveal overflow-hidden rounded-xl border border-border bg-white shadow-brand"
             >

@@ -17,6 +17,7 @@ export function JobCard({
     <Link
       href={job.href}
       data-reveal
+      suppressHydrationWarning
       data-job-category={job.category}
       style={revealStyle(index)}
       className={`reveal flex items-start gap-3 rounded-xl border border-border bg-white p-3.5 shadow-brand transition-colors hover:border-primary-600 md:items-center ${
@@ -46,6 +47,20 @@ export function JobCard({
             {job.deadlineLabel}
           </span>
         </div>
+        {job.employmentType || job.salaryPeriodLabel ? (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {job.employmentType ? (
+              <span className="rounded-full bg-bg px-2 py-0.5 text-[11px] text-text-muted">
+                {job.employmentType}
+              </span>
+            ) : null}
+            {job.salaryPeriodLabel ? (
+              <span className="rounded-full bg-bg px-2 py-0.5 text-[11px] text-text-muted">
+                {job.salaryPeriodLabel}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
       </div>
       <span className="hidden flex-shrink-0 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-bold text-white md:inline-flex">
         Ứng tuyển

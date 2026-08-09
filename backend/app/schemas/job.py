@@ -2,6 +2,8 @@ from datetime import date, datetime
 
 from pydantic import BaseModel
 
+from app.models.enums import EmploymentType, SalaryPeriod
+
 
 class CompanyPublic(BaseModel):
     slug: str
@@ -32,6 +34,8 @@ class JobListItem(BaseModel):
     salary_min: int | None
     salary_max: int | None
     salary_negotiable: bool
+    employment_type: EmploymentType | None
+    salary_period: SalaryPeriod | None
     is_hot: bool
     deadline: date | None
     published_at: datetime | None
@@ -42,7 +46,6 @@ class JobDetail(JobListItem):
     age_min: int | None
     age_max: int | None
     shift_type: str | None
-    employment_type: str | None
     description: str | None
     requirements: str | None
     benefits: str | None

@@ -26,6 +26,7 @@ export function JobListSection({
 
         <div
           data-reveal
+          suppressHydrationWarning
           className="reveal no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1"
         >
           {categoryTabs.map((category) => (

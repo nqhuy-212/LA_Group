@@ -88,6 +88,24 @@ def test_valid_submission_creates_application(client, taxonomy, db_session):
     assert application.consent_given is True
 
 
+def test_submission_without_cv_succeeds(client, taxonomy, db_session):
+    # CV là optional — lao động phổ thông không phải lúc nào cũng có sẵn file CV,
+    # đơn phải gửi được chỉ với họ tên/SĐT (xem app/api/v1/public/applications.py).
+    resp = client.post(
+        "/api/applications",
+        data=_valid_form(taxonomy["job"].slug),
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["ok"] is True
+
+    application = db_session.query(Application).filter_by(
+        reference_code=body["reference_code"]
+    ).one()
+    assert application.cv_file_path is None
+    assert application.cv_original_name is None
+
+
 def test_response_does_not_echo_pii(client, taxonomy):
     resp = client.post(
         "/api/applications",

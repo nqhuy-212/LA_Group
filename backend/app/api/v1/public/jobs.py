@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.core.search import unaccent_ilike
 from app.db.session import get_db
 from app.models import Company, IndustrialPark, Job, JobCategory
-from app.models.enums import JobStatus
+from app.models.enums import EmploymentType, JobStatus, SalaryPeriod
 from app.schemas.common import PageResponse
 from app.schemas.job import (
     CompanyPublic,
@@ -51,6 +51,8 @@ def _job_list_item(job: Job) -> JobListItem:
         salary_min=job.salary_min,
         salary_max=job.salary_max,
         salary_negotiable=job.salary_negotiable,
+        employment_type=job.employment_type,
+        salary_period=job.salary_period,
         is_hot=job.is_hot,
         deadline=job.deadline,
         published_at=job.published_at,
@@ -65,7 +67,6 @@ def _job_detail(job: Job) -> JobDetail:
         age_min=job.age_min,
         age_max=job.age_max,
         shift_type=job.shift_type,
-        employment_type=job.employment_type,
         description=job.description,
         requirements=job.requirements,
         benefits=job.benefits,
@@ -82,6 +83,8 @@ def list_jobs(
     industrial_park: str | None = None,
     province: str | None = None,
     salary_min: int | None = None,
+    employment_type: EmploymentType | None = None,
+    salary_period: SalaryPeriod | None = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=50),
     sort: str = "newest",
@@ -98,6 +101,10 @@ def list_jobs(
         conditions.append(Job.province_code == province)
     if salary_min:
         conditions.append(Job.salary_max >= salary_min)
+    if employment_type:
+        conditions.append(Job.employment_type == employment_type)
+    if salary_period:
+        conditions.append(Job.salary_period == salary_period)
 
     total = db.execute(
         select(func.count()).select_from(Job).where(*conditions)

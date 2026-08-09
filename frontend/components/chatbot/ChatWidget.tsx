@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ChatQuiz } from "@/components/chatbot/ChatQuiz";
 import { IconChatBubble, IconClose, IconSend } from "@/components/ui/icons";
 
 export const OPEN_CHAT_EVENT = "la-group:open-chat";
@@ -9,20 +10,15 @@ type Message = {
   id: number;
   from: "bot" | "user";
   text: string;
+  telHref?: string;
 };
 
 const initialMessages: Message[] = [
   {
     id: 0,
     from: "bot",
-    text: "Xin chào! Mình là trợ lý AI của LA Group 👋 Bạn đang tìm công việc như thế nào?",
+    text: "Xin chào! Mình là trợ lý AI của LA Group 👋 Trả lời nhanh 4 câu dưới đây để mình tìm việc phù hợp cho bạn nhé — hoặc bạn cứ gõ câu hỏi tự do bất cứ lúc nào.",
   },
-];
-
-const suggestions = [
-  "Tôi muốn tìm việc sản xuất, lắp ráp",
-  "Tôi muốn tìm việc gần khu vực Hải Dương",
-  "Mức lương mong muốn 8-10 triệu",
 ];
 
 const CONNECTION_ERROR_TEXT =
@@ -33,12 +29,22 @@ type ChatEvent =
   | { type: "done" }
   | { type: "error"; message: string };
 
-export function ChatWidget() {
+export function ChatWidget({
+  industrialParks = [],
+}: {
+  industrialParks?: { slug: string; name: string }[];
+}) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const nextIdRef = useRef(1);
+
+  function pushMessage(from: "bot" | "user", text: string, telHref?: string) {
+    const id = nextIdRef.current++;
+    setMessages((prev) => [...prev, { id, from, text, telHref }]);
+  }
 
   useEffect(() => {
     function handleOpen() {
@@ -65,8 +71,8 @@ export function ChatWidget() {
         content: m.text,
       }));
 
-    const userMsgId = messages.length;
-    const botMsgId = userMsgId + 1;
+    const userMsgId = nextIdRef.current++;
+    const botMsgId = nextIdRef.current++;
     setMessages((prev) => [
       ...prev,
       { id: userMsgId, from: "user", text: trimmed },
@@ -177,21 +183,17 @@ export function ChatWidget() {
               }`}
             >
               {message.text}
+              {message.telHref ? (
+                <a
+                  href={message.telHref}
+                  className="mt-2 flex min-h-11 items-center justify-center rounded-full bg-accent px-4 text-sm font-bold text-white"
+                >
+                  📞 Gọi ngay: 0922.86.99.66
+                </a>
+              ) : null}
             </div>
           ))}
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((suggestion) => (
-              <button
-                key={suggestion}
-                type="button"
-                disabled={sending}
-                onClick={() => sendMessage(suggestion)}
-                className="rounded-full border border-primary-600 bg-white px-3.5 py-2 text-xs font-bold text-primary-700 disabled:opacity-50"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
+          <ChatQuiz industrialParks={industrialParks} onPushMessage={pushMessage} />
         </div>
 
         <div className="flex flex-shrink-0 gap-2 border-t border-border bg-white p-3">

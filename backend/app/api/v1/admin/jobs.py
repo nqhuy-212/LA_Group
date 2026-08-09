@@ -89,6 +89,7 @@ def _job_admin_out(job: Job) -> JobAdminOut:
         age_max=job.age_max,
         shift_type=job.shift_type,
         employment_type=job.employment_type,
+        salary_period=job.salary_period,
         description=job.description,
         requirements=job.requirements,
         benefits=job.benefits,

@@ -2,7 +2,14 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.models.enums import ApplicationStatus, JobStatus, PostStatus, PostType
+from app.models.enums import (
+    ApplicationStatus,
+    EmploymentType,
+    JobStatus,
+    PostStatus,
+    PostType,
+    SalaryPeriod,
+)
 
 # ---------------------------------------------------------------------------
 # Jobs
@@ -17,7 +24,8 @@ class JobAdminBase(BaseModel):
     age_min: int | None = Field(default=None, ge=15, le=100)
     age_max: int | None = Field(default=None, ge=15, le=100)
     shift_type: str | None = Field(default=None, max_length=50)
-    employment_type: str | None = Field(default=None, max_length=50)
+    employment_type: EmploymentType | None = None
+    salary_period: SalaryPeriod | None = None
     description: str | None = None
     requirements: str | None = None
     benefits: str | None = None
@@ -57,7 +65,8 @@ class JobAdminUpdate(BaseModel):
     age_min: int | None = Field(default=None, ge=15, le=100)
     age_max: int | None = Field(default=None, ge=15, le=100)
     shift_type: str | None = Field(default=None, max_length=50)
-    employment_type: str | None = Field(default=None, max_length=50)
+    employment_type: EmploymentType | None = None
+    salary_period: SalaryPeriod | None = None
     description: str | None = None
     requirements: str | None = None
     benefits: str | None = None
@@ -87,7 +96,8 @@ class JobAdminOut(BaseModel):
     age_min: int | None
     age_max: int | None
     shift_type: str | None
-    employment_type: str | None
+    employment_type: EmploymentType | None
+    salary_period: SalaryPeriod | None
     description: str | None
     requirements: str | None
     benefits: str | None
@@ -210,6 +220,7 @@ class ApplicationAdminOut(BaseModel):
     hometown_text: str | None
     has_cv: bool
     cv_original_name: str | None
+    notes: str | None
     source: str
     status: str
     assigned_to_id: int | None

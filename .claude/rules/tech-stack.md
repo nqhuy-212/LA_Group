@@ -8,11 +8,11 @@
   - **Khu vực nội bộ** (route group `(internal)`/`/dashboard/*`): layout Sidebar + Topbar riêng cho nhân viên/quản lý LA Group, yêu cầu đăng nhập. Xem chi tiết ở `feature-admin-dashboard.md`.
 
 **Backend**
-- **Framework**: FastAPI (Python) — tách biệt hoàn toàn khỏi Next.js, giao tiếp qua REST API. Chọn FastAPI (thay vì Next.js API routes) vì cần tích hợp AI (Claude API, OCR CCCD) và tự động hoá nghiệp vụ (tính lương, in hợp đồng) — hệ sinh thái Python phù hợp hơn cho các việc này.
+- **Framework**: FastAPI (Python) — tách biệt hoàn toàn khỏi Next.js, giao tiếp qua REST API. Chọn FastAPI (thay vì Next.js API routes) vì cần tích hợp AI (OpenAI API, OCR CCCD) và tự động hoá nghiệp vụ (tính lương, in hợp đồng) — hệ sinh thái Python phù hợp hơn cho các việc này.
 - **Database**: PostgreSQL **tự host trên VPS** (không dùng dịch vụ managed/Firebase) — ưu tiên chi phí thấp nhất và tự chủ hoàn toàn dữ liệu (dữ liệu lao động, CCCD, hợp đồng là dữ liệu nhạy cảm). Có lợi thế JSONB (dữ liệu OCR/rule tính lương linh hoạt). *(Ghi chú: chatbot RAG dùng tool-use gọi thẳng DB ở MVP, chưa cần extension `pgvector` — xem D11/`feature-chatbot-ai.md`.)*
 - **ORM/Migration**: SQLAlchemy (sync) + Alembic (không dùng Prisma vì backend là Python).
 - **Auth**: JWT tự triển khai trong FastAPI bằng `PyJWT` + `bcrypt` trực tiếp (không dùng `passlib`, không tương thích bcrypt ≥4.1), lưu trong **httpOnly/Secure/SameSite=Strict cookie** — dùng cho **khu vực nội bộ/Dashboard** (nhân sự LA Group). Không dùng `OAuth2PasswordBearer` — kể cả khi test qua `/docs` ở dev, Swagger UI vẫn gọi thẳng `POST /api/auth/login` và trình duyệt tự lưu cookie như luồng thật (đã triển khai đầy đủ ở P2, xem `security.md`). Có RBAC 3 role tối thiểu: `admin`/`manager`/`staff` (`app/api/deps.py` — `get_current_user`/`require_roles`), kiểm tra quyền ở cả middleware Next.js lẫn dependency FastAPI (không tin tưởng một lớp duy nhất). Người lao động (ứng viên) không cần tài khoản để xem tin và dùng chatbot.
-- **AI Chatbot**: Anthropic Claude API gọi từ FastAPI (Python SDK `anthropic`, không phải `@anthropic-ai/sdk` phía Next.js) — mọi logic nghiệp vụ/RAG nằm ở backend. Next.js chỉ chứa UI widget gọi qua FastAPI. Xem chi tiết ở `feature-chatbot-ai.md`.
+- **AI Chatbot**: OpenAI API gọi từ FastAPI (Python SDK `openai`, model mặc định `gpt-4o-mini` qua `settings.chat_model`) — mọi logic nghiệp vụ/RAG nằm ở backend. Next.js chỉ chứa UI widget gọi qua FastAPI. Đổi từ Anthropic Claude sang OpenAI ở P8 vì LAHR có sẵn ngân sách/API key OpenAI (xem CLAUDE.md). Xem chi tiết ở `feature-chatbot-ai.md`.
 
 **Hạ tầng & Deploy**
 - **VPS**: Tino, gói "N8N Basic" (4GB RAM/30GB NVMe, ~239.000đ/tháng), có đường nâng cấp "N8N Pro" (6GB RAM/60GB NVMe, ~379.000đ/tháng) nếu thiếu tài nguyên.

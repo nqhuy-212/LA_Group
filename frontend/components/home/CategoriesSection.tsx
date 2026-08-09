@@ -26,6 +26,7 @@ export function CategoriesSection({ categories }: { categories: JobCategoryCard[
               <div
                 key={category.slug}
                 data-reveal
+                suppressHydrationWarning
                 style={revealStyle(index)}
                 className="reveal rounded-xl border border-border bg-white p-4 shadow-brand"
               >

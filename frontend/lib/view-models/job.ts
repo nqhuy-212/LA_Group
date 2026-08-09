@@ -19,6 +19,16 @@ export type JobListItemDTO = components["schemas"]["JobListItem"];
 export type JobDetailDTO = components["schemas"]["JobDetail"];
 export type JobCategoryWithCountDTO = components["schemas"]["JobCategoryWithCount"];
 
+const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
+  official: "Chính thức",
+  seasonal: "Thời vụ",
+};
+
+const SALARY_PERIOD_LABELS: Record<string, string> = {
+  weekly: "Lương tuần",
+  monthly: "Lương tháng",
+};
+
 export function toJobCardVM(dto: JobListItemDTO): JobCardVM {
   return {
     id: dto.slug,
@@ -33,6 +43,8 @@ export function toJobCardVM(dto: JobListItemDTO): JobCardVM {
       ? `${dto.industrial_park.name}, ${dto.province_name}`
       : dto.province_name,
     deadlineLabel: formatDeadline(dto.deadline ?? null),
+    employmentType: dto.employment_type ? EMPLOYMENT_TYPE_LABELS[dto.employment_type] : null,
+    salaryPeriodLabel: dto.salary_period ? SALARY_PERIOD_LABELS[dto.salary_period] : null,
   };
 }
 
@@ -60,7 +72,6 @@ export function toJobDetailVM(dto: JobDetailDTO): JobDetailVM {
     quantityLabel: `Tuyển ${dto.quantity} người`,
     ageLabel: formatAgeRange(dto.age_min, dto.age_max),
     shiftType: dto.shift_type,
-    employmentType: dto.employment_type,
     description: splitParagraphs(dto.description),
     requirements: splitParagraphs(dto.requirements),
     benefits: splitParagraphs(dto.benefits),

@@ -1,0 +1,9 @@
+# Shell script và file cấu hình hạ tầng LUÔN dùng LF, kể cả khi checkout trên
+# Windows. Máy dev là Windows nhưng những file này chạy trên VPS Linux — dính
+# CRLF là hỏng ngay: bash báo "bad interpreter: /usr/bin/env bash^M", còn nginx
+# nuốt ký tự \r vào cuối directive.
+*.sh            text eol=lf
+*.template      text eol=lf
+Dockerfile      text eol=lf
+docker-compose*.yml text eol=lf
+*.conf          text eol=lf

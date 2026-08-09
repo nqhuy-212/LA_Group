@@ -50,6 +50,7 @@ export function FeedListSection({
                 key={item.id}
                 href={item.href}
                 data-reveal
+                suppressHydrationWarning
                 style={revealStyle(index)}
                 className="reveal flex items-start gap-3 border-b border-border py-3 last:border-none"
               >

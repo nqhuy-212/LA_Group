@@ -14,6 +14,8 @@ type RawSearchParams = {
   nganh?: string;
   kv?: string;
   luong?: string;
+  hinh_thuc?: string;
+  ky_luong?: string;
   page?: string;
 };
 
@@ -27,6 +29,8 @@ function buildHref(current: RawSearchParams, overrides: Partial<RawSearchParams>
   if (merged.nganh) params.set("nganh", merged.nganh);
   if (merged.kv) params.set("kv", merged.kv);
   if (merged.luong) params.set("luong", merged.luong);
+  if (merged.hinh_thuc) params.set("hinh_thuc", merged.hinh_thuc);
+  if (merged.ky_luong) params.set("ky_luong", merged.ky_luong);
   if (merged.page && merged.page !== "1") params.set("page", merged.page);
   const qs = params.toString();
   return qs ? `/viec-lam?${qs}` : "/viec-lam";
@@ -82,6 +86,8 @@ export default async function ViecLamPage({
   if (sp.nganh) apiParams.set("category", sp.nganh);
   if (sp.kv) apiParams.set("industrial_park", sp.kv);
   if (sp.luong) apiParams.set("salary_min", sp.luong);
+  if (sp.hinh_thuc) apiParams.set("employment_type", sp.hinh_thuc);
+  if (sp.ky_luong) apiParams.set("salary_period", sp.ky_luong);
   apiParams.set("page", String(page));
   apiParams.set("page_size", String(PAGE_SIZE));
 
@@ -101,7 +107,7 @@ export default async function ViecLamPage({
 
   return (
     <Container className="py-8 md:py-12">
-      <div data-reveal className="reveal mb-5">
+      <div data-reveal suppressHydrationWarning className="reveal mb-5">
         <h1 className="text-xl font-extrabold md:text-2xl">Tìm việc làm</h1>
         <p className="mt-1 text-sm text-text-muted">
           {jobsRes.ok
@@ -112,6 +118,7 @@ export default async function ViecLamPage({
 
       <div
         data-reveal
+        suppressHydrationWarning
         className="reveal no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-1"
       >
         <Link

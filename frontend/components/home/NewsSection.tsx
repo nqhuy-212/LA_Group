@@ -23,6 +23,7 @@ export function NewsSection({ posts }: { posts: NewsPost[] }) {
               key={post.id}
               href={post.href}
               data-reveal
+              suppressHydrationWarning
               style={revealStyle(index)}
               className="reveal overflow-hidden rounded-xl border border-border bg-white shadow-brand"
             >

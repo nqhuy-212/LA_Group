@@ -96,6 +96,35 @@ def test_filter_by_category(client, db_session, taxonomy):
     assert body["items"][0]["slug"] == "kt-job"
 
 
+def test_filter_by_employment_type_and_salary_period(client, db_session, taxonomy):
+    from app.models.enums import EmploymentType, SalaryPeriod
+
+    _make_job(
+        db_session, taxonomy, "job-thoi-vu-tuan",
+        employment_type=EmploymentType.SEASONAL, salary_period=SalaryPeriod.WEEKLY,
+    )
+    _make_job(
+        db_session, taxonomy, "job-chinh-thuc-thang",
+        employment_type=EmploymentType.OFFICIAL, salary_period=SalaryPeriod.MONTHLY,
+    )
+
+    resp = client.get("/api/jobs", params={"employment_type": "seasonal"})
+    body = resp.json()
+    assert body["total"] == 1
+    assert body["items"][0]["slug"] == "job-thoi-vu-tuan"
+    assert body["items"][0]["employment_type"] == "seasonal"
+    assert body["items"][0]["salary_period"] == "weekly"
+
+    resp2 = client.get("/api/jobs", params={"salary_period": "monthly"})
+    assert resp2.json()["total"] == 1
+    assert resp2.json()["items"][0]["slug"] == "job-chinh-thuc-thang"
+
+
+def test_invalid_employment_type_query_returns_422(client):
+    resp = client.get("/api/jobs", params={"employment_type": "part_time"})
+    assert resp.status_code == 422
+
+
 def test_page_size_over_50_is_rejected(client):
     resp = client.get("/api/jobs", params={"page_size": 100})
     assert resp.status_code == 422

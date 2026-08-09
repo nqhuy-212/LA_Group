@@ -19,7 +19,7 @@ _SSE_HEADERS = {
 @router.post("/chat")
 @limiter.limit("10/10minutes")
 async def chat(request: Request, payload: ChatRequest) -> StreamingResponse:
-    if not settings.anthropic_api_key:
+    if not settings.openai_api_key:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Chatbot chưa được cấu hình"
         )

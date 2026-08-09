@@ -101,7 +101,9 @@ def test_overview_respects_date_range(client, db_session, taxonomy):
     _make_application(db_session, ref="UV000002", job_id=taxonomy["job"].id)
     _login(client, db_session, UserRole.ADMIN, "admin-overview-range@lahr.vn")
 
-    today = date.today().isoformat()
+    # UTC, không phải date.today() (local) — server lọc from/to theo UTC (xem
+    # admin/stats.py), local giờ VN (UTC+7) qua nửa đêm sẽ lệch ngày.
+    today = datetime.now(UTC).date().isoformat()
     resp = client.get(
         "/api/admin/stats/overview", params={"from": today, "to": today}
     )

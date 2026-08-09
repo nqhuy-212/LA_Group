@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { ButtonLink } from "@/components/ui/Button";
 import { IconClose, IconMenu } from "@/components/ui/icons";
 
 const navLinks = [
@@ -52,15 +51,6 @@ export function MainNav() {
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-2.5 md:flex">
-          <ButtonLink href="/viec-lam" variant="outline-light">
-            Nộp CV
-          </ButtonLink>
-          <ButtonLink href="#lien-he" variant="accent">
-            Đăng tuyển dụng
-          </ButtonLink>
-        </div>
-
         <button
           type="button"
           className="flex h-11 w-11 flex-shrink-0 items-center justify-center text-white md:hidden"
@@ -87,15 +77,6 @@ export function MainNav() {
               </li>
             ))}
           </ul>
-          <div className="mx-2 h-px bg-white/10" />
-          <div className="flex gap-2 p-3">
-            <ButtonLink href="/viec-lam" variant="ghost" block>
-              Nộp CV
-            </ButtonLink>
-            <ButtonLink href="#lien-he" variant="accent" block>
-              Đăng tuyển
-            </ButtonLink>
-          </div>
         </nav>
       ) : null}
     </div>

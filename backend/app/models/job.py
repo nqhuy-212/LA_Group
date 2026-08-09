@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.db.mixins import IdMixin, TimestampMixin
-from app.models.enums import JobStatus, enum_values
+from app.models.enums import EmploymentType, JobStatus, SalaryPeriod, enum_values
 
 if TYPE_CHECKING:
     from app.models.company import Company
@@ -37,7 +37,14 @@ class Job(IdMixin, TimestampMixin, Base):
     age_min: Mapped[int | None] = mapped_column(Integer, default=None)
     age_max: Mapped[int | None] = mapped_column(Integer, default=None)
     shift_type: Mapped[str | None] = mapped_column(String(50), default=None)
-    employment_type: Mapped[str | None] = mapped_column(String(50), default=None)
+    employment_type: Mapped[EmploymentType | None] = mapped_column(
+        SAEnum(EmploymentType, name="employment_type", values_callable=enum_values),
+        default=None,
+    )
+    salary_period: Mapped[SalaryPeriod | None] = mapped_column(
+        SAEnum(SalaryPeriod, name="salary_period", values_callable=enum_values),
+        default=None,
+    )
 
     description: Mapped[str | None] = mapped_column(Text, default=None)
     requirements: Mapped[str | None] = mapped_column(Text, default=None)

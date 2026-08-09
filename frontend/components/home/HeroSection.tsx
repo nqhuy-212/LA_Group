@@ -38,7 +38,7 @@ export function HeroSection() {
       className="bg-[radial-gradient(circle_at_15%_20%,var(--color-primary-600),var(--color-primary-900)_70%)] py-9 pb-12 text-white md:py-13 md:pb-16"
     >
       <Container className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr] md:items-center">
-        <div data-reveal className="reveal">
+        <div data-reveal suppressHydrationWarning className="reveal">
           <span className="inline-block rounded-full bg-white/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
             Cung ứng nhân lực LA Group (LAHR)
           </span>
@@ -76,7 +76,12 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div data-reveal style={revealStyle(1)} className="reveal grid grid-cols-2 gap-3">
+        <div
+          data-reveal
+          suppressHydrationWarning
+          style={revealStyle(1)}
+          className="reveal grid grid-cols-2 gap-3"
+        >
           {quickActions.map(({ icon: Icon, title, description }) => (
             <div
               key={title}

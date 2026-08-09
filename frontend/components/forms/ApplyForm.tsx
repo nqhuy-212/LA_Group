@@ -132,11 +132,10 @@ export function ApplyForm({ jobSlug }: { jobSlug: string }) {
       </div>
 
       <label className={labelClass}>
-        CV/Hồ sơ (PDF, JPG hoặc PNG, tối đa 5MB) *
+        CV/Hồ sơ (không bắt buộc — PDF, JPG hoặc PNG, tối đa 5MB)
         <input
           type="file"
           name="cv"
-          required
           accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
           className={`${fieldClass} py-1.5`}
         />

@@ -14,7 +14,7 @@ export function AboutSection() {
   return (
     <section className="bg-gradient-to-br from-primary-900 to-primary-700 py-10 text-white md:py-14">
       <Container className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-center">
-        <div data-reveal className="reveal">
+        <div data-reveal suppressHydrationWarning className="reveal">
           <span className="inline-block rounded-full bg-white/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
             Về chúng tôi
           </span>
@@ -36,6 +36,7 @@ export function AboutSection() {
         </div>
         <div
           data-reveal
+          suppressHydrationWarning
           style={revealStyle(1)}
           className="reveal flex h-[170px] items-center justify-center rounded-xl bg-gradient-to-br from-primary-600 to-primary-900 md:h-full md:min-h-[280px]"
         >

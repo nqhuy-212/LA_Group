@@ -20,11 +20,12 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 20
     refresh_token_expire_days: int = 7
 
-    anthropic_api_key: str = ""
-    # Haiku 4.5: đủ tốt cho tư vấn viên việc làm bám RAG (tool search_jobs cung cấp
-    # sẵn dữ liệu thật), rẻ hơn nhiều so với Opus/Sonnet — phù hợp mô hình không có
-    # ngân sách ads lớn của LAHR (xem company-info.md). Chốt ở P8, xem CLAUDE.md.
-    chat_model: str = "claude-haiku-4-5-20251001"
+    openai_api_key: str = ""
+    # gpt-4o-mini: rẻ, nhanh, hỗ trợ tool-calling tốt — đủ dùng cho tư vấn viên
+    # việc làm bám RAG (tool search_jobs cung cấp sẵn dữ liệu thật). Đổi từ
+    # Anthropic Claude sang OpenAI ở phiên test P8 vì LAHR có sẵn ngân sách/API
+    # key OpenAI, không cần xin credit Anthropic riêng — xem CLAUDE.md.
+    chat_model: str = "gpt-4o-mini"
     chat_daily_token_budget: int = 200_000
 
     upload_dir: str = "../uploads"

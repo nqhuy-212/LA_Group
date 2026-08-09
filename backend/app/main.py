@@ -16,6 +16,7 @@ from app.api.v1.public.applications import router as applications_router
 from app.api.v1.public.chat import router as chat_router
 from app.api.v1.public.companies import router as companies_router
 from app.api.v1.public.jobs import router as jobs_router
+from app.api.v1.public.leads import router as leads_router
 from app.api.v1.public.posts import router as posts_router
 from app.api.v1.public.taxonomies import router as taxonomies_router
 from app.core.config import settings
@@ -61,6 +62,7 @@ async def security_headers_middleware(request: Request, call_next):
 
 app.include_router(auth_router)
 app.include_router(applications_router)
+app.include_router(leads_router)
 app.include_router(chat_router)
 app.include_router(companies_router)
 app.include_router(jobs_router)

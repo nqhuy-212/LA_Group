@@ -14,6 +14,7 @@ from fastapi import (
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.antispam import PHONE_DAILY_LIMIT, count_recent_submissions_by_phone, is_bot
 from app.core.notify import notify_new_application
 from app.core.rate_limit import get_client_ip, limiter
 from app.core.reference_code import generate_reference_code
@@ -30,23 +31,7 @@ from app.schemas.application import (
 
 router = APIRouter(prefix="/api", tags=["applications"])
 
-# D10: anti-spam bằng honeypot + timing, không dùng captcha ở MVP (chỉ thêm khi bị
-# spam thật). Bot điền form tự động thường: (a) tự điền cả field ẩn, (b) submit gần
-# như tức thời sau khi trang render — người thật luôn mất vài giây đọc + gõ.
-MIN_HUMAN_ELAPSED_MS = 2000
 DUPLICATE_WINDOW_DAYS = 7
-PHONE_DAILY_LIMIT = 10
-
-
-def _is_bot(honeypot: str, form_rendered_at: str) -> bool:
-    if honeypot.strip():
-        return True
-    try:
-        rendered_at = datetime.fromisoformat(form_rendered_at.replace("Z", "+00:00"))
-    except ValueError:
-        return True  # field bị giả mạo/thiếu — coi như đáng ngờ, chặn cho an toàn
-    elapsed_ms = (datetime.now(UTC) - rendered_at).total_seconds() * 1000
-    return elapsed_ms < MIN_HUMAN_ELAPSED_MS
 
 
 @router.post("/applications", response_model=ApplicationCreateResponse)
@@ -65,13 +50,13 @@ def create_application(
     consent_given: bool = Form(False),
     website: str = Form(""),  # honeypot — ẩn khỏi mắt người, bot tự động thường tự điền
     form_rendered_at: str = Form(...),
-    cv: UploadFile = File(...),
+    cv: UploadFile | None = File(None),
     db: Session = Depends(get_db),
 ) -> ApplicationCreateResponse:
     # Không bao giờ log body/field của endpoint này (họ tên, SĐT, email là PII) —
     # kể cả khi xử lý lỗi, chỉ raise HTTPException với thông điệp chung chung.
 
-    if _is_bot(website, form_rendered_at):
+    if is_bot(website, form_rendered_at):
         # Từ chối im lặng: trả về y hệt response thành công thật (không tạo bản ghi)
         # để bot không học được rằng nó đã bị phát hiện.
         return ApplicationCreateResponse(ok=True, reference_code=generate_reference_code(db))
@@ -127,13 +112,7 @@ def create_application(
             ),
         )
 
-    daily_count = db.execute(
-        select(Application.id).where(
-            Application.phone == normalized_phone,
-            Application.created_at >= now - timedelta(hours=24),
-        )
-    ).scalars().all()
-    if len(daily_count) >= PHONE_DAILY_LIMIT:
+    if count_recent_submissions_by_phone(db, normalized_phone) >= PHONE_DAILY_LIMIT:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=(
@@ -142,16 +121,21 @@ def create_application(
             ),
         )
 
-    try:
-        saved_file = save_upload_stream(cv.file)
-    except UnsupportedFileTypeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=str(exc)
-        ) from exc
-    except FileTooLargeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=str(exc)
-        ) from exc
+    # CV là optional (D-chưa-đánh-số, thay đổi theo yêu cầu thực tế: lao động phổ
+    # thông không phải lúc nào cũng có sẵn file CV) — chỉ lưu khi người dùng thực
+    # sự chọn file, bỏ qua entry rỗng mà trình duyệt vẫn gửi kèm khi input để trống.
+    saved_file = None
+    if cv is not None and cv.filename:
+        try:
+            saved_file = save_upload_stream(cv.file)
+        except UnsupportedFileTypeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=str(exc)
+            ) from exc
+        except FileTooLargeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=str(exc)
+            ) from exc
 
     application = Application(
         reference_code=generate_reference_code(db),
@@ -163,10 +147,10 @@ def create_application(
         gender=gender,
         province_code=province_code,
         hometown_text=strip_html(hometown_text) if hometown_text else None,
-        cv_file_path=saved_file.relative_path,
-        cv_original_name=cv.filename,
-        cv_mime=saved_file.mime,
-        cv_size=saved_file.size,
+        cv_file_path=saved_file.relative_path if saved_file else None,
+        cv_original_name=cv.filename if saved_file else None,
+        cv_mime=saved_file.mime if saved_file else None,
+        cv_size=saved_file.size if saved_file else None,
         source=ApplicationSource.WEB,
         status=ApplicationStatus.NEW,
         consent_given=True,

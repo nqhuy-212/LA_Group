@@ -8,6 +8,7 @@ export function AiBannerSection() {
       <Container>
         <div
           data-reveal
+          suppressHydrationWarning
           className="reveal relative flex flex-col items-start gap-4 overflow-hidden rounded-2xl bg-gradient-to-tr from-primary-800 to-primary-600 p-6 text-white md:flex-row md:items-center md:justify-between md:px-10 md:py-9"
         >
           <div

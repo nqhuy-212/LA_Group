@@ -1,4 +1,6 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// Biến runtime — xem ghi chú ở app/layout.tsx. Component này là Server Component
+// (không có "use client") nên đọc được env lúc chạy.
+const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
 
 // Dữ liệu pháp nhân chính thức — khớp .claude/rules/company-info.md, không tự ý
 // đổi (MST/địa chỉ/điện thoại là thông tin đăng ký kinh doanh thật của LAHR).

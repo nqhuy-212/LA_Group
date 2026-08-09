@@ -1,0 +1,102 @@
+# D5: một origin qua Nginx — "/" -> Next.js (frontend), "/api/" -> FastAPI (backend).
+# Dev dùng next.config.ts rewrites() để mô phỏng; ở prod Nginx đảm nhiệm việc này.
+#
+# Đây là TEMPLATE: image nginx tự chạy envsubst trên /etc/nginx/templates/*.template
+# rồi ghi ra /etc/nginx/conf.d/. Chỉ ${DOMAIN} được thay thế — compose đặt
+# NGINX_ENVSUBST_FILTER="^DOMAIN$" để envsubst KHÔNG nuốt mất biến của nginx
+# ($host, $scheme, $proxy_add_x_forwarded_for...). Nhờ vậy đổi domain (demo ->
+# tên miền khách hàng) chỉ là sửa .env.prod, không phải sửa file cấu hình.
+
+# Docker DNS. BẮT BUỘC vì proxy_pass bên dưới dùng BIẾN thay vì hằng số:
+# với hằng số, nginx resolve tên "backend"/"frontend" đúng MỘT LẦN lúc nạp config,
+# nên mỗi lần `docker compose up -d` tạo lại container (IP mới) là nginx trả 502
+# vĩnh viễn cho tới khi reload — tức mọi lần deploy đều làm sập site.
+resolver 127.0.0.11 valid=10s ipv6=off;
+
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 5;
+gzip_min_length 1024;
+gzip_types
+    text/plain text/css text/xml text/javascript
+    application/javascript application/json application/xml
+    application/rss+xml image/svg+xml;
+
+# Chặn request tới IP trần hoặc Host lạ: từ chối ngay ở tầng bắt tay TLS, không
+# để lộ site qua tên miền không mong muốn (tránh cả duplicate content với SEO).
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    http2 on;
+    server_name _;
+    ssl_reject_handshake on;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    # Certbot gia hạn định kỳ vẫn cần đường này mở qua HTTP.
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${DOMAIN} www.${DOMAIN};
+
+    ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # add_header ở đây áp cho cả server block; KHÔNG thêm add_header trong location
+    # nào bên dưới, vì add_header lồng nhau sẽ HUỶ toàn bộ header kế thừa từ cha.
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Giới hạn upload CV (MAX_UPLOAD_BYTES=5MB ở backend) + headroom cho multipart overhead.
+    client_max_body_size 6m;
+
+    location /api/ {
+        set $upstream_be http://backend:8000;
+        proxy_pass $upstream_be;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        # get_client_ip (app/core/rate_limit.py) chỉ tin header này khi ENVIRONMENT=prod —
+        # đúng vì đây là hop đầu tiên từ internet, không có proxy nào phía trước Nginx.
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # POST /api/chat trả SSE streaming — cần timeout dài hơn request thường; upstream
+        # (app/api/v1/public/chat.py) tự set header X-Accel-Buffering: no để Nginx không
+        # buffer response, chữ mới chạy dần theo stream thay vì đợi xong mới hiện.
+        proxy_read_timeout 120s;
+    }
+
+    location / {
+        set $upstream_fe http://frontend:3000;
+        proxy_pass $upstream_fe;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

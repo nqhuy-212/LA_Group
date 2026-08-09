@@ -12,7 +12,9 @@ export function EventsSection({ events }: { events: EventItem[] }) {
       {events.length === 0 ? (
         <p className="px-4 text-center text-sm text-primary-100">Đang cập nhật...</p>
       ) : (
-        <EventsCarousel events={events} />
+        <div className="mx-auto w-full max-w-brand">
+          <EventsCarousel events={events} />
+        </div>
       )}
     </section>
   );

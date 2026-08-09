@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// Biến RUNTIME (không phải NEXT_PUBLIC_*) — chỉ dùng ở Server Component nên không
+// cần inline vào bundle client. Nhờ vậy đổi domain chỉ cần sửa .env.prod + restart,
+// không phải build lại image (Next đóng băng mọi NEXT_PUBLIC_* vào bundle lúc build).
+const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
 const SITE_TITLE = "LA Group (LAHR) – Cung ứng nhân lực & kết nối việc làm tại Hải Dương";
 const SITE_DESCRIPTION =
   "LA Group (Công ty CP Dịch vụ Cung ứng Nhân lực LA - LAHR) - Cung ứng, cho thuê lại lao động cho các khu công nghiệp tại Hải Dương và miền Bắc. Tìm việc làm, tư vấn AI, chính sách công ty.";

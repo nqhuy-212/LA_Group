@@ -19,10 +19,10 @@ export function TopBar() {
           </a>
         </div>
         <div className="flex gap-3.5">
-          <Link href="#" className="hover:text-white">
+          <Link href="#lien-he" className="hover:text-white">
             Dành cho doanh nghiệp
           </Link>
-          <Link href="#" className="hover:text-white">
+          <Link href="/dang-nhap" className="hover:text-white">
             Đăng nhập
           </Link>
         </div>

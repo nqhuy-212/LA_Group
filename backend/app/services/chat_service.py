@@ -3,7 +3,7 @@ import logging
 from collections.abc import AsyncIterator
 from datetime import date
 
-import anthropic
+import openai
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
@@ -12,7 +12,7 @@ from app.core.config import settings
 from app.core.search import unaccent_ilike
 from app.db.session import SessionLocal
 from app.models import IndustrialPark, Job, JobCategory, Province
-from app.models.enums import JobStatus
+from app.models.enums import EmploymentType, JobStatus, SalaryPeriod
 from app.schemas.chat import ChatMessageIn
 
 logger = logging.getLogger("app.chat")
@@ -37,30 +37,48 @@ thiệu tin tuyển dụng, luôn kèm đường link (`url`) để người dù
 - Mức lương trong dữ liệu là số nguyên VNĐ/tháng — hãy diễn đạt tự nhiên (VD: "8 - 10 triệu")."""
 
 SEARCH_JOBS_TOOL: dict = {
-    "name": "search_jobs",
-    "description": (
-        "Tìm tin tuyển dụng ĐANG CÒN HIỆU LỰC trong cơ sở dữ liệu thật của LA Group theo "
-        "từ khoá vị trí, khu vực/khu công nghiệp, ngành nghề, và mức lương tối thiểu mong "
-        "muốn. Luôn gọi tool này trước khi trả lời bất kỳ câu hỏi nào về việc làm cụ thể."
-    ),
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "keyword": {
-                "type": "string",
-                "description": "Từ khoá tên vị trí/công việc, VD 'công nhân lắp ráp'",
-            },
-            "province": {
-                "type": "string",
-                "description": "Tên tỉnh/thành hoặc khu công nghiệp, VD 'Đại An', 'Hải Dương'",
-            },
-            "category": {
-                "type": "string",
-                "description": "Tên ngành nghề, VD 'Sản xuất', 'Kho vận'",
-            },
-            "salary_min": {
-                "type": "integer",
-                "description": "Mức lương tối thiểu mong muốn, đơn vị VNĐ/tháng",
+    "type": "function",
+    "function": {
+        "name": "search_jobs",
+        "description": (
+            "Tìm tin tuyển dụng ĐANG CÒN HIỆU LỰC trong cơ sở dữ liệu thật của LA Group theo "
+            "từ khoá vị trí, khu vực/khu công nghiệp, ngành nghề, và mức lương tối thiểu mong "
+            "muốn. Luôn gọi tool này trước khi trả lời bất kỳ câu hỏi nào về việc làm cụ thể."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "keyword": {
+                    "type": "string",
+                    "description": "Từ khoá tên vị trí/công việc, VD 'công nhân lắp ráp'",
+                },
+                "province": {
+                    "type": "string",
+                    "description": "Tên tỉnh/thành hoặc khu công nghiệp, VD 'Đại An', 'Hải Dương'",
+                },
+                "category": {
+                    "type": "string",
+                    "description": "Tên ngành nghề, VD 'Sản xuất', 'Kho vận'",
+                },
+                "salary_min": {
+                    "type": "integer",
+                    "description": "Mức lương tối thiểu mong muốn, đơn vị VNĐ/tháng",
+                },
+                "employment_type": {
+                    "type": "string",
+                    "enum": ["official", "seasonal"],
+                    "description": (
+                        "Loại hình công việc: 'official' = chính thức, "
+                        "'seasonal' = thời vụ"
+                    ),
+                },
+                "salary_period": {
+                    "type": "string",
+                    "enum": ["weekly", "monthly"],
+                    "description": (
+                        "Kỳ trả lương: 'weekly' = lương tuần, 'monthly' = lương tháng"
+                    ),
+                },
             },
         },
     },
@@ -73,6 +91,8 @@ def _search_jobs_sync(
     province: str | None,
     category: str | None,
     salary_min: int | None,
+    employment_type: str | None = None,
+    salary_period: str | None = None,
 ) -> dict:
     """Tách khỏi việc tự mở session để test được trực tiếp bằng `db_session` fixture
     (xem `tests/test_chat.py`) — hàm mở session riêng (`_search_jobs_with_own_session`)
@@ -90,6 +110,19 @@ def _search_jobs_sync(
         conditions.append(Job.category.has(unaccent_ilike(JobCategory.name, category)))
     if salary_min:
         conditions.append(Job.salary_max >= salary_min)
+    # Model đôi khi trả giá trị lạ ngoài enum sau nhiều lượt hội thoại dài dù JSON
+    # schema đã ràng buộc "enum" — validate phòng thủ, bỏ qua điều kiện lọc thay vì
+    # để lỗi so sánh SQLAlchemy enum làm sập cả request (không tin tuyệt đối LLM).
+    if employment_type:
+        try:
+            conditions.append(Job.employment_type == EmploymentType(employment_type))
+        except ValueError:
+            pass
+    if salary_period:
+        try:
+            conditions.append(Job.salary_period == SalaryPeriod(salary_period))
+        except ValueError:
+            pass
 
     jobs = db.execute(
         select(Job)
@@ -112,6 +145,8 @@ def _search_jobs_sync(
                 "salary_min": job.salary_min,
                 "salary_max": job.salary_max,
                 "salary_negotiable": job.salary_negotiable,
+                "employment_type": job.employment_type.value if job.employment_type else None,
+                "salary_period": job.salary_period.value if job.salary_period else None,
                 "deadline": job.deadline.isoformat() if job.deadline else None,
                 "url": f"{settings.public_site_url}/viec-lam/{job.slug}",
             }
@@ -121,10 +156,17 @@ def _search_jobs_sync(
 
 
 def _search_jobs_with_own_session(
-    keyword: str | None, province: str | None, category: str | None, salary_min: int | None
+    keyword: str | None,
+    province: str | None,
+    category: str | None,
+    salary_min: int | None,
+    employment_type: str | None,
+    salary_period: str | None,
 ) -> dict:
     with SessionLocal() as db:
-        return _search_jobs_sync(db, keyword, province, category, salary_min)
+        return _search_jobs_sync(
+            db, keyword, province, category, salary_min, employment_type, salary_period
+        )
 
 
 async def _run_search_jobs_tool(tool_input: dict) -> dict:
@@ -134,6 +176,8 @@ async def _run_search_jobs_tool(tool_input: dict) -> dict:
         tool_input.get("province"),
         tool_input.get("category"),
         tool_input.get("salary_min"),
+        tool_input.get("employment_type"),
+        tool_input.get("salary_period"),
     )
 
 
@@ -180,47 +224,84 @@ def _build_messages(message: str, history: list[ChatMessageIn]) -> list[dict]:
 
 
 async def stream_chat(message: str, history: list[ChatMessageIn]) -> AsyncIterator[str]:
-    client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-    messages = _build_messages(message, history)
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+    messages: list[dict] = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        *_build_messages(message, history),
+    ]
 
     try:
         for _ in range(MAX_TOOL_TURNS):
-            async with client.messages.stream(
+            stream = await client.chat.completions.create(
                 model=settings.chat_model,
-                max_tokens=1024,
-                system=SYSTEM_PROMPT,
-                tools=[SEARCH_JOBS_TOOL],
                 messages=messages,
-            ) as stream:
-                async for text in stream.text_stream:
-                    yield _sse("token", text=text)
-                final_message = await stream.get_final_message()
+                tools=[SEARCH_JOBS_TOOL],
+                # Chỉ có đúng 1 tool (search_jobs) — tắt gọi song song để giữ vòng
+                # lặp đơn giản (1 tool call/lượt), khớp cấu trúc tool-use gốc.
+                parallel_tool_calls=False,
+                stream=True,
+                stream_options={"include_usage": True},
+            )
 
-            _record_usage(final_message.usage.input_tokens, final_message.usage.output_tokens)
+            content = ""
+            tool_call_id: str | None = None
+            tool_call_name: str | None = None
+            tool_call_arguments = ""
+            finish_reason: str | None = None
+            usage = None
 
-            if final_message.stop_reason != "tool_use":
+            async for chunk in stream:
+                if chunk.usage:
+                    usage = chunk.usage
+                if not chunk.choices:
+                    continue
+                choice = chunk.choices[0]
+                if choice.finish_reason:
+                    finish_reason = choice.finish_reason
+                delta = choice.delta
+                if delta.content:
+                    content += delta.content
+                    yield _sse("token", text=delta.content)
+                if delta.tool_calls:
+                    call = delta.tool_calls[0]
+                    if call.id:
+                        tool_call_id = call.id
+                    if call.function and call.function.name:
+                        tool_call_name = call.function.name
+                    if call.function and call.function.arguments:
+                        tool_call_arguments += call.function.arguments
+
+            if usage:
+                _record_usage(usage.prompt_tokens, usage.completion_tokens)
+
+            if finish_reason != "tool_calls" or tool_call_id is None:
                 break
 
-            tool_use_block = next(
-                block for block in final_message.content if block.type == "tool_use"
-            )
-            tool_result = await _run_search_jobs_tool(tool_use_block.input)
-            messages.append({"role": "assistant", "content": final_message.content})
+            tool_input = json.loads(tool_call_arguments) if tool_call_arguments else {}
+            tool_result = await _run_search_jobs_tool(tool_input)
             messages.append(
                 {
-                    "role": "user",
-                    "content": [
+                    "role": "assistant",
+                    "content": content or None,
+                    "tool_calls": [
                         {
-                            "type": "tool_result",
-                            "tool_use_id": tool_use_block.id,
-                            "content": json.dumps(tool_result, ensure_ascii=False),
+                            "id": tool_call_id,
+                            "type": "function",
+                            "function": {"name": tool_call_name, "arguments": tool_call_arguments},
                         }
                     ],
                 }
             )
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call_id,
+                    "content": json.dumps(tool_result, ensure_ascii=False),
+                }
+            )
         yield _sse("done")
-    except anthropic.APIError:
-        logger.exception("Lỗi gọi Anthropic API")
+    except openai.APIError:
+        logger.exception("Lỗi gọi OpenAI API")
         yield _sse(
             "error",
             message="Xin lỗi, có lỗi xảy ra. Bạn vui lòng thử lại hoặc gọi hotline 0922.86.99.66.",

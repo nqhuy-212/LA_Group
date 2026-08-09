@@ -57,3 +57,50 @@ jobs:
       - run: npm run typecheck
       - run: npm run test
       - run: npm run build
+
+  # Build & push image cho VPS. KHÔNG build trên VPS (4GB RAM, `npm run build` của
+  # Next ăn 2-3GB → chắc chắn OOM). Chỉ chạy khi đã push lên main và 2 job test xanh.
+  images:
+    needs: [backend, frontend]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      # Chữ thường bắt buộc — GHCR không nhận tên có chữ hoa như "LA_Group".
+      REGISTRY: ghcr.io
+      BE_IMAGE: ghcr.io/${{ github.repository_owner }}/lahr-backend
+      FE_IMAGE: ghcr.io/${{ github.repository_owner }}/lahr-frontend
+      # Domain giai đoạn demo. Đổi sang tên miền khách hàng: chỉ cần sửa SITE_URL
+      # trong .env.prod trên VPS rồi restart — KHÔNG phải build lại image (biến này
+      # là runtime, không bị đóng băng vào bundle như NEXT_PUBLIC_*). Giá trị ở đây
+      # chỉ để HTML prerender lúc build mang sẵn domain đúng.
+      SITE_URL: https://rg-nqhuy.io.vn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.BE_IMAGE }}:latest,${{ env.BE_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          build-args: SITE_URL=${{ env.SITE_URL }}
+          tags: ${{ env.FE_IMAGE }}:latest,${{ env.FE_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

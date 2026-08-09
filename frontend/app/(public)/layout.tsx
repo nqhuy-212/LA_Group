@@ -35,7 +35,7 @@ export default async function PublicLayout({
       <SiteHeader categories={categories} industrialParks={industrialParks} />
       <main className="flex-1">{children}</main>
       <SiteFooter />
-      <ChatWidget />
+      <ChatWidget industrialParks={industrialParks} />
       <ScrollReveal />
     </>
   );

@@ -63,6 +63,7 @@ def _application_admin_out(application: Application) -> ApplicationAdminOut:
         hometown_text=application.hometown_text,
         has_cv=application.cv_file_path is not None,
         cv_original_name=application.cv_original_name,
+        notes=application.notes,
         source=application.source.value,
         status=application.status.value,
         assigned_to_id=application.assigned_to_id,

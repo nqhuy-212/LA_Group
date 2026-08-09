@@ -4,7 +4,7 @@ import pytest
 
 from app.core.config import settings
 from app.models import Company, IndustrialPark, Job, JobCategory, Province
-from app.models.enums import JobStatus
+from app.models.enums import EmploymentType, JobStatus, SalaryPeriod
 from app.services import chat_service
 
 
@@ -88,6 +88,39 @@ def test_search_jobs_filters_by_salary_min(db_session, taxonomy):
     assert result["jobs"][0]["salary_max"] == 12_000_000
 
 
+def test_search_jobs_filters_by_employment_type(db_session, taxonomy):
+    taxonomy["make_job"](slug="job-chinh-thuc", employment_type=EmploymentType.OFFICIAL)
+    taxonomy["make_job"](slug="job-thoi-vu", employment_type=EmploymentType.SEASONAL)
+
+    result = chat_service._search_jobs_sync(
+        db_session, None, None, None, None, employment_type="seasonal"
+    )
+    assert result["count"] == 1
+    assert result["jobs"][0]["url"].endswith("/viec-lam/job-thoi-vu")
+    assert result["jobs"][0]["employment_type"] == "seasonal"
+
+
+def test_search_jobs_filters_by_salary_period(db_session, taxonomy):
+    taxonomy["make_job"](slug="job-tuan", salary_period=SalaryPeriod.WEEKLY)
+    taxonomy["make_job"](slug="job-thang", salary_period=SalaryPeriod.MONTHLY)
+
+    result = chat_service._search_jobs_sync(
+        db_session, None, None, None, None, salary_period="weekly"
+    )
+    assert result["count"] == 1
+    assert result["jobs"][0]["url"].endswith("/viec-lam/job-tuan")
+    assert result["jobs"][0]["salary_period"] == "weekly"
+
+
+def test_search_jobs_ignores_invalid_enum_value_instead_of_crashing(db_session, taxonomy):
+    taxonomy["make_job"](slug="job-binh-thuong")
+
+    result = chat_service._search_jobs_sync(
+        db_session, None, None, None, None, employment_type="ban-thoi-gian"
+    )
+    assert result["count"] == 1
+
+
 def test_search_jobs_excludes_draft_and_closed(db_session, taxonomy):
     taxonomy["make_job"](slug="job-draft", status=JobStatus.DRAFT, published_at=None)
     taxonomy["make_job"](slug="job-closed", status=JobStatus.CLOSED)
@@ -119,13 +152,13 @@ def test_chat_history_too_long_returns_422(client):
 
 
 def test_chat_without_api_key_returns_503(client, monkeypatch):
-    monkeypatch.setattr(settings, "anthropic_api_key", "")
+    monkeypatch.setattr(settings, "openai_api_key", "")
     resp = client.post("/api/chat", json={"message": "xin chao", "history": []})
     assert resp.status_code == 503
 
 
 def test_chat_budget_exceeded_returns_fallback_message(client, monkeypatch):
-    monkeypatch.setattr(settings, "anthropic_api_key", "test-key-fake")
+    monkeypatch.setattr(settings, "openai_api_key", "test-key-fake")
     monkeypatch.setattr(chat_service, "has_budget", lambda: False)
 
     resp = client.post("/api/chat", json={"message": "xin chao", "history": []})
@@ -134,7 +167,7 @@ def test_chat_budget_exceeded_returns_fallback_message(client, monkeypatch):
 
 
 def test_chat_rate_limit_after_10_requests(client, monkeypatch):
-    monkeypatch.setattr(settings, "anthropic_api_key", "test-key-fake")
+    monkeypatch.setattr(settings, "openai_api_key", "test-key-fake")
 
     async def _fake_stream(message, history):
         yield 'data: {"type": "token", "text": "xin chao"}\n\n'

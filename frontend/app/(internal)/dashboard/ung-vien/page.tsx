@@ -153,6 +153,11 @@ export default async function AdminApplicationListPage({
                         Đã xoá PII
                       </span>
                     ) : null}
+                    {application.source === "chatbot" && !application.job_title ? (
+                      <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[11px] font-bold text-primary-800">
+                        Từ chatbot
+                      </span>
+                    ) : null}
                   </div>
                   <p className="mt-0.5 text-xs text-text-muted">
                     {application.reference_code} · {application.job_title ?? "Không gắn tin"} ·{" "}
@@ -166,6 +171,11 @@ export default async function AdminApplicationListPage({
                     {" · Nộp "}
                     {formatDate(application.created_at)}
                   </p>
+                  {application.notes ? (
+                    <p className="mt-1.5 rounded-lg bg-bg px-2.5 py-1.5 text-xs text-text">
+                      Ghi chú: {application.notes}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 

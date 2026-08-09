@@ -59,7 +59,7 @@ export default async function PostDetailPage({
 
   return (
     <Container className="max-w-[820px] py-8 md:py-12">
-      <div data-reveal className="reveal">
+      <div data-reveal suppressHydrationWarning className="reveal">
         <span className="text-xs font-extrabold uppercase tracking-wide text-primary-700">
           {TAG_LABELS[post.type] ?? "Tin tức"}
         </span>
@@ -69,7 +69,7 @@ export default async function PostDetailPage({
         ) : null}
       </div>
 
-      <article data-reveal className="reveal mt-6">
+      <article data-reveal suppressHydrationWarning className="reveal mt-6">
         {paragraphs.length > 0 ? (
           paragraphs.map((paragraph, index) => (
             <p key={index} className="mb-3 text-[15px] leading-relaxed text-text">

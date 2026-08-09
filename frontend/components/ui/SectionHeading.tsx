@@ -22,6 +22,7 @@ export function SectionHeading({
   return (
     <div
       data-reveal
+      suppressHydrationWarning
       className={`reveal mb-5 flex flex-wrap items-end justify-between gap-3 ${className}`}
     >
       <div>

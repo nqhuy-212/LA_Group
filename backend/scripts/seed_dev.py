@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.models import AddressMapping, Company, IndustrialPark, Job, JobCategory, Post, Province
-from app.models.enums import JobStatus, PostStatus, PostType
+from app.models.enums import EmploymentType, JobStatus, PostStatus, PostType, SalaryPeriod
 
 HAI_DUONG_CODE = "30"
 
@@ -167,7 +167,8 @@ JOBS = [
         "age_min": 18,
         "age_max": 35,
         "shift_type": "Theo ca (2 ca/ngày)",
-        "employment_type": "Toàn thời gian",
+        "employment_type": EmploymentType.OFFICIAL,
+        "salary_period": SalaryPeriod.MONTHLY,
         "description": (
             "Lắp ráp linh kiện điện tử theo dây chuyền, kiểm tra chất lượng sản phẩm "
             "đầu ra theo tiêu chuẩn nhà máy."
@@ -193,7 +194,8 @@ JOBS = [
         "age_min": 20,
         "age_max": 40,
         "shift_type": "Hành chính",
-        "employment_type": "Toàn thời gian",
+        "employment_type": EmploymentType.OFFICIAL,
+        "salary_period": SalaryPeriod.MONTHLY,
         "description": (
             "Vận hành, bảo trì và sửa chữa máy CNC; theo dõi thông số kỹ thuật, xử lý "
             "sự cố phát sinh trong quá trình sản xuất."
@@ -217,7 +219,8 @@ JOBS = [
         "age_min": 18,
         "age_max": 30,
         "shift_type": "Theo ca",
-        "employment_type": "Toàn thời gian",
+        "employment_type": EmploymentType.SEASONAL,
+        "salary_period": SalaryPeriod.WEEKLY,
         "description": (
             "Tư vấn, hỗ trợ khách hàng mua sắm; sắp xếp, trưng bày hàng hoá; hỗ trợ thu "
             "ngân khi cần."
@@ -238,7 +241,8 @@ JOBS = [
         "age_min": 18,
         "age_max": 40,
         "shift_type": "Theo ca",
-        "employment_type": "Toàn thời gian",
+        "employment_type": EmploymentType.SEASONAL,
+        "salary_period": SalaryPeriod.WEEKLY,
         "description": (
             "Bốc xếp, sắp xếp hàng hoá trong kho; kiểm đếm số lượng theo phiếu xuất "
             "nhập kho."
@@ -259,7 +263,8 @@ JOBS = [
         "age_min": 18,
         "age_max": 45,
         "shift_type": "Hành chính",
-        "employment_type": "Toàn thời gian",
+        "employment_type": EmploymentType.OFFICIAL,
+        "salary_period": SalaryPeriod.MONTHLY,
         "description": "May sản phẩm theo chuyền, đảm bảo năng suất và chất lượng đường may.",
         "requirements": "Biết sử dụng máy may công nghiệp là lợi thế, không yêu cầu kinh nghiệm.",
         "benefits": "Đào tạo nghề miễn phí cho người mới.\n\nThưởng chuyên cần hàng tháng.",
@@ -277,7 +282,8 @@ JOBS = [
         "age_min": 20,
         "age_max": 45,
         "shift_type": "Hành chính",
-        "employment_type": "Toàn thời gian",
+        "employment_type": EmploymentType.OFFICIAL,
+        "salary_period": SalaryPeriod.MONTHLY,
         "description": (
             "Lắp đặt, bảo trì hệ thống điện công nghiệp; xử lý sự cố điện trong nhà "
             "xưởng."
@@ -316,6 +322,7 @@ def seed_jobs(session: Session) -> None:
                 "age_max": job["age_max"],
                 "shift_type": job["shift_type"],
                 "employment_type": job["employment_type"],
+                "salary_period": job["salary_period"],
                 "description": job["description"],
                 "requirements": job["requirements"],
                 "benefits": job["benefits"],

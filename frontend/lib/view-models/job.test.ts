@@ -28,6 +28,8 @@ function makeJobDTO(overrides: Partial<JobListItemDTO> = {}): JobListItemDTO {
     salary_min: 9_000_000,
     salary_max: 12_000_000,
     salary_negotiable: false,
+    employment_type: "official",
+    salary_period: "monthly",
     is_hot: true,
     deadline: "2026-08-15",
     published_at: "2026-07-20T00:00:00Z",
@@ -42,7 +44,6 @@ function makeJobDetailDTO(overrides: Partial<JobDetailDTO> = {}): JobDetailDTO {
     age_min: 18,
     age_max: 35,
     shift_type: "Theo ca",
-    employment_type: "Toàn thời gian",
     description: "Lắp ráp linh kiện điện tử theo dây chuyền.",
     requirements: "Sức khoẻ tốt.\n\nChăm chỉ, cẩn thận.",
     benefits: "Thưởng tháng 13.",
@@ -66,6 +67,8 @@ describe("toJobCardVM", () => {
       salaryLabel: "9 – 12 triệu",
       location: "KCN Kỹ thuật cao An Phát, Hải Dương",
       deadlineLabel: "Hạn nộp: 15/08/2026",
+      employmentType: "Chính thức",
+      salaryPeriodLabel: "Lương tháng",
     });
   });
 
@@ -125,6 +128,8 @@ describe("toJobDetailVM", () => {
     expect(vm.requirements).toEqual(["Sức khoẻ tốt.", "Chăm chỉ, cẩn thận."]);
     expect(vm.isExpired).toBe(false);
     expect(vm.publishedDateLabel).toBe("20/07/2026");
+    expect(vm.employmentType).toBe("Chính thức");
+    expect(vm.salaryPeriodLabel).toBe("Lương tháng");
   });
 
   it("marks non-published jobs as expired", () => {

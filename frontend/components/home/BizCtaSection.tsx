@@ -7,6 +7,7 @@ export function BizCtaSection() {
       <Container>
         <div
           data-reveal
+          suppressHydrationWarning
           className="reveal flex flex-col gap-3 rounded-xl border border-dashed border-primary-600 bg-white p-5 text-center md:flex-row md:items-center md:justify-between md:px-9 md:py-7 md:text-left"
         >
           <div>

@@ -89,6 +89,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Lead
+         * @description Lead tư vấn chung từ chatbot (không gắn 1 tin tuyển dụng cụ thể) — ghi vào
+         *     cùng bảng `applications` với `job_id=NULL`, `source=CHATBOT` (hardcode server-side,
+         *     KHÔNG nhận từ client). Tách riêng khỏi `POST /api/applications` vì đó là endpoint
+         *     rủi ro cao nhất hệ thống (PII, đã có nhiều test bao phủ) — xem CLAUDE.md.
+         *     Không bao giờ log body/field của endpoint này (SĐT là PII).
+         */
+        post: operations["create_lead_api_leads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/chat": {
         parameters: {
             query?: never;
@@ -576,6 +600,8 @@ export interface components {
             has_cv: boolean;
             /** Cv Original Name */
             cv_original_name: string | null;
+            /** Notes */
+            notes: string | null;
             /** Source */
             source: string;
             /** Status */
@@ -652,7 +678,28 @@ export interface components {
             /** Form Rendered At */
             form_rendered_at: string;
             /** Cv */
-            cv: string;
+            cv?: string | null;
+        };
+        /** Body_create_lead_api_leads_post */
+        Body_create_lead_api_leads_post: {
+            /** Phone */
+            phone: string;
+            /** Full Name */
+            full_name?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Consent Given
+             * @default false
+             */
+            consent_given: boolean;
+            /**
+             * Website
+             * @default
+             */
+            website: string;
+            /** Form Rendered At */
+            form_rendered_at: string;
         };
         /** ChatMessageIn */
         ChatMessageIn: {
@@ -744,6 +791,11 @@ export interface components {
             created_at: string;
         };
         /**
+         * EmploymentType
+         * @enum {string}
+         */
+        EmploymentType: "official" | "seasonal";
+        /**
          * Gender
          * @enum {string}
          */
@@ -802,8 +854,8 @@ export interface components {
             age_max?: number | null;
             /** Shift Type */
             shift_type?: string | null;
-            /** Employment Type */
-            employment_type?: string | null;
+            employment_type?: components["schemas"]["EmploymentType"] | null;
+            salary_period?: components["schemas"]["SalaryPeriod"] | null;
             /** Description */
             description?: string | null;
             /** Requirements */
@@ -872,8 +924,8 @@ export interface components {
             age_max: number | null;
             /** Shift Type */
             shift_type: string | null;
-            /** Employment Type */
-            employment_type: string | null;
+            employment_type: components["schemas"]["EmploymentType"] | null;
+            salary_period: components["schemas"]["SalaryPeriod"] | null;
             /** Description */
             description: string | null;
             /** Requirements */
@@ -931,8 +983,8 @@ export interface components {
             age_max?: number | null;
             /** Shift Type */
             shift_type?: string | null;
-            /** Employment Type */
-            employment_type?: string | null;
+            employment_type?: components["schemas"]["EmploymentType"] | null;
+            salary_period?: components["schemas"]["SalaryPeriod"] | null;
             /** Description */
             description?: string | null;
             /** Requirements */
@@ -984,6 +1036,8 @@ export interface components {
             salary_max: number | null;
             /** Salary Negotiable */
             salary_negotiable: boolean;
+            employment_type: components["schemas"]["EmploymentType"] | null;
+            salary_period: components["schemas"]["SalaryPeriod"] | null;
             /** Is Hot */
             is_hot: boolean;
             /** Deadline */
@@ -998,8 +1052,6 @@ export interface components {
             age_max: number | null;
             /** Shift Type */
             shift_type: string | null;
-            /** Employment Type */
-            employment_type: string | null;
             /** Description */
             description: string | null;
             /** Requirements */
@@ -1032,6 +1084,8 @@ export interface components {
             salary_max: number | null;
             /** Salary Negotiable */
             salary_negotiable: boolean;
+            employment_type: components["schemas"]["EmploymentType"] | null;
+            salary_period: components["schemas"]["SalaryPeriod"] | null;
             /** Is Hot */
             is_hot: boolean;
             /** Deadline */
@@ -1243,6 +1297,11 @@ export interface components {
             /** Count */
             count: number;
         };
+        /**
+         * SalaryPeriod
+         * @enum {string}
+         */
+        SalaryPeriod: "weekly" | "monthly";
         /** StatsOverviewOut */
         StatsOverviewOut: {
             /**
@@ -1469,6 +1528,39 @@ export interface operations {
             };
         };
     };
+    create_lead_api_leads_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["Body_create_lead_api_leads_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     chat_api_chat_post: {
         parameters: {
             query?: never;
@@ -1541,6 +1633,8 @@ export interface operations {
                 industrial_park?: string | null;
                 province?: string | null;
                 salary_min?: number | null;
+                employment_type?: components["schemas"]["EmploymentType"] | null;
+                salary_period?: components["schemas"]["SalaryPeriod"] | null;
                 page?: number;
                 page_size?: number;
                 sort?: string;

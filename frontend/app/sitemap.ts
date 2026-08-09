@@ -5,7 +5,8 @@ import type { components } from "@/lib/api/schema";
 type JobsPageDTO = components["schemas"]["PageResponse_JobListItem_"];
 type PostListItemDTO = components["schemas"]["PostListItem"];
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// Biến runtime — xem ghi chú ở app/layout.tsx.
+const SITE_URL = process.env.SITE_URL ?? "http://localhost:3000";
 const MAX_PAGES = 20; // an toàn chống vòng lặp vô hạn nếu API trả sai page_size
 
 const STATIC_ROUTES: MetadataRoute.Sitemap = [

@@ -13,6 +13,15 @@ import { usePathname } from "next/navigation";
  * `(public)` layout, which persists across client-side navigation, so without
  * the `pathname` dependency a page navigated to via `<Link>` would mount new
  * `[data-reveal]` elements that never get observed (stuck at `opacity: 0`).
+ *
+ * Every `[data-reveal]` element also carries `suppressHydrationWarning`:
+ * `(public)/loading.tsx` gives the routed page its own Suspense boundary,
+ * separate from this layout-level component, so this `useEffect` can fire —
+ * and `IntersectionObserver` can mutate `classList` on already-visible nodes
+ * — before that boundary finishes hydrating. That's an intentional
+ * post-hydration DOM mutation, exactly the case `suppressHydrationWarning`
+ * exists for; deferring the observer with a timer only reduces how often the
+ * race is lost, it doesn't remove it.
  */
 export function ScrollReveal() {
   const pathname = usePathname();
