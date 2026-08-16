@@ -21,6 +21,13 @@ from app.schemas.auth import LoginRequest, MeResponse
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 REFRESH_TOKEN_COOKIE = "refresh_token"
+# Cờ gợi ý cho FRONTEND, cố ý KHÔNG httpOnly — chỉ chứa "1", không chứa token.
+# Mục đích: TopBar site công khai đổi được nhãn "Đăng nhập" ↔ "Trang quản trị" mà
+# KHÔNG phải gọi `cookies()` ở Server Component — đọc cookie ở đó sẽ ép cả nhánh
+# public thành dynamic, mất static prerender của trang chủ (trả giá hiệu năng cho
+# hàng nghìn khách vãng lai chỉ để phục vụ vài nhân viên nội bộ).
+# Không dùng cờ này để phân quyền: hàng rào thật vẫn là JWT ở `get_current_user`.
+SESSION_HINT_COOKIE = "has_session"
 # Hai lớp chặn brute-force độc lập, ngưỡng khác nhau có chủ đích để không che lấp
 # nhau: rate limit ở decorator phía trên chặn 1 IP dò nhiều email khác nhau; còn 2
 # hằng số dưới đây khoá RIÊNG một email cụ thể dù request đến từ IP nào.
@@ -52,6 +59,15 @@ def _set_auth_cookies(response: Response, access_token: str, refresh_token: str)
         samesite="strict",
         max_age=settings.refresh_token_expire_days * 24 * 3600,
         path="/api/auth",
+    )
+    response.set_cookie(
+        key=SESSION_HINT_COOKIE,
+        value="1",
+        httponly=False,
+        secure=True,
+        samesite="strict",
+        max_age=settings.refresh_token_expire_days * 24 * 3600,
+        path="/",
     )
 
 
@@ -168,6 +184,7 @@ def logout(
 
     response.delete_cookie(ACCESS_TOKEN_COOKIE, path="/")
     response.delete_cookie(REFRESH_TOKEN_COOKIE, path="/api/auth")
+    response.delete_cookie(SESSION_HINT_COOKIE, path="/")
     return {"ok": True}
 
 

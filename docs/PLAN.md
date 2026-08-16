@@ -1,7 +1,7 @@
 # Kế hoạch triển khai — LA Group Job Portal
 
-> **Trạng thái**: P0–P9 xong, site đã chạy thật trên tên miền khách hàng (trạng thái hạ tầng: [`VPS_tracking.md`](../VPS_tracking.md)). P10.1 xong.
-> **Việc phải làm tiếp: [§P10.2](#p10--quản-lý-danh-mục--nút-xem-kết-quả-trên-web-chưa-làm)** — CRUD danh mục (be+fe).
+> **Trạng thái**: P0–P9 xong, site đã chạy thật trên tên miền khách hàng (trạng thái hạ tầng: [`VPS_tracking.md`](../VPS_tracking.md)). P10 xong toàn bộ (P10.1 + P10.2) — không còn phase nào tiếp theo trong roadmap gốc, xem §Primitive có sẵn trước khi thêm tính năng mới.
+> **Việc phải làm tiếp**: chưa có phase mới nào được lên kế hoạch. Đợi yêu cầu tiếp theo.
 > Việc phải làm trên VPS: [`VPS.md`](../VPS.md) — viết cho một phiên Claude chạy trực tiếp trên VPS qua Remote SSH.
 > File này là **nguồn sự thật duy nhất cho việc phải làm tiếp**. Trạng thái hiện tại + bẫy kỹ thuật đã gặp nằm ở [CLAUDE.md](../CLAUDE.md); quy tắc thường trực nằm ở `.claude/rules/*`.
 
@@ -64,7 +64,7 @@ P0 ─> P1 ─> P2 ─┬─> P3 ─> P4 ─┬─> P6 ─> P7 ─> P9
 | 13 | Chatbot RAG | P8 | backend | 2 ngày | 4 | ✅ (đổi sang OpenAI API, đã verify hành vi LLM thật bằng `OPENAI_API_KEY`) |
 | 14 | Deploy VPS | P9 | devops | 1–2 ngày | tất cả | ✅ (artifact + verify local xong; DoD cần VPS/domain/SSH thật — xem Việc còn nợ) |
 | 15 | Nút xem kết quả trên web | P10.1 | frontend | 0.5 ngày | — | ✅ |
-| 16 | CRUD danh mục trong Admin | P10.2 | be+fe | 1.5 ngày | — | ⬜ ⬅ tiếp theo |
+| 16 | CRUD danh mục trong Admin | P10.2 | be+fe | 1.5 ngày | — | ✅ |
 
 **Khi tách be/fe trong cùng phase**: phiên backend kết thúc bằng pytest xanh + gọi thử qua `/docs`; **DoD của phase chỉ tích khi phiên frontend xong** (DoD viết theo trải nghiệm người dùng cuối). Đừng tích sớm.
 
@@ -72,9 +72,11 @@ P0 ─> P1 ─> P2 ─┬─> P3 ─> P4 ─┬─> P6 ─> P7 ─> P9
 
 ---
 
-## P10 — Quản lý danh mục + nút xem kết quả trên web (chưa làm)
+## P10 — Quản lý danh mục + nút xem kết quả trên web (xong)
 
 Yêu cầu phát sinh sau khi site chạy thật, không nằm trong roadmap gốc. **P10.1 và P10.2 độc lập hoàn toàn** — nhận riêng từng phiên, không chặn nhau.
+
+**Bổ sung sau khi P10.1 đã tích DoD (yêu cầu thêm từ người dùng, cùng phiên với P10.2)**: nút "Xem trang web" ban đầu chỉ có 1 chiều (dashboard → public, mở tab mới). Người dùng yêu cầu thêm chiều ngược lại — public → dashboard, nhận biết trạng thái đăng nhập, cùng tab — xem 2 mục DoD mới thêm vào cuối §P10.1 bên dưới.
 
 **Quyết định đã chốt với người dùng (2026-08-16) — không tự đổi:**
 - Danh mục quản lý ở **cả hai nơi**: thêm/xoá nhanh ngay cạnh dropdown trong form đăng tin *và* trang `/dashboard/danh-muc` 4 tab để sửa tên/logo/ẩn-hiện.
@@ -93,20 +95,22 @@ Yêu cầu phát sinh sau khi site chạy thật, không nằm trong roadmap g�
 - [x] Mỗi dòng việc làm/tin tức có nút "Xem trên web" — ẩn khi `job.status === "draft"` / `post.status !== "published"` (API công khai 404 đúng các trạng thái đó), thay bằng chữ mờ "Chưa công khai"
 - [x] `JobForm`/`PostForm` có nút phụ "Lưu & xem trên web" (lấy `slug` từ response; giữ `window.location.href`, **không** `router.push` — bẫy đã trả giá ở P5)
 - [x] Server Action `revalidatePath` cho `/viec-lam/[slug]`, `/viec-lam`, `/tin-tuc/[slug]`, `/tin-tuc`, `/` gọi sau khi lưu — sửa xong bấm xem thấy ngay nội dung mới (đây là DoD thật của cả phase, không phải chi tiết phụ)
+- [x] Chiều ngược lại (public → dashboard): cookie gợi ý `has_session` (không httpOnly, set/xoá cùng lúc với access/refresh token) + `InternalEntryLink.tsx` ở `TopBar` (desktop) và panel hamburger `MainNav` (mobile) tự đổi "Đăng nhập" ↔ "Trang quản trị" theo trạng thái đăng nhập, điều hướng **cùng tab**, không dùng `cookies()` ở Server Component (giữ `/` static — xem `docs/DECISIONS.md`)
+- [x] Nút "Xem trang web" trong `InternalShell` đổi từ mở tab mới sang điều hướng cùng tab, khớp ngữ nghĩa "chuyển qua lại" 2 khu vực (khác nút "Xem trên web" ở từng dòng job/post — vẫn mở tab mới vì đó là xem trước 1 tin cụ thể)
 
-### DoD — P10.2 CRUD danh mục (công ty / ngành nghề / KCN / tỉnh)
+### DoD — P10.2 CRUD danh mục (công ty / ngành nghề / KCN / tỉnh) ✅
 
-- [ ] `api/v1/admin/taxonomies.py`: 3 router `/api/admin/{job-categories,industrial-parks,provinces}` đủ GET/POST/PATCH/DELETE + audit log + `require_roles`, theo đúng khuôn `admin/companies.py` (Company đã có sẵn CRUD, chỉ thiếu UI)
-- [ ] DELETE đếm bản ghi tham chiếu **trước** (`jobs.category_id`/`industrial_park_id`/`province_code`, `industrial_parks.province_code`, `applications.province_code`) → 409 tiếng Việt kèm số lượng cụ thể; giữ `except IntegrityError` làm lưới an toàn cuối
-- [ ] Slug danh mục **bất biến sau khi tạo** (không regenerate theo `name` — `jobs` đã publish đang tham chiếu)
-- [ ] `GET /api/provinces` công khai (dropdown cần; sau này dùng lại cho bộ lọc tỉnh ở `SearchBar`)
-- [ ] `tests/test_admin_taxonomies.py`: RBAC 3 role × 3 danh mục, 409 khi có tham chiếu, xoá được khi không tham chiếu, slug dài bị cắt đúng, `is_active=false` biến mất khỏi API công khai
-- [ ] `npm run gen:api` + commit lại `lib/api/schema.d.ts`
-- [ ] `components/internal/TaxonomySelect.tsx` — select + nút `+`/xoá, form thêm mới trong Dialog Radix (D12); thêm xong tự chọn giá trị mới, **không mất dữ liệu đang nhập dở** trong form đăng tin
-- [ ] `JobForm` dùng `TaxonomySelect` cho cả 4 chiều; **xoá hằng số `PROVINCE_CODE`/`PROVINCE_NAME`** và ô input `disabled`, `province_code` lấy từ giá trị chọn thật
-- [ ] 2 fetch danh mục trong `dashboard/viec-lam/{moi,[id]}/page.tsx` đổi `revalidate: 3600` → `false` (quên thì danh mục vừa thêm biến mất tới 1 tiếng khi tải lại trang)
-- [ ] `/dashboard/danh-muc` 4 tab + mục mới trong `NAV_ITEMS` (ẩn với `staff`), mỗi dòng hiện số tin đang tham chiếu
-- [ ] Responsive 375px cho trang mới + Dialog (tiêu chí khu vực nội bộ; **không** đối chiếu `vieclamhaiphong.net_.png` — xem `design-system.md` §Phạm vi áp dụng)
+- [x] `api/v1/admin/taxonomies.py`: 3 router `/api/admin/{job-categories,industrial-parks,provinces}` đủ GET/POST/PATCH/DELETE + audit log + `require_roles`, theo đúng khuôn `admin/companies.py`; nâng luôn DELETE của `admin/companies.py` sang cùng pattern đếm-trước + thêm `job_count` vào `CompanyAdminOut`
+- [x] DELETE đếm bản ghi tham chiếu **trước** (`jobs.category_id`/`industrial_park_id`/`province_code`, `industrial_parks.province_code`, `applications.province_code`) → 409 tiếng Việt kèm số lượng cụ thể; giữ `except IntegrityError` làm lưới an toàn cuối
+- [x] Slug danh mục **bất biến sau khi tạo** (không regenerate theo `name` — `jobs` đã publish đang tham chiếu)
+- [x] `GET /api/provinces` công khai (dropdown cần; sau này dùng lại cho bộ lọc tỉnh ở `SearchBar`)
+- [x] `tests/test_admin_taxonomies.py`: RBAC 3 role × 3 danh mục, 409 khi có tham chiếu, xoá được khi không tham chiếu, slug dài bị cắt đúng, `is_active=false` biến mất khỏi API công khai (20 test mới, 147/147 backend pass)
+- [x] `npm run gen:api` + commit lại `lib/api/schema.d.ts`
+- [x] `components/internal/TaxonomySelect.tsx` — select + nút `+`/xoá, form thêm mới trong `<dialog>` native portal ra `document.body` (đổi từ Radix Dialog — `@radix-ui/*` thực tế chưa từng được cài, xem `docs/DECISIONS.md`); thêm xong tự chọn giá trị mới, **không mất dữ liệu đang nhập dở** trong form đăng tin (bug thật gặp phải + fix ở `docs/PITFALLS.md`)
+- [x] `JobForm` dùng `TaxonomySelect` cho cả 4 chiều; **xoá hằng số `PROVINCE_CODE`/`PROVINCE_NAME`** và ô input `disabled`, `province_code` lấy từ giá trị chọn thật
+- [x] 2 fetch danh mục trong `dashboard/viec-lam/{moi,[id]}/page.tsx` đổi sang nguồn ADMIN (`serverFetchAuthed`, tự động `revalidate: false`) thay vì nguồn public `revalidate: 3600` — vừa fix bẫy cache cũ, vừa thấy được cả danh mục `is_active=false`
+- [x] `/dashboard/danh-muc` 4 tab (Công ty/Ngành nghề/Khu công nghiệp/Tỉnh-Thành) + mục mới trong `NAV_ITEMS` (ẩn với `staff`), mỗi dòng hiện số tin đang tham chiếu
+- [x] Responsive 375px cho trang mới + dialog — verify bằng Playwright thật (tiêu chí khu vực nội bộ; **không** đối chiếu `vieclamhaiphong.net_.png` — xem `design-system.md` §Phạm vi áp dụng)
 
 ---
 
@@ -128,13 +132,14 @@ Chi tiết triển khai xem git log; các quyết định và bẫy rút ra đã
 | **P9** | `backend/Dockerfile`, `frontend/Dockerfile` (multi-stage standalone), `docker-compose.prod.yml`, `scripts/{backup,restore}.sh`, `.env.prod.example`; migration `d1def644e25b` sửa bug `immutable_unaccent` (phát hiện qua test restore thật — xem CLAUDE.md § Bẫy đã gặp) |
 | **GĐ A+B** | Vá 22 vấn đề của artifact P9: `nginx/{lahr,bootstrap}.conf.template` (thay `nginx/lahr.conf`) + `scripts/dc.sh`; `SITE_URL` runtime thay `NEXT_PUBLIC_SITE_URL`; `mem_limit`/log rotation/pin tag/`INTERNAL_API_URL` trong compose; backup thêm volume `uploads`; job CI `images` push GHCR |
 | **Mở rộng (sau P9)** | Tiêu chí việc làm `employment_type`/`salary_period` enum hoá (migration `6875eab5dcc5`) + `Application.notes`; `chat_service.py` mở rộng tool `search_jobs`; `core/antispam.py` (trích từ `applications.py`) + `api/v1/public/leads.py` (`POST /api/leads`, lead chatbot); `public/jobs.py` filter công khai `employment_type`/`salary_period`; `JobListItem` schema thêm 2 field (hiện ở cả list lẫn detail). FE: `JobForm.tsx` dropdown; `SearchBar.tsx` 6 chiều lọc; `JobCard.tsx` badge loại hình/kỳ lương; `components/chatbot/{ChatQuiz,LeadForm}.tsx` (quiz 4 câu + nút quay lại kể cả sau "gọi trực tiếp", tự động hiện khi mở chat, sau câu 3 gọi thẳng `GET /api/jobs` hiện danh sách việc thật — không qua LLM). Sửa bug `seed_dev.py` ghi free-text cũ vào cột enum + 2 test flaky do lệch timezone local/UTC. 14 test mới (125/125 backend pass) |
-| **P10.1** | `dashboard/actions.ts` (Server Action `revalidateJobPaths`/`revalidatePostPaths`); `InternalShell.tsx` link "Xem trang web ↗"; `JobRowActions`/`PostRowActions` nút "Xem trên web" theo `status` (ẩn khi chưa công khai); `JobForm`/`PostForm` nút phụ "Lưu & xem trên web" (phân biệt qua `submitter.value`, giữ `window.location.href`). Verify bằng Playwright + backend/DB cô lập tạm (không đụng DB production) |
+| **P10.1** | `dashboard/actions.ts` (Server Action `revalidateJobPaths`/`revalidatePostPaths`); `InternalShell.tsx` link "Xem trang web" (điều hướng cùng tab); `JobRowActions`/`PostRowActions` nút "Xem trên web" theo `status` (ẩn khi chưa công khai, mở tab mới); `JobForm`/`PostForm` nút phụ "Lưu & xem trên web" (phân biệt qua `submitter.value`, giữ `window.location.href`). Bổ sung sau: cookie `has_session` (`auth.py`) + `InternalEntryLink.tsx` (`TopBar`/`MainNav` mobile) — chiều public → dashboard nhận biết đăng nhập, dùng `useSyncExternalStore` thay `cookies()` để giữ `/` static. Verify bằng Playwright + backend/DB cô lập tạm (không đụng DB production) |
+| **P10.2** | `api/v1/admin/taxonomies.py` (3 router job-categories/industrial-parks/provinces, đếm tham chiếu trước khi xoá); nâng `admin/companies.py` DELETE + `CompanyAdminOut.job_count` cùng pattern; `core/slug.py` thêm `max_length`; `public/taxonomies.py` thêm `GET /api/provinces`; `schemas/job.py` thêm `ProvincePublic`. FE: `components/internal/TaxonomySelect.tsx` (`<dialog>` native + `createPortal`) tích hợp vào `JobForm` cho cả 4 chiều; `app/(internal)/dashboard/danh-muc/` (`DanhMucTabs.tsx` + 4 tab component); `InternalShell.tsx` thêm mục "Danh mục" (ẩn `staff`). 20 test mới (147/147 backend pass). Verify bằng Playwright + backend/DB cô lập tạm |
 
 ---
 
 ## Primitive có sẵn — tái dùng, đừng viết lại
 
-Kiểm mục này trước khi làm P10 hoặc thêm bất kỳ tính năng mới nào (Employee/Contract/Timesheet... xem § Entity giai đoạn sau).
+Không còn phase nào tiếp theo trong roadmap gốc — kiểm mục này trước khi thêm bất kỳ tính năng mới nào (Employee/Contract/Timesheet... xem § Entity giai đoạn sau).
 
 **Backend**
 - `app/api/deps.py` — `get_current_user`, `require_roles(...)` → dùng cho mọi endpoint admin mới
@@ -148,6 +153,7 @@ Kiểm mục này trước khi làm P10 hoặc thêm bất kỳ tính năng mớ
 - `api/v1/admin/stats.py` — pattern roll-up `address_mappings` (`outerjoin` + `func.coalesce`) và bucket tuổi bằng `case()`/`func.age()`; tái dùng khi cần thống kê GROUP BY khác
 - `api/v1/admin/users.py` — `GET /api/admin/users` (chỉ đọc, 3 role) phục vụ mọi dropdown "chọn nhân viên nội bộ" sau này
 - `app/services/chat_service.py` — pattern tool-use streaming với OpenAI SDK (`client.chat.completions.create(..., stream=True)` + `run_in_threadpool` cho phần đụng DB); `has_budget()`/`_record_usage()` cho trần chi tiêu ngày kiểu đếm token in-memory; tool JSON schema dùng `"enum": [...]` khi field chỉ có tập giá trị cố định (ép model không tự bịa) + validate defensive bằng `try/except ValueError` phía server
+- `app/api/v1/admin/taxonomies.py` — pattern CRUD danh mục nhỏ (không phân trang) với `job_count` tính qua `outerjoin` + `func.coalesce`, đếm tham chiếu trước khi DELETE → 409 kèm số lượng cụ thể; tái dùng khi cần thêm danh mục tra cứu mới. `app/core/slug.py` `generate_unique_slug(..., max_length=...)` khi cột slug hẹp hơn 200 ký tự mặc định
 
 **Frontend**
 - `lib/api/client.ts` — `serverFetch` / `browserFetch`; `lib/api/server-auth-client.ts` — `serverFetchAuthed` (**để riêng, đừng gộp lại**)
@@ -157,6 +163,8 @@ Kiểm mục này trước khi làm P10 hoặc thêm bất kỳ tính năng mớ
 - `components/internal/charts.tsx` — `HorizontalBarList`/`TimeSeriesBars`/`StatCard`, bar chart SVG/CSS thuần (không dùng recharts) cho mọi thống kê nội bộ sau này
 - `components/ui/*` — Button, Badge, Container, SectionHeading, ScrollReveal, `icons.tsx`
 - `components/chatbot/ChatQuiz.tsx` — pattern quiz nhiều bước có nút quay lại đặt hoàn toàn ở frontend (không để LLM tự dẫn dắt thứ tự), đẩy Q&A vào transcript qua callback rồi tái dùng `sendMessage()` gốc — tham khảo khi cần thêm luồng hỏi-đáp có thứ tự khác cho chatbot
+- `components/layout/InternalEntryLink.tsx` — đọc cookie không nhạy cảm (`has_session`) qua `useSyncExternalStore` (KHÔNG `useEffect`+`setState`, bị lint `react-hooks/set-state-in-effect` chặn) để biết trạng thái đăng nhập ở Client Component mà không ép trang public thành dynamic; `getServerSnapshot` cố định khớp HTML server, tránh hydration mismatch — tái dùng cho mọi chỗ cần "biết trạng thái server nhưng vẫn giữ static prerender"
+- `components/internal/TaxonomySelect.tsx` — `<select>` + thêm/xoá nhanh qua `<dialog>` native portal ra `document.body` (`createPortal`), khai báo `createFields` để mỗi taxonomy tự định nghĩa payload tạo khác nhau; **bắt buộc portal** nếu dialog/modal có `<form>` riêng được gọi từ bên trong một `<form>` khác — xem bẫy nested-form ở `docs/PITFALLS.md`
 
 ---
 

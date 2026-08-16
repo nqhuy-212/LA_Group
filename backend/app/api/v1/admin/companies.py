@@ -8,7 +8,7 @@ from app.core.audit import write_audit_log
 from app.core.rate_limit import get_client_ip
 from app.core.slug import generate_unique_slug
 from app.db.session import get_db
-from app.models import Company, User
+from app.models import Company, Job, User
 from app.models.enums import UserRole
 from app.schemas.admin import CompanyAdminCreate, CompanyAdminOut, CompanyAdminUpdate
 from app.schemas.common import PageResponse
@@ -30,6 +30,27 @@ def _get_company_or_404(db: Session, company_id: int) -> Company:
     return company
 
 
+def _company_job_count(db: Session, company_id: int) -> int:
+    return db.execute(
+        select(func.count()).select_from(Job).where(Job.company_id == company_id)
+    ).scalar_one()
+
+
+def _company_out(company: Company, job_count: int) -> CompanyAdminOut:
+    return CompanyAdminOut(
+        id=company.id,
+        slug=company.slug,
+        name=company.name,
+        display_name_public=company.display_name_public,
+        logo_initials=company.logo_initials,
+        logo_url=company.logo_url,
+        is_partner=company.is_partner,
+        job_count=job_count,
+        created_at=company.created_at,
+        updated_at=company.updated_at,
+    )
+
+
 @router.get("", response_model=PageResponse[CompanyAdminOut])
 def list_companies_admin(
     q: str | None = None,
@@ -43,15 +64,21 @@ def list_companies_admin(
         conditions.append(Company.name.ilike(f"%{q}%"))
 
     total = db.execute(select(func.count()).select_from(Company).where(*conditions)).scalar_one()
-    companies = db.execute(
-        select(Company)
+    job_counts = (
+        select(Job.company_id, func.count().label("job_count")).group_by(Job.company_id)
+    ).subquery()
+    rows = db.execute(
+        select(Company, func.coalesce(job_counts.c.job_count, 0))
+        .outerjoin(job_counts, job_counts.c.company_id == Company.id)
         .where(*conditions)
         .order_by(Company.name)
         .offset((page - 1) * page_size)
         .limit(page_size)
-    ).scalars().all()
+    ).all()
     return PageResponse(
-        items=[CompanyAdminOut.model_validate(c) for c in companies], total=total, page=page,
+        items=[_company_out(company, count) for company, count in rows],
+        total=total,
+        page=page,
         page_size=page_size,
     )
 
@@ -62,7 +89,8 @@ def get_company_admin(
     db: Session = Depends(get_db),
     _user: User = Depends(require_roles(*VIEW_ROLES)),
 ) -> CompanyAdminOut:
-    return CompanyAdminOut.model_validate(_get_company_or_404(db, company_id))
+    company = _get_company_or_404(db, company_id)
+    return _company_out(company, _company_job_count(db, company.id))
 
 
 @router.post("", response_model=CompanyAdminOut, status_code=status.HTTP_201_CREATED)
@@ -87,7 +115,7 @@ def create_company_admin(
     )
     db.commit()
     db.refresh(company)
-    return CompanyAdminOut.model_validate(company)
+    return _company_out(company, job_count=0)
 
 
 @router.patch("/{company_id}", response_model=CompanyAdminOut)
@@ -118,7 +146,7 @@ def update_company_admin(
     )
     db.commit()
     db.refresh(company)
-    return CompanyAdminOut.model_validate(company)
+    return _company_out(company, _company_job_count(db, company.id))
 
 
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -129,6 +157,15 @@ def delete_company_admin(
     user: User = Depends(require_roles(*DELETE_ROLES)),
 ) -> None:
     company = _get_company_or_404(db, company_id)
+    job_count = _company_job_count(db, company.id)
+    if job_count > 0:
+        # Company không có cột is_active (khác job_categories/provinces) nên không
+        # gợi ý "ẩn" — chỉ có thể xoá tin/đổi công ty của tin trước.
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Không thể xoá: đang có {job_count} tin tuyển dụng thuộc công ty này.",
+        )
+
     write_audit_log(
         db,
         user_id=user.id,

@@ -67,3 +67,11 @@ class IndustrialParkOut(BaseModel):
     name: str
     province_code: str
     district_name: str | None
+
+
+class ProvincePublic(BaseModel):
+    model_config = {"from_attributes": True}
+
+    code: str
+    name: str
+    type: str

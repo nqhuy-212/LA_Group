@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { InternalEntryLink } from "@/components/layout/InternalEntryLink";
 import { IconClose, IconMenu } from "@/components/ui/icons";
 
 const navLinks = [
@@ -76,6 +77,15 @@ export function MainNav() {
                 </Link>
               </li>
             ))}
+            {/* TopBar (desktop) đã có link này nhưng cố ý `hidden sm:block` để
+                giữ sticky header ngắn trên mobile — panel hamburger là cách duy
+                nhất cho điện thoại vào được khu nội bộ (xem docs/DECISIONS.md). */}
+            <li className="mt-1 border-t border-white/10 pt-1">
+              <InternalEntryLink
+                className="block rounded-lg px-3 py-3.5 text-[15px] font-semibold text-primary-100 active:bg-white/10"
+                onNavigate={() => setOpen(false)}
+              />
+            </li>
           </ul>
         </nav>
       ) : null}

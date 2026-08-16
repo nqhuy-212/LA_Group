@@ -192,8 +192,91 @@ class CompanyAdminOut(BaseModel):
     logo_initials: str | None
     logo_url: str | None
     is_partner: bool
+    job_count: int
     created_at: datetime
     updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Taxonomies: JobCategory / IndustrialPark / Province (P10.2 — CRUD danh mục)
+# ---------------------------------------------------------------------------
+
+
+class JobCategoryAdminCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    sort_order: int = 0
+    is_active: bool = True
+
+
+class JobCategoryAdminUpdate(BaseModel):
+    # Không có `slug` — slug bất biến sau khi tạo, jobs đã publish đang tham
+    # chiếu (xem app/api/v1/admin/taxonomies.py).
+    name: str | None = Field(default=None, min_length=2, max_length=120)
+    sort_order: int | None = None
+    is_active: bool | None = None
+
+
+class JobCategoryAdminOut(BaseModel):
+    id: int
+    slug: str
+    name: str
+    sort_order: int
+    is_active: bool
+    job_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class IndustrialParkAdminCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=200)
+    province_code: str
+    district_name: str | None = Field(default=None, max_length=120)
+
+
+class IndustrialParkAdminUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=200)
+    province_code: str | None = None
+    district_name: str | None = Field(default=None, max_length=120)
+
+
+class IndustrialParkAdminOut(BaseModel):
+    id: int
+    slug: str
+    name: str
+    province_code: str
+    district_name: str | None
+    job_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ProvinceAdminCreate(BaseModel):
+    # PK do người dùng nhập (mã GSO) — không sinh bằng generate_unique_slug như 2
+    # danh mục trên (Province không có cột slug/id — xem data-models.md).
+    code: str = Field(min_length=1, max_length=3)
+    name: str = Field(min_length=2, max_length=120)
+    type: str = Field(min_length=1, max_length=30)
+    is_active: bool = True
+
+
+class ProvinceAdminUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=120)
+    type: str | None = Field(default=None, min_length=1, max_length=30)
+    is_active: bool | None = None
+
+
+class ProvinceAdminOut(BaseModel):
+    code: str
+    name: str
+    type: str
+    is_active: bool
+    job_count: int
 
     model_config = {"from_attributes": True}
 

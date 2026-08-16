@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InternalEntryLink } from "@/components/layout/InternalEntryLink";
 import { IconMail, IconPhone } from "@/components/ui/icons";
 
 export function TopBar() {
@@ -22,9 +23,7 @@ export function TopBar() {
           <Link href="#lien-he" className="hover:text-white">
             Dành cho doanh nghiệp
           </Link>
-          <Link href="/dang-nhap" className="hover:text-white">
-            Đăng nhập
-          </Link>
+          <InternalEntryLink className="hover:text-white" />
         </div>
       </div>
     </div>

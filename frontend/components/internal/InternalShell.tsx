@@ -8,6 +8,7 @@ import {
   IconClose,
   IconExternalLink,
   IconFileText,
+  IconGear,
   IconLayoutDashboard,
   IconLogout,
   IconMenu,
@@ -24,6 +25,14 @@ const NAV_ITEMS = [
   { href: "/dashboard/viec-lam", label: "Việc làm", icon: IconBriefcase },
   { href: "/dashboard/ung-vien", label: "Ứng viên", icon: IconUsers },
   { href: "/dashboard/tin-tuc", label: "Tin tức & Chính sách", icon: IconFileText },
+  // Thêm/sửa/xoá = admin+manager, xoá riêng chỉ admin (hàng rào thật ở backend
+  // taxonomies.py) — ẩn hẳn tab với staff, khớp RBAC feature-admin-dashboard.md.
+  {
+    href: "/dashboard/danh-muc",
+    label: "Danh mục",
+    icon: IconGear,
+    roles: ["admin", "manager"],
+  },
 ];
 
 const ROLE_LABEL: Record<string, string> = {
@@ -54,9 +63,11 @@ export function InternalShell({
     return href === "/dashboard" ? pathname === href : pathname.startsWith(href);
   }
 
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(user.role));
+
   const navList = (
     <nav className="flex flex-col gap-1 p-3">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+      {visibleNavItems.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}
@@ -122,17 +133,19 @@ export function InternalShell({
 
           {/* Hiện ở mọi kích thước — quản lý xem dashboard bằng điện thoại vẫn
               phải mở được site công khai (feature-admin-dashboard.md). Dưới
-              640px thu về icon để không chen chỗ khối email + Đăng xuất. */}
-          <a
+              640px thu về icon để không chen chỗ khối email + Đăng xuất.
+              Điều hướng CÙNG TAB (không target="_blank"): đây là lối "chuyển
+              qua lại" 2 khu vực, không phải xem trước 1 tin cụ thể — phiên
+              đăng nhập vẫn còn nguyên vì cookie httpOnly cùng origin, TopBar
+              site công khai tự nhận ra qua InternalEntryLink. */}
+          <Link
             href="/"
-            target="_blank"
-            rel="noopener"
-            aria-label="Xem trang web (mở tab mới)"
+            aria-label="Xem trang web"
             className="flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-border px-3 text-sm font-semibold text-text-muted hover:bg-bg"
           >
             <IconExternalLink className="h-4 w-4 flex-shrink-0" />
             <span className="hidden sm:inline">Xem trang web</span>
-          </a>
+          </Link>
 
           <div className="flex min-w-0 items-center gap-3">
             {/* min-w-0 + truncate: email dài (VD tuyendung.hd@lahr.vn) cộng thêm

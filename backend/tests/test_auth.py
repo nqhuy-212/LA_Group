@@ -45,6 +45,19 @@ def test_login_cookies_have_httponly_secure_samesite_strict(client, user):
         assert "samesite=strict" in raw
 
 
+def test_login_sets_session_hint_cookie_not_httponly(client, user):
+    # has_session giúp TopBar site công khai đổi nhãn "Đăng nhập" ↔ "Trang quản
+    # trị" mà không phải gọi cookies() ở Server Component (mất static prerender) —
+    # xem app/api/v1/auth.py. Cờ này KHÔNG được httpOnly (JS phải đọc được), khác
+    # hẳn access_token/refresh_token.
+    resp = client.post("/api/auth/login", json={"email": user.email, "password": PASSWORD})
+    assert resp.cookies["has_session"] == "1"
+    raw = _cookie_flags(resp, "has_session").lower()
+    assert "httponly" not in raw
+    assert "secure" in raw
+    assert "samesite=strict" in raw
+
+
 def test_login_wrong_password_and_unknown_email_return_identical_error(client, user):
     wrong_password = client.post(
         "/api/auth/login", json={"email": user.email, "password": "sai-mat-khau"}
@@ -146,6 +159,14 @@ def test_logout_clears_cookies_and_revokes_refresh_token(client, user, db_sessio
 
     me_resp = client.get("/api/auth/me")
     assert me_resp.status_code == 401
+
+
+def test_logout_clears_session_hint_cookie(client, user):
+    client.post("/api/auth/login", json={"email": user.email, "password": PASSWORD})
+    logout_resp = client.post("/api/auth/logout")
+    raw = _cookie_flags(logout_resp, "has_session").lower()
+    # delete_cookie ghi đè bằng max-age=0/expires quá khứ, không phải xoá giá trị
+    assert "max-age=0" in raw or "1970" in raw
 
 
 def test_require_roles_dependency_allows_and_blocks_by_role():

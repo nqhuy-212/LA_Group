@@ -3,9 +3,9 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.models import IndustrialPark, Job, JobCategory
+from app.models import IndustrialPark, Job, JobCategory, Province
 from app.models.enums import JobStatus
-from app.schemas.job import IndustrialParkOut, JobCategoryWithCount
+from app.schemas.job import IndustrialParkOut, JobCategoryWithCount, ProvincePublic
 
 router = APIRouter(prefix="/api", tags=["taxonomies"])
 
@@ -34,3 +34,12 @@ def list_job_categories(db: Session = Depends(get_db)) -> list[JobCategoryWithCo
 def list_industrial_parks(db: Session = Depends(get_db)) -> list[IndustrialParkOut]:
     parks = db.execute(select(IndustrialPark).order_by(IndustrialPark.name)).scalars().all()
     return [IndustrialParkOut.model_validate(park) for park in parks]
+
+
+@router.get("/provinces", response_model=list[ProvincePublic])
+def list_provinces(db: Session = Depends(get_db)) -> list[ProvincePublic]:
+    # Dropdown đăng tin (P10.2) + sau này dùng lại cho bộ lọc tỉnh ở SearchBar.
+    provinces = db.execute(
+        select(Province).where(Province.is_active.is_(True)).order_by(Province.name)
+    ).scalars().all()
+    return [ProvincePublic.model_validate(p) for p in provinces]

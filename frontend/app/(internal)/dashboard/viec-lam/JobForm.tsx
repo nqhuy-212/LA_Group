@@ -1,19 +1,24 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import {
+  TaxonomySelect,
+  type TaxonomyCreateResult,
+  type TaxonomyDeleteResult,
+  type TaxonomyOption,
+} from "@/components/internal/TaxonomySelect";
 import { Button } from "@/components/ui/Button";
 import { browserFetch } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { revalidateJobPaths } from "../actions";
 
 type JobAdminOutDTO = components["schemas"]["JobAdminOut"];
+type CompanyAdminOutDTO = components["schemas"]["CompanyAdminOut"];
+type JobCategoryAdminOutDTO = components["schemas"]["JobCategoryAdminOut"];
+type IndustrialParkAdminOutDTO = components["schemas"]["IndustrialParkAdminOut"];
+type ProvinceAdminOutDTO = components["schemas"]["ProvinceAdminOut"];
 type Taxonomy = { slug: string; name: string };
-
-// Toàn hệ thống hiện chỉ seed đúng 1 tỉnh (Hải Dương, mã "30" — xem
-// company-info.md/data-models.md); chưa có API public liệt kê tỉnh nên cố định
-// tại đây thay vì dựng thêm cả một endpoint chỉ để chọn 1 giá trị duy nhất.
-const PROVINCE_CODE = "30";
-const PROVINCE_NAME = "Hải Dương";
+type ProvinceTaxonomy = { code: string; name: string };
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "draft", label: "Nháp (chưa hiển thị công khai)" },
@@ -52,16 +57,27 @@ export function JobForm({
   categories,
   industrialParks,
   companies,
+  provinces,
+  canManageTaxonomies,
   initialJob,
 }: {
   categories: Taxonomy[];
   industrialParks: Taxonomy[];
   companies: Taxonomy[];
+  provinces: ProvinceTaxonomy[];
+  canManageTaxonomies: boolean;
   initialJob?: JobAdminOutDTO;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const isEdit = Boolean(initialJob);
+
+  const [companySlug, setCompanySlug] = useState(initialJob?.company_slug ?? "");
+  const [categorySlug, setCategorySlug] = useState(initialJob?.category_slug ?? "");
+  const [industrialParkSlug, setIndustrialParkSlug] = useState(
+    initialJob?.industrial_park_slug ?? "",
+  );
+  const [provinceCode, setProvinceCode] = useState(initialJob?.province_code ?? "");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -74,10 +90,10 @@ export function JobForm({
     const form = new FormData(event.currentTarget);
     const payload = {
       title: String(form.get("title") ?? "").trim(),
-      company_slug: String(form.get("company_slug") ?? ""),
-      category_slug: String(form.get("category_slug") ?? ""),
-      industrial_park_slug: stringOrNull(form.get("industrial_park_slug")),
-      province_code: PROVINCE_CODE,
+      company_slug: companySlug,
+      category_slug: categorySlug,
+      industrial_park_slug: industrialParkSlug || null,
+      province_code: provinceCode,
       salary_min: numberOrNull(form.get("salary_min")),
       salary_max: numberOrNull(form.get("salary_max")),
       salary_negotiable: form.get("salary_negotiable") === "on",
@@ -125,6 +141,110 @@ export function JobForm({
       : "/dashboard/viec-lam";
   }
 
+  async function createCompany(values: Record<string, string>): Promise<TaxonomyCreateResult> {
+    const res = await browserFetch<CompanyAdminOutDTO>("/api/admin/companies", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: values.name }),
+    });
+    return res.ok
+      ? { ok: true, option: { value: res.data.slug, label: res.data.name } }
+      : { ok: false, error: res.error };
+  }
+
+  async function deleteCompany(slug: string): Promise<TaxonomyDeleteResult> {
+    const company = companies.find((c) => c.slug === slug);
+    if (!company) return { ok: false, error: "Không tìm thấy công ty" };
+    // Danh sách chỉ có slug/name (không có id) — id nằm trong AdminOut đầy đủ,
+    // nhưng route DELETE cần id nên phải tra ngược qua API list (page_size=100
+    // đã đủ với quy mô danh mục hiện tại, khớp cách trang moi/page.tsx đang fetch).
+    const listRes = await browserFetch<{ items: CompanyAdminOutDTO[] }>(
+      "/api/admin/companies?page_size=100",
+    );
+    if (!listRes.ok) return { ok: false, error: listRes.error };
+    const found = listRes.data.items.find((c) => c.slug === slug);
+    if (!found) return { ok: false, error: "Không tìm thấy công ty" };
+    const res = await browserFetch(`/api/admin/companies/${found.id}`, { method: "DELETE" });
+    return res.ok ? { ok: true } : { ok: false, error: res.error };
+  }
+
+  async function createCategory(values: Record<string, string>): Promise<TaxonomyCreateResult> {
+    const res = await browserFetch<JobCategoryAdminOutDTO>("/api/admin/job-categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: values.name }),
+    });
+    return res.ok
+      ? { ok: true, option: { value: res.data.slug, label: res.data.name } }
+      : { ok: false, error: res.error };
+  }
+
+  async function deleteCategory(slug: string): Promise<TaxonomyDeleteResult> {
+    const listRes = await browserFetch<JobCategoryAdminOutDTO[]>("/api/admin/job-categories");
+    if (!listRes.ok) return { ok: false, error: listRes.error };
+    const found = listRes.data.find((c) => c.slug === slug);
+    if (!found) return { ok: false, error: "Không tìm thấy ngành nghề" };
+    const res = await browserFetch(`/api/admin/job-categories/${found.id}`, { method: "DELETE" });
+    return res.ok ? { ok: true } : { ok: false, error: res.error };
+  }
+
+  async function createIndustrialPark(
+    values: Record<string, string>,
+  ): Promise<TaxonomyCreateResult> {
+    const res = await browserFetch<IndustrialParkAdminOutDTO>("/api/admin/industrial-parks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: values.name, province_code: values.province_code }),
+    });
+    return res.ok
+      ? { ok: true, option: { value: res.data.slug, label: res.data.name } }
+      : { ok: false, error: res.error };
+  }
+
+  async function deleteIndustrialPark(slug: string): Promise<TaxonomyDeleteResult> {
+    const listRes = await browserFetch<IndustrialParkAdminOutDTO[]>("/api/admin/industrial-parks");
+    if (!listRes.ok) return { ok: false, error: listRes.error };
+    const found = listRes.data.find((p) => p.slug === slug);
+    if (!found) return { ok: false, error: "Không tìm thấy khu công nghiệp" };
+    const res = await browserFetch(`/api/admin/industrial-parks/${found.id}`, {
+      method: "DELETE",
+    });
+    return res.ok ? { ok: true } : { ok: false, error: res.error };
+  }
+
+  async function createProvince(values: Record<string, string>): Promise<TaxonomyCreateResult> {
+    const res = await browserFetch<ProvinceAdminOutDTO>("/api/admin/provinces", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: values.code, name: values.name, type: values.type }),
+    });
+    return res.ok
+      ? { ok: true, option: { value: res.data.code, label: res.data.name } }
+      : { ok: false, error: res.error };
+  }
+
+  async function deleteProvince(code: string): Promise<TaxonomyDeleteResult> {
+    const res = await browserFetch(`/api/admin/provinces/${code}`, { method: "DELETE" });
+    return res.ok ? { ok: true } : { ok: false, error: res.error };
+  }
+
+  const companyOptions: TaxonomyOption[] = companies.map((c) => ({
+    value: c.slug,
+    label: c.name,
+  }));
+  const categoryOptions: TaxonomyOption[] = categories.map((c) => ({
+    value: c.slug,
+    label: c.name,
+  }));
+  const industrialParkOptions: TaxonomyOption[] = industrialParks.map((p) => ({
+    value: p.slug,
+    label: p.name,
+  }));
+  const provinceOptions: TaxonomyOption[] = provinces.map((p) => ({
+    value: p.code,
+    label: p.name,
+  }));
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <label className={labelClass}>
@@ -140,64 +260,71 @@ export function JobForm({
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className={labelClass}>
-          Công ty/Nhà máy *
-          <select
-            name="company_slug"
-            required
-            defaultValue={initialJob?.company_slug ?? ""}
-            className={fieldClass}
-          >
-            <option value="" disabled>
-              -- Chọn công ty --
-            </option>
-            {companies.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <TaxonomySelect
+          label="Công ty/Nhà máy *"
+          selectName="company_slug"
+          required
+          options={companyOptions}
+          value={companySlug}
+          onChange={setCompanySlug}
+          canManage={canManageTaxonomies}
+          createTitle="Thêm công ty/nhà máy"
+          createFields={[{ kind: "text", name: "name", label: "Tên công ty" }]}
+          onCreate={createCompany}
+          onDelete={deleteCompany}
+          emptyOptionLabel="-- Chọn công ty --"
+        />
 
-        <label className={labelClass}>
-          Ngành nghề *
-          <select
-            name="category_slug"
-            required
-            defaultValue={initialJob?.category_slug ?? ""}
-            className={fieldClass}
-          >
-            <option value="" disabled>
-              -- Chọn ngành nghề --
-            </option>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <TaxonomySelect
+          label="Ngành nghề *"
+          selectName="category_slug"
+          required
+          options={categoryOptions}
+          value={categorySlug}
+          onChange={setCategorySlug}
+          canManage={canManageTaxonomies}
+          createTitle="Thêm ngành nghề"
+          createFields={[{ kind: "text", name: "name", label: "Tên ngành nghề" }]}
+          onCreate={createCategory}
+          onDelete={deleteCategory}
+          emptyOptionLabel="-- Chọn ngành nghề --"
+        />
 
-        <label className={labelClass}>
-          Khu công nghiệp
-          <select
-            name="industrial_park_slug"
-            defaultValue={initialJob?.industrial_park_slug ?? ""}
-            className={fieldClass}
-          >
-            <option value="">Không thuộc KCN nào</option>
-            {industrialParks.map((p) => (
-              <option key={p.slug} value={p.slug}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <TaxonomySelect
+          label="Khu công nghiệp"
+          selectName="industrial_park_slug"
+          options={industrialParkOptions}
+          value={industrialParkSlug}
+          onChange={setIndustrialParkSlug}
+          canManage={canManageTaxonomies}
+          createTitle="Thêm khu công nghiệp"
+          createFields={[
+            { kind: "text", name: "name", label: "Tên khu công nghiệp" },
+            { kind: "select", name: "province_code", label: "Tỉnh/Thành", options: provinceOptions },
+          ]}
+          onCreate={createIndustrialPark}
+          onDelete={deleteIndustrialPark}
+          emptyOptionLabel="Không thuộc KCN nào"
+        />
 
-        <label className={labelClass}>
-          Tỉnh/Thành
-          <input value={PROVINCE_NAME} disabled className={`${fieldClass} bg-bg text-text-muted`} />
-        </label>
+        <TaxonomySelect
+          label="Tỉnh/Thành *"
+          selectName="province_code"
+          required
+          options={provinceOptions}
+          value={provinceCode}
+          onChange={setProvinceCode}
+          canManage={canManageTaxonomies}
+          createTitle="Thêm tỉnh/thành"
+          createFields={[
+            { kind: "text", name: "code", label: "Mã tỉnh (GSO)", maxLength: 3 },
+            { kind: "text", name: "name", label: "Tên tỉnh/thành" },
+            { kind: "text", name: "type", label: "Loại (VD: Tỉnh, Thành phố)" },
+          ]}
+          onCreate={createProvince}
+          onDelete={deleteProvince}
+          emptyOptionLabel="-- Chọn tỉnh/thành --"
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

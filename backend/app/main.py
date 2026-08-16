@@ -10,6 +10,9 @@ from app.api.v1.admin.companies import router as admin_companies_router
 from app.api.v1.admin.jobs import router as admin_jobs_router
 from app.api.v1.admin.posts import router as admin_posts_router
 from app.api.v1.admin.stats import router as admin_stats_router
+from app.api.v1.admin.taxonomies import industrial_parks_router as admin_industrial_parks_router
+from app.api.v1.admin.taxonomies import job_categories_router as admin_job_categories_router
+from app.api.v1.admin.taxonomies import provinces_router as admin_provinces_router
 from app.api.v1.admin.users import router as admin_users_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.public.applications import router as applications_router
@@ -74,6 +77,9 @@ app.include_router(admin_companies_router)
 app.include_router(admin_applications_router)
 app.include_router(admin_stats_router)
 app.include_router(admin_users_router)
+app.include_router(admin_job_categories_router)
+app.include_router(admin_industrial_parks_router)
+app.include_router(admin_provinces_router)
 
 
 @app.get("/api/health")
