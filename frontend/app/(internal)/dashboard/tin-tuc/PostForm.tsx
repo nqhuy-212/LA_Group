@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { browserFetch } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
+import { revalidatePostPaths } from "../actions";
 
 type PostAdminOutDTO = components["schemas"]["PostAdminOut"];
 
@@ -41,6 +42,9 @@ export function PostForm({ initialPost }: { initialPost?: PostAdminOutDTO }) {
     setError(null);
     setPending(true);
 
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const viewAfterSave = submitter?.value === "view";
+
     const form = new FormData(event.currentTarget);
     const payload = {
       title: String(form.get("title") ?? "").trim(),
@@ -54,12 +58,12 @@ export function PostForm({ initialPost }: { initialPost?: PostAdminOutDTO }) {
     };
 
     const res = isEdit
-      ? await browserFetch(`/api/admin/posts/${initialPost!.id}`, {
+      ? await browserFetch<PostAdminOutDTO>(`/api/admin/posts/${initialPost!.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         })
-      : await browserFetch("/api/admin/posts", {
+      : await browserFetch<PostAdminOutDTO>("/api/admin/posts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -70,9 +74,10 @@ export function PostForm({ initialPost }: { initialPost?: PostAdminOutDTO }) {
       setError(res.error);
       return;
     }
+    await revalidatePostPaths(res.data.slug);
     // Full page load thay vì router.push + router.refresh — xem ghi chú tương tự
     // ở JobForm.tsx/CLAUDE.md.
-    window.location.href = "/dashboard/tin-tuc";
+    window.location.href = viewAfterSave ? `/tin-tuc/${res.data.slug}` : "/dashboard/tin-tuc";
   }
 
   return (
@@ -176,9 +181,14 @@ export function PostForm({ initialPost }: { initialPost?: PostAdminOutDTO }) {
 
       {error ? <p className="text-sm font-semibold text-accent-dark">{error}</p> : null}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Đang lưu..." : isEdit ? "Lưu thay đổi" : "Đăng bài"}
-      </Button>
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Đang lưu..." : isEdit ? "Lưu thay đổi" : "Đăng bài"}
+        </Button>
+        <Button type="submit" value="view" variant="ghost" disabled={pending}>
+          Lưu &amp; xem trên web
+        </Button>
+      </div>
     </form>
   );
 }

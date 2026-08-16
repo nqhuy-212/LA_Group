@@ -1,7 +1,7 @@
 # Kế hoạch triển khai — LA Group Job Portal
 
-> **Trạng thái**: P0–P9 xong về mã nguồn — không còn phase code nào. Đang ở giai đoạn **triển khai production**, xem §Triển khai production bên dưới.
-> **Repo đã sẵn sàng deploy** — 22 vấn đề của artifact P9 đã sửa xong (GĐ A + B). Việc tiếp theo là commit + push để CI đẩy image lên GHCR.
+> **Trạng thái**: P0–P9 xong, site đã chạy thật trên tên miền khách hàng (trạng thái hạ tầng: [`VPS_tracking.md`](../VPS_tracking.md)). P10.1 xong.
+> **Việc phải làm tiếp: [§P10.2](#p10--quản-lý-danh-mục--nút-xem-kết-quả-trên-web-chưa-làm)** — CRUD danh mục (be+fe).
 > Việc phải làm trên VPS: [`VPS.md`](../VPS.md) — viết cho một phiên Claude chạy trực tiếp trên VPS qua Remote SSH.
 > File này là **nguồn sự thật duy nhất cho việc phải làm tiếp**. Trạng thái hiện tại + bẫy kỹ thuật đã gặp nằm ở [CLAUDE.md](../CLAUDE.md); quy tắc thường trực nằm ở `.claude/rules/*`.
 
@@ -63,10 +63,50 @@ P0 ─> P1 ─> P2 ─┬─> P3 ─> P4 ─┬─> P6 ─> P7 ─> P9
 | 12 | Dashboard tổng quan + biểu đồ | P7-fe | frontend | 1 ngày | 11 | ✅ |
 | 13 | Chatbot RAG | P8 | backend | 2 ngày | 4 | ✅ (đổi sang OpenAI API, đã verify hành vi LLM thật bằng `OPENAI_API_KEY`) |
 | 14 | Deploy VPS | P9 | devops | 1–2 ngày | tất cả | ✅ (artifact + verify local xong; DoD cần VPS/domain/SSH thật — xem Việc còn nợ) |
+| 15 | Nút xem kết quả trên web | P10.1 | frontend | 0.5 ngày | — | ✅ |
+| 16 | CRUD danh mục trong Admin | P10.2 | be+fe | 1.5 ngày | — | ⬜ ⬅ tiếp theo |
 
 **Khi tách be/fe trong cùng phase**: phiên backend kết thúc bằng pytest xanh + gọi thử qua `/docs`; **DoD của phase chỉ tích khi phiên frontend xong** (DoD viết theo trải nghiệm người dùng cuối). Đừng tích sớm.
 
 **Mốc go-live**: sau P5 đã mở được site công khai read-only; P6 đã mở nhận hồ sơ online. Còn thiếu P9 (domain + HTTPS thật).
+
+---
+
+## P10 — Quản lý danh mục + nút xem kết quả trên web (chưa làm)
+
+Yêu cầu phát sinh sau khi site chạy thật, không nằm trong roadmap gốc. **P10.1 và P10.2 độc lập hoàn toàn** — nhận riêng từng phiên, không chặn nhau.
+
+**Quyết định đã chốt với người dùng (2026-08-16) — không tự đổi:**
+- Danh mục quản lý ở **cả hai nơi**: thêm/xoá nhanh ngay cạnh dropdown trong form đăng tin *và* trang `/dashboard/danh-muc` 4 tab để sửa tên/logo/ẩn-hiện.
+- **Xoá thật khi chưa có bản ghi tham chiếu; 409 kèm số lượng + gợi ý "ẩn" khi đã có.** Không cascade — xoá lan sang `jobs` là mất tin đã có backlink/index Google.
+- RBAC: thêm/sửa = `admin`+`manager`, xoá = `admin` (khớp `admin/companies.py` sẵn có). Nút `+`/xoá ẩn với `staff`; backend vẫn là hàng rào thật.
+
+**Ràng buộc phát hiện khi đọc code — bỏ qua là hỏng tính năng:**
+- Trang chi tiết công khai cache ISR 300s (`(public)/viec-lam/[slug]/page.tsx`, và `serverFetch` mặc định `revalidate: 300`) → nút "xem kết quả" hiện **bản cũ tới 5 phút** nếu không `revalidatePath` sau khi lưu.
+- `job_categories.slug` chỉ `String(30)` → `generate_unique_slug` phải thêm tham số `max_length`, nếu không sẽ ném `IntegrityError` khó hiểu lúc ghi.
+- `provinces` PK là `code` (mã GSO do người dùng nhập), **không có cột slug** → không dùng `generate_unique_slug` cho tỉnh.
+- `companies`/`industrial_parks` **không có `is_active`** → chỉ "ẩn" được ngành nghề/tỉnh. Không thêm migration ở phase này.
+
+### DoD — P10.1 Nút xem kết quả trên web (frontend thuần) ✅
+
+- [x] Topbar `InternalShell` có link "Xem trang web ↗" mở tab mới (`rel="noopener"`), không mất phiên dashboard
+- [x] Mỗi dòng việc làm/tin tức có nút "Xem trên web" — ẩn khi `job.status === "draft"` / `post.status !== "published"` (API công khai 404 đúng các trạng thái đó), thay bằng chữ mờ "Chưa công khai"
+- [x] `JobForm`/`PostForm` có nút phụ "Lưu & xem trên web" (lấy `slug` từ response; giữ `window.location.href`, **không** `router.push` — bẫy đã trả giá ở P5)
+- [x] Server Action `revalidatePath` cho `/viec-lam/[slug]`, `/viec-lam`, `/tin-tuc/[slug]`, `/tin-tuc`, `/` gọi sau khi lưu — sửa xong bấm xem thấy ngay nội dung mới (đây là DoD thật của cả phase, không phải chi tiết phụ)
+
+### DoD — P10.2 CRUD danh mục (công ty / ngành nghề / KCN / tỉnh)
+
+- [ ] `api/v1/admin/taxonomies.py`: 3 router `/api/admin/{job-categories,industrial-parks,provinces}` đủ GET/POST/PATCH/DELETE + audit log + `require_roles`, theo đúng khuôn `admin/companies.py` (Company đã có sẵn CRUD, chỉ thiếu UI)
+- [ ] DELETE đếm bản ghi tham chiếu **trước** (`jobs.category_id`/`industrial_park_id`/`province_code`, `industrial_parks.province_code`, `applications.province_code`) → 409 tiếng Việt kèm số lượng cụ thể; giữ `except IntegrityError` làm lưới an toàn cuối
+- [ ] Slug danh mục **bất biến sau khi tạo** (không regenerate theo `name` — `jobs` đã publish đang tham chiếu)
+- [ ] `GET /api/provinces` công khai (dropdown cần; sau này dùng lại cho bộ lọc tỉnh ở `SearchBar`)
+- [ ] `tests/test_admin_taxonomies.py`: RBAC 3 role × 3 danh mục, 409 khi có tham chiếu, xoá được khi không tham chiếu, slug dài bị cắt đúng, `is_active=false` biến mất khỏi API công khai
+- [ ] `npm run gen:api` + commit lại `lib/api/schema.d.ts`
+- [ ] `components/internal/TaxonomySelect.tsx` — select + nút `+`/xoá, form thêm mới trong Dialog Radix (D12); thêm xong tự chọn giá trị mới, **không mất dữ liệu đang nhập dở** trong form đăng tin
+- [ ] `JobForm` dùng `TaxonomySelect` cho cả 4 chiều; **xoá hằng số `PROVINCE_CODE`/`PROVINCE_NAME`** và ô input `disabled`, `province_code` lấy từ giá trị chọn thật
+- [ ] 2 fetch danh mục trong `dashboard/viec-lam/{moi,[id]}/page.tsx` đổi `revalidate: 3600` → `false` (quên thì danh mục vừa thêm biến mất tới 1 tiếng khi tải lại trang)
+- [ ] `/dashboard/danh-muc` 4 tab + mục mới trong `NAV_ITEMS` (ẩn với `staff`), mỗi dòng hiện số tin đang tham chiếu
+- [ ] Responsive 375px cho trang mới + Dialog (tiêu chí khu vực nội bộ; **không** đối chiếu `vieclamhaiphong.net_.png` — xem `design-system.md` §Phạm vi áp dụng)
 
 ---
 
@@ -88,12 +128,13 @@ Chi tiết triển khai xem git log; các quyết định và bẫy rút ra đã
 | **P9** | `backend/Dockerfile`, `frontend/Dockerfile` (multi-stage standalone), `docker-compose.prod.yml`, `scripts/{backup,restore}.sh`, `.env.prod.example`; migration `d1def644e25b` sửa bug `immutable_unaccent` (phát hiện qua test restore thật — xem CLAUDE.md § Bẫy đã gặp) |
 | **GĐ A+B** | Vá 22 vấn đề của artifact P9: `nginx/{lahr,bootstrap}.conf.template` (thay `nginx/lahr.conf`) + `scripts/dc.sh`; `SITE_URL` runtime thay `NEXT_PUBLIC_SITE_URL`; `mem_limit`/log rotation/pin tag/`INTERNAL_API_URL` trong compose; backup thêm volume `uploads`; job CI `images` push GHCR |
 | **Mở rộng (sau P9)** | Tiêu chí việc làm `employment_type`/`salary_period` enum hoá (migration `6875eab5dcc5`) + `Application.notes`; `chat_service.py` mở rộng tool `search_jobs`; `core/antispam.py` (trích từ `applications.py`) + `api/v1/public/leads.py` (`POST /api/leads`, lead chatbot); `public/jobs.py` filter công khai `employment_type`/`salary_period`; `JobListItem` schema thêm 2 field (hiện ở cả list lẫn detail). FE: `JobForm.tsx` dropdown; `SearchBar.tsx` 6 chiều lọc; `JobCard.tsx` badge loại hình/kỳ lương; `components/chatbot/{ChatQuiz,LeadForm}.tsx` (quiz 4 câu + nút quay lại kể cả sau "gọi trực tiếp", tự động hiện khi mở chat, sau câu 3 gọi thẳng `GET /api/jobs` hiện danh sách việc thật — không qua LLM). Sửa bug `seed_dev.py` ghi free-text cũ vào cột enum + 2 test flaky do lệch timezone local/UTC. 14 test mới (125/125 backend pass) |
+| **P10.1** | `dashboard/actions.ts` (Server Action `revalidateJobPaths`/`revalidatePostPaths`); `InternalShell.tsx` link "Xem trang web ↗"; `JobRowActions`/`PostRowActions` nút "Xem trên web" theo `status` (ẩn khi chưa công khai); `JobForm`/`PostForm` nút phụ "Lưu & xem trên web" (phân biệt qua `submitter.value`, giữ `window.location.href`). Verify bằng Playwright + backend/DB cô lập tạm (không đụng DB production) |
 
 ---
 
 ## Primitive có sẵn — tái dùng, đừng viết lại
 
-Không còn phase nào tiếp theo trong roadmap gốc — kiểm mục này trước khi thêm bất kỳ tính năng mới nào (Employee/Contract/Timesheet... xem § Entity giai đoạn sau).
+Kiểm mục này trước khi làm P10 hoặc thêm bất kỳ tính năng mới nào (Employee/Contract/Timesheet... xem § Entity giai đoạn sau).
 
 **Backend**
 - `app/api/deps.py` — `get_current_user`, `require_roles(...)` → dùng cho mọi endpoint admin mới
@@ -131,31 +172,9 @@ Không còn phase nào tiếp theo trong roadmap gốc — kiểm mục này tr�
 
 ---
 
-## Triển khai production — kế hoạch 2 giai đoạn domain
+## Triển khai production
 
-Mã nguồn xong, artifact deploy xong, restore đã verify thật. Còn lại là hạ tầng.
-
-**Chiến lược**: chạy demo trên domain riêng của dev (`rg-nqhuy.io.vn`) trước, chốt với khách rồi mới chuyển sang tên miền khách hàng (đã mua ở tino.vn, chưa dùng). Cả hai domain đều **chưa từng có website** → không có rủi ro cutover, không cần hạ TTL/pre-issue cert/`--resolve` như phương án cho `lahr.vn` trước đây.
-
-| Bước | Việc | Ai làm | Tài liệu | Trạng thái |
-|---|---|---|---|---|
-| 0 | **GĐ A + B** — sửa 22 vấn đề của artifact P9, tham số hoá `DOMAIN`, thêm job CI push GHCR | Claude, phiên repo | [`DEPLOY.md`](DEPLOY.md) §Phần 2 | ✅ |
-| 1 | Commit + push `main`, đợi CI xanh và image lên GHCR | người dùng | — | ✅ CI #14 xanh cả 3 job; image `ghcr.io/nqhuy-212/lahr-{backend,frontend}:latest` đã public |
-| 2 | Thuê VPS Ubuntu, kết nối Remote SSH từ IDE | người dùng | — | ⬅ tiếp theo |
-| 3 | `git clone https://github.com/nqhuy-212/LA_Group.git` | người dùng | — | ⬜ |
-| 4 | Phiên Claude **mới trên VPS** tự động triển khai | Claude, phiên VPS | [`../VPS.md`](../VPS.md) §1–§9 | ⬜ |
-| 5 | Site demo chạy thật ở `https://rg-nqhuy.io.vn` | — | `VPS.md` §9 Nghiệm thu | ⬜ |
-| 6 | Sau khi demo xong → chuyển sang tên miền khách hàng | Claude, phiên VPS | `VPS.md` §10 | ⬜ |
-
-**CI đã bù xong phần không verify được cục bộ** (máy dev không bật Docker): `pytest`/`alembic check` cho ~70 file P7/P8 chưa từng qua CI, và `docker build` thật cho cả 2 image. Việc thêm job `images` lộ ra ngay 1 lỗi có sẵn trong repo — xem `CLAUDE.md` §Bẫy, mục `requirements.txt`.
-
-**Còn lại chưa chạy ở đâu**: `docker compose up` thật (chỉ verify được `config` + render nginx template bằng `envsubst` cục bộ) — sẽ biết ở bước 4.
-
-**Quyết định mới phát sinh** (khác `DEPLOY.md` vốn viết cho `lahr.vn`):
-- **Tham số hoá `DOMAIN`** qua cơ chế template của image nginx (`nginx/*.conf.template` + `NGINX_ENVSUBST_FILTER`), vì domain còn đổi ít nhất 1 lần nữa (demo → khách hàng).
-- **`NEXT_PUBLIC_SITE_URL` → `SITE_URL` (biến runtime)** — cả 4 chỗ dùng đều là Server Component nên không cần tiền tố `NEXT_PUBLIC_`. Nhờ vậy đổi domain chỉ cần sửa `.env.prod` + restart thay vì build lại image.
-- **`frontend` và `n8n` không nạp `.env.prod`** — chỉ `postgres`/`backend` cần secret. Nạp cả file sẽ đẩy mật khẩu DB + `OPENAI_API_KEY` vào những container không bao giờ dùng tới.
-- **Bỏ toàn bộ GĐ E/F cutover** trong `DEPLOY.md` (hạ TTL, pre-issue cert DNS-01, `curl --resolve`) — chỉ cần khi domain đích đang có website chạy; `rg-nqhuy.io.vn` và domain khách đều trống.
+✅ Xong cả 2 giai đoạn domain (demo `rg-nqhuy.io.vn` → tên miền khách hàng `vieclam-lagroup.vn`). **Trạng thái thật + việc còn nợ trên VPS: [`VPS_tracking.md`](../VPS_tracking.md)** — đừng chép lại sang đây. Quy trình từng bước: [`VPS.md`](../VPS.md). Quyết định hạ tầng phát sinh đã nằm ở [`DECISIONS.md`](DECISIONS.md) §Triển khai.
 
 ---
 

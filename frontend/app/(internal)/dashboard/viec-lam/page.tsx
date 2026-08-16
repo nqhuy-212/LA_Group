@@ -86,7 +86,12 @@ export default async function AdminJobListPage({
                 </p>
               </div>
 
-              <JobRowActions jobId={job.id} canDelete={canDelete} />
+              <JobRowActions
+                jobId={job.id}
+                jobSlug={job.slug}
+                jobStatus={job.status}
+                canDelete={canDelete}
+              />
             </div>
           ))}
         </div>

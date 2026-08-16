@@ -86,7 +86,12 @@ export default async function AdminPostListPage({
                 </p>
               </div>
 
-              <PostRowActions postId={post.id} canDelete={canDelete} />
+              <PostRowActions
+                postId={post.id}
+                postSlug={post.slug}
+                postStatus={post.status}
+                canDelete={canDelete}
+              />
             </div>
           ))}
         </div>

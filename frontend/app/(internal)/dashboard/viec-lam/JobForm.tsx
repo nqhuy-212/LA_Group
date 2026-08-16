@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { browserFetch } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
+import { revalidateJobPaths } from "../actions";
 
 type JobAdminOutDTO = components["schemas"]["JobAdminOut"];
 type Taxonomy = { slug: string; name: string };
@@ -67,6 +68,9 @@ export function JobForm({
     setError(null);
     setPending(true);
 
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const viewAfterSave = submitter?.value === "view";
+
     const form = new FormData(event.currentTarget);
     const payload = {
       title: String(form.get("title") ?? "").trim(),
@@ -94,12 +98,12 @@ export function JobForm({
     };
 
     const res = isEdit
-      ? await browserFetch(`/api/admin/jobs/${initialJob!.id}`, {
+      ? await browserFetch<JobAdminOutDTO>(`/api/admin/jobs/${initialJob!.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         })
-      : await browserFetch("/api/admin/jobs", {
+      : await browserFetch<JobAdminOutDTO>("/api/admin/jobs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -110,10 +114,15 @@ export function JobForm({
       setError(res.error);
       return;
     }
+    // Trang chi tiết công khai cache ISR 300s — không revalidate thì "xem kết
+    // quả" hiện bản cũ tới 5 phút.
+    await revalidateJobPaths(res.data.slug);
     // Full page load thay vì router.push + router.refresh — pattern đó không thực
     // sự điều hướng được sau khi vừa ghi xong dữ liệu (đã xác nhận qua test thật,
     // xem CLAUDE.md). window.location luôn lấy dữ liệu mới nhất từ server.
-    window.location.href = "/dashboard/viec-lam";
+    window.location.href = viewAfterSave
+      ? `/viec-lam/${res.data.slug}`
+      : "/dashboard/viec-lam";
   }
 
   return (
@@ -393,9 +402,14 @@ export function JobForm({
 
       {error ? <p className="text-sm font-semibold text-accent-dark">{error}</p> : null}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Đang lưu..." : isEdit ? "Lưu thay đổi" : "Đăng tin"}
-      </Button>
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? "Đang lưu..." : isEdit ? "Lưu thay đổi" : "Đăng tin"}
+        </Button>
+        <Button type="submit" value="view" variant="ghost" disabled={pending}>
+          Lưu &amp; xem trên web
+        </Button>
+      </div>
     </form>
   );
 }

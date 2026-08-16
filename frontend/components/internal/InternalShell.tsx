@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import {
   IconBriefcase,
   IconClose,
+  IconExternalLink,
   IconFileText,
   IconLayoutDashboard,
   IconLogout,
@@ -119,11 +120,25 @@ export function InternalShell({
             <IconMenu className="h-5 w-5" />
           </button>
 
-          <div className="hidden md:block" />
+          {/* Hiện ở mọi kích thước — quản lý xem dashboard bằng điện thoại vẫn
+              phải mở được site công khai (feature-admin-dashboard.md). Dưới
+              640px thu về icon để không chen chỗ khối email + Đăng xuất. */}
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Xem trang web (mở tab mới)"
+            className="flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-border px-3 text-sm font-semibold text-text-muted hover:bg-bg"
+          >
+            <IconExternalLink className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline">Xem trang web</span>
+          </a>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right leading-tight">
-              <p className="text-sm font-semibold text-text">{user.email}</p>
+          <div className="flex min-w-0 items-center gap-3">
+            {/* min-w-0 + truncate: email dài (VD tuyendung.hd@lahr.vn) cộng thêm
+                nút "Xem trang web" đủ để đẩy header tràn ngang ở 375px. */}
+            <div className="min-w-0 text-right leading-tight">
+              <p className="truncate text-sm font-semibold text-text">{user.email}</p>
               <p className="text-xs text-text-muted">
                 {ROLE_LABEL[user.role] ?? user.role}
               </p>
