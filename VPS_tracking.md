@@ -26,7 +26,8 @@ Cả 3 fix + bug healthcheck đã **verify sống trên production** bằng Pupp
 | Nhà cung cấp | Tino, gói "N8N Basic" (4GB RAM / 30GB NVMe) |
 | Hostname | `rg-nqhuy` |
 | IP public | `103.142.26.63` |
-| Domain hiện tại (demo) | `rg-nqhuy.io.vn` — DNS A record đã trỏ đúng VPS |
+| Domain hiện tại (khách hàng, chính thức) | `vieclam-lagroup.vn` — DNS A record đã trỏ đúng VPS, DNSSEC bật (DNSKEY + RRSIG xác nhận qua `dig`) |
+| Domain demo cũ | `rg-nqhuy.io.vn` — **đã ngưng phục vụ** (không còn trong `server_name` của nginx, gọi HTTPS vào domain này sẽ lỗi TLS handshake "unrecognized name" — đây là hành vi đúng, không phải lỗi) |
 | Đường dẫn repo trên VPS | `/root/LA_Group` (⚠️ khác `/opt/lahr` mà `VPS.md` giả định — không sao vì `scripts/dc.sh` dùng path tương đối, nhưng nhớ điều này nếu viết script/cron mới) |
 | SSH | Port `22` (fallback) **và** `2222` (mới) đều đang mở |
 | OS | Ubuntu, kernel `6.8.0-137-generic` |
@@ -56,6 +57,18 @@ Cả 3 fix + bug healthcheck đã **verify sống trên production** bằng Pupp
 
 ---
 
+## 2b. Đã hoàn thành (Phase 2 — chuyển sang domain khách hàng, 2026-08-16)
+
+Theo đúng quy trình `VPS.md` §10 (không cần cutover phức tạp vì domain khách hàng chưa từng có site cũ):
+
+- [x] Verify DNS A record (`@`/`www`) đã trỏ `vieclam-lagroup.vn` → `103.142.26.63`, **DNSSEC bật** (xác nhận qua `dig DNSKEY`/`+dnssec` thấy RRSIG hợp lệ).
+- [x] Quay `NGINX_CONF` về `bootstrap.conf.template` tạm thời → xin cert Let's Encrypt mới cho `vieclam-lagroup.vn` + `www` (hết hạn **2026-11-14**) → đổi `DOMAIN`/`NGINX_CONF`/`CORS_ORIGINS`/`PUBLIC_SITE_URL`/`SITE_URL` trong `.env.prod` → `up -d --force-recreate nginx backend frontend`.
+- [x] Verify: HTTPS 200 + HSTS, HTTP→HTTPS 301, `/api/health` OK, JSON-LD `Organization` đã tự đọc đúng domain mới (không cần sửa code — đọc `SITE_URL` runtime).
+- [x] **Domain demo `rg-nqhuy.io.vn` cố ý KHÔNG giữ song song** (khác gợi ý ở `VPS.md` §10) — `server_name` trong `lahr.conf.template` chỉ có 1 `${DOMAIN}`, giờ trỏ domain mới; gọi HTTPS vào domain cũ sẽ lỗi TLS "unrecognized name" (đúng thiết kế, không phải bug).
+- [x] **Phát hiện + fix 1 bug thật khi chuyển domain**: `app/robots.ts` cache vĩnh viễn, không tự cập nhật `Sitemap: ...` sang domain mới như `sitemap.ts` vẫn làm được — xem chi tiết ở `docs/PITFALLS.md` (mục cuối). Đã thêm `export const revalidate = 3600;`, verify bằng `tsc --noEmit`, commit + đợi CI build lại + redeploy frontend.
+
+---
+
 ## 3. Việc còn nợ (chưa làm / chưa verify được)
 
 ### Bảo mật SSH — ưu tiên cao, cần người dùng
@@ -73,14 +86,18 @@ Cả 3 fix + bug healthcheck đã **verify sống trên production** bằng Pupp
 - Việc tiếp theo: khi người dùng có tài khoản lưu trữ ngoài, chạy `rclone config` → `env -i PATH=$PATH ./scripts/backup.sh` để test → cài cron theo `VPS.md` §8.
 
 ### Nghiệm thu chưa verify được (§9 VPS.md)
-- [ ] SSL Labs (`ssllabs.com/ssltest`) ≥ A — cần chạy từ máy ngoài.
+- [ ] SSL Labs (`ssllabs.com/ssltest`) ≥ A cho `vieclam-lagroup.vn` — cần chạy từ máy ngoài.
 - [ ] `nmap -Pn 103.142.26.63` từ máy ngoài chỉ thấy đúng 80/443/2222 (**hiện tại còn thêm port 22** vì lý do ở trên — kỳ vọng sẽ còn 4 port cho tới khi đóng 22).
-- [ ] `sitemap.xml` chứa domain thật — mới deploy được ~1 vài phút tại thời điểm ghi file này, cần đợi đủ khung `revalidate: 3600` rồi kiểm lại (`curl -sS https://rg-nqhuy.io.vn/sitemap.xml | grep rg-nqhuy`).
-- [ ] Nộp thử 1 hồ sơ ứng tuyển thật kèm CV qua UI → tải CV về từ Dashboard → purge hồ sơ test (chưa làm, nên làm trước khi coi Phase 1 là "xong hẳn" để chắc luồng upload thật hoạt động sau proxy Nginx thật, không chỉ qua `next dev`).
+- [ ] `robots.txt`/`sitemap.xml` đã có fix `revalidate` (§2b) nhưng **cache cũ trên domain mới cần ≤1h để tự làm mới lần đầu** — kiểm lại sau: `curl -sS https://vieclam-lagroup.vn/robots.txt` phải thấy `Sitemap: https://vieclam-lagroup.vn/sitemap.xml` (không phải `rg-nqhuy.io.vn`).
+- [ ] Nộp thử 1 hồ sơ ứng tuyển thật kèm CV qua UI → tải CV về từ Dashboard → purge hồ sơ test (chưa làm, nên làm trước khi coi hạ tầng là "xong hẳn" để chắc luồng upload thật hoạt động sau proxy Nginx thật, không chỉ qua `next dev`).
 - [ ] Test nộp hồ sơ + chatbot **qua trình duyệt thật** (mới verify qua `curl`/API, chưa test UI thật trên domain HTTPS thật).
 
-### SEO — cố ý chưa làm (theo `seo.md`)
-- Google Rich Results Test / Facebook Sharing Debugger / Google Search Console: **đợi sang domain khách hàng chính thức** (`VPS.md` §9 ghi rõ "đừng submit domain demo cho Google").
+### SEO — giờ đã sang domain khách hàng chính thức, có thể bắt đầu (theo `seo.md`)
+- [ ] Đợi `robots.txt`/`sitemap.xml` tự làm mới xong (mục trên) rồi mới submit — nộp domain với sitemap còn trỏ nhầm domain cũ sẽ gây nhầm lẫn cho Google.
+- [ ] Google Search Console: thêm property `vieclam-lagroup.vn`, submit sitemap.
+- [ ] Google Rich Results Test cho `JobPosting` trên 1 tin thật.
+- [ ] Facebook Sharing Debugger cho trang chủ + 1 tin tuyển dụng.
+- [ ] Lighthouse mobile: Performance ≥85, SEO ≥95.
 
 ---
 
@@ -105,8 +122,8 @@ Cả 3 fix + bug healthcheck đã **verify sống trên production** bằng Pupp
 
 ## 5. Kế hoạch tiếp theo (theo thứ tự ưu tiên)
 
-1. **Người dùng thêm SSH public key** → agent/người dùng đóng port 22 + tắt password auth (§3 ở trên).
+1. **Người dùng thêm SSH public key** → đóng port 22 + tắt password auth (§3 ở trên).
 2. Test luồng ứng tuyển thật qua trình duyệt (nộp CV, tải về từ Dashboard, purge) trên domain HTTPS thật — chưa test qua UI, chỉ mới test qua API.
-3. Khi người dùng có tài khoản Backblaze B2/Google Drive: cấu hình `rclone`, test `backup.sh` + `restore.sh` vào DB trống, cài cron nightly (§8 VPS.md).
-4. Chạy `nmap` từ máy ngoài + SSL Labs test để hoàn thất §9 VPS.md.
-5. **Phase 2** (theo yêu cầu gốc của người dùng): chuyển sang tên miền khách hàng — làm theo `VPS.md` §10 khi khách cung cấp domain thật. Sau đó mới chạy Google Rich Results Test / Facebook Debugger / submit Search Console (seo.md — không submit domain demo).
+3. Kiểm lại `robots.txt`/`sitemap.xml` sau ≤1h rồi mới submit Google Search Console / Rich Results Test / Facebook Debugger (§3 SEO ở trên).
+4. Khi người dùng có tài khoản Backblaze B2/Google Drive: cấu hình `rclone`, test `backup.sh` + `restore.sh` vào DB trống, cài cron nightly (§8 VPS.md).
+5. Chạy `nmap` từ máy ngoài + SSL Labs test để hoàn tất §9 VPS.md.

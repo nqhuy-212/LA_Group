@@ -47,9 +47,9 @@ Làm trong **cùng commit** với code của phase, đúng theo bảng phân vai
 
 ---
 
-## Trạng thái dự án (2026-08-09, đã lên VPS thật — Phase 1 xong)
+## Trạng thái dự án (2026-08-16, đã chuyển sang tên miền khách hàng — Phase 2 xong)
 
-**P0–P9 xong về mã nguồn; đã deploy thành công lên VPS thật tại `https://rg-nqhuy.io.vn`** (SSL Let's Encrypt hợp lệ, HSTS+gzip bật, admin đăng nhập được, dữ liệu seed thật hiển thị). Chi tiết tiến độ + việc còn nợ trên VPS: [`VPS_tracking.md`](VPS_tracking.md). Việc tiếp theo: Phase 2 — chuyển sang tên miền khách hàng (`VPS.md` §10).
+**P0–P9 xong về mã nguồn; đang chạy thật tại `https://vieclam-lagroup.vn`** (SSL Let's Encrypt riêng cho domain khách hàng, DNSSEC bật, HSTS+gzip bật, admin đăng nhập được, dữ liệu seed thật hiển thị). Domain demo `rg-nqhuy.io.vn` đã ngưng phục vụ (không còn trong `server_name`). Chi tiết tiến độ + việc còn nợ trên VPS: [`VPS_tracking.md`](VPS_tracking.md).
 
 **Deploy thật đã verify**: SSL/HTTPS, HSTS, gzip, `/api/docs` 404 ở prod, resiliency (`force-recreate backend` không gây 502 vĩnh viễn), `certbot renew --dry-run`, `docker stats` ~260MB (dưới xa mục tiêu 2GB), disk 28%. **Chưa verify**: nmap từ máy ngoài, SSL Labs rating, backup nightly + rclone offsite (khách chưa có tài khoản B2/Drive — xem `VPS_tracking.md` §việc còn nợ), Google Rich Results/Facebook Debugger (đợi sang domain khách hàng theo quy ước ở `seo.md`). Chatbot dùng OpenAI API và **đã verify hành vi LLM thật** (tool `search_jobs` trả đúng tin có trong DB kèm link, không bịa, từ chối lịch sự câu ngoài phạm vi).
 
